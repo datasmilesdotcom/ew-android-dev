@@ -1,0 +1,204 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context="app.mobile.examwarrior.demo.QuestionPagerActivity$PlaceholderFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/section_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:visibility="gone"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/constraintLayout"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintTop_creator="1" />
+
+        <RelativeLayout
+            android:layout_marginBottom="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <de.timfreiheit.mathjax.android.MathJaxView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/laTexView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:minHeight="100dp"
+                app:automaticLinebreaks="true"
+                app:blacker="1"
+                android:layout_above="@+id/ops"
+                app:horizontalScrollbarsEnabled="false"
+                app:input="TeX"
+                app:minScaleAdjust="3"
+                app:output="CommonHTML" />
+
+            <app.mobile.examwarrior.widget.checkable.PresetRadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ops"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical">
+
+                <app.mobile.examwarrior.widget.checkable.PresetValueButton
+                    style="@style/PresetLayoutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:gravity="center"
+                    app:presetButtonValueText="20" />
+
+                <app.mobile.examwarrior.widget.checkable.PresetValueButton
+                    style="@style/PresetLayoutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:gravity="center"
+                    app:presetButtonValueText="20" />
+                <app.mobile.examwarrior.widget.checkable.PresetValueButton
+                    style="@style/PresetLayoutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:gravity="center"
+                    app:presetButtonValueText="20" />
+                <app.mobile.examwarrior.widget.checkable.PresetValueButton
+                    style="@style/PresetLayoutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:gravity="center"
+                    app:presetButtonValueText="20" />
+
+            </app.mobile.examwarrior.widget.checkable.PresetRadioGroup>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <app.mobile.examwarrior.widget.CheckableLinearLayout
+                android:id="@+id/checkbox"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/checked_selector"
+                android:clickable="true"
+                android:focusable="false" />
+
+
+            <app.mobile.examwarrior.widget.CheckableLinearLayout
+                android:id="@+id/checkbox1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/checked_selector"
+                android:clickable="true"
+                android:focusable="false"
+                android:gravity="center_vertical"
+                android:padding="10dp">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@color/primary_light" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="some text" />
+            </app.mobile.examwarrior.widget.CheckableLinearLayout>
+
+            <app.mobile.examwarrior.widget.CheckableLinearLayout
+                android:id="@+id/checkbox2"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/checked_selector"
+                android:clickable="true"
+                android:focusable="false" />
+
+            <app.mobile.examwarrior.widget.CheckableLinearLayout
+                android:id="@+id/checkbox3"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/checked_selector"
+                android:clickable="true"
+                android:focusable="false" />
+
+            <app.mobile.examwarrior.widget.CheckableLinearLayout
+                android:id="@+id/checkbox4"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/checked_selector"
+                android:clickable="true"
+                android:focusable="false" />
+        </LinearLayout>
+
+
+        <app.mobile.examwarrior.widget.checkable.PresetRadioGroup
+            android:id="@+id/preset_time_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="3dp"
+            android:layout_marginBottom="13dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="3">
+
+            <app.mobile.examwarrior.widget.checkable.PresetValueButton
+                android:id="@+id/preset_time_value_button_30"
+                style="@style/PresetLayoutButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:presetButtonUnitText="60"
+
+                app:presetButtonValueText="20" />
+
+            <app.mobile.examwarrior.widget.checkable.PresetValueButton
+                android:id="@+id/preset_time_value_button_60"
+                style="@style/PresetLayoutButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:presetButtonUnitText="2"
+                app:presetButtonValueText="20" />
+
+            <app.mobile.examwarrior.widget.checkable.PresetValueButton
+                android:id="@+id/preset_time_value_button_120"
+                style="@style/PresetLayoutButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:presetButtonUnitText="sjkdh"
+                app:presetButtonValueText="120" />
+
+        </app.mobile.examwarrior.widget.checkable.PresetRadioGroup>
+
+    </LinearLayout>
+
+
+</ScrollView>

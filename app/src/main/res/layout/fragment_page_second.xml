@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <app.mobile.examwarrior.widget.AspectRatioImageView
+        android:id="@+id/image_two"
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        app:aspectRatio="1.1"
+        app:aspectRatioEnabled="true"
+        app:dominantMeasurement="width"
+        app:srcCompat="@drawable/banner_two" />
+
+    <app.mobile.examwarrior.widget.CustomFontTextView
+        android:id="@+id/text_two"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="we provide what you need."
+        android:textColor="#fff"
+        android:padding="10dp"
+        android:layout_marginTop="@dimen/intro_text_margin"
+        android:textSize="@dimen/intro_text_size"
+        android:textStyle="bold"
+        app:textAllCaps="true"
+
+        app:tv_customFont="@string/font_GothamRndBold" />
+</LinearLayout>

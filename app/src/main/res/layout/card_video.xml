@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
+
+    <FrameLayout
+        android:id="@+id/videoContainer"
+        android:layout_marginTop="10dp"
+        android:layout_width="180dp"
+        android:background="#123456"
+        android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:layout_height="120dp">
+        <TextView
+            android:id="@+id/webVideoView"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_gravity="right|bottom"
+            android:textStyle="bold"
+            android:text="1:26:20"
+            android:textColor="#FFFFFF"
+            android:background="#000000"
+            android:textSize="15dp"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/videoContainer"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_above="@+id/channelname"
+            android:layout_width="wrap_content"
+            android:gravity="left|top"
+            android:text="Best Action Movie "
+            android:textColor="#000000"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/channelname"
+            android:layout_above="@+id/viewer"
+            android:layout_width="wrap_content"
+            android:gravity="left|center_vertical"
+            android:textSize="12dp"
+            android:text="channel name"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/viewer"
+            android:layout_width="wrap_content"
+            android:gravity="left|center_vertical"
+            android:layout_alignParentBottom="true"
+            android:text="31 M views"
+            android:textSize="12dp"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+</RelativeLayout>

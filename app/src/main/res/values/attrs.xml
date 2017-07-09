@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="AspectRatioImageView">
+        <attr name="aspectRatio" format="float" />
+        <attr name="aspectRatioEnabled" format="boolean" />
+        <attr name="dominantMeasurement">
+            <enum name="width" value="0" />
+            <enum name="height" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="TextViewExpandableAnimation">
+        <attr name="tvea_expandLines" format="integer" />
+        <attr name="tvea_shrinkBitmap" format="reference" />
+        <attr name="tvea_expandBitmap" format="reference" />
+        <attr name="tvea_textStateColor" format="color" />
+        <attr name="tvea_textContentColor" format="color" />
+        <attr name="tvea_textContentSize" format="dimension" />
+        <attr name="tvea_textShrink" format="string" />
+        <attr name="tvea_textExpand" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="CustomFontTextView">
+        <attr name="tv_customFont" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="MaterialEditText">
+        <attr name="et_customFont" format="string" />
+    </declare-styleable>
+
+
+    <declare-styleable name="MaterialButton">
+        <attr name="bt_customFont" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="MessageInput">
+        <attr name="inputButtonBackground" format="reference" />
+        <attr name="inputButtonIcon" format="reference" />
+        <attr name="inputButtonMargin" format="dimension|reference" />
+        <attr name="inputButtonWidth" format="dimension|reference" />
+        <attr name="inputButtonHeight" format="dimension|reference" />
+        <attr name="inputMaxLines" format="integer" />
+        <attr name="inputHint" format="string" />
+        <attr name="inputText" format="string" />
+        <attr name="inputTextSize" format="dimension|reference" />
+        <attr name="inputTextColor" format="color|reference" />
+        <attr name="inputHintColor" format="color|reference" />
+        <attr name="inputBackground" format="reference" />
+        <attr name="inputCursorDrawable" format="reference" />
+    </declare-styleable>
+
+    <!-- Declare custom theme attributes that allow changing which styles are
+         used for button bars depending on the API level.
+         ?android:attr/buttonBarStyle is new as of API 11 so this is
+         necessary to support previous API levels. -->
+    <declare-styleable name="ButtonBarContainerTheme">
+        <attr name="metaButtonBarStyle" format="reference" />
+        <attr name="metaButtonBarButtonStyle" format="reference" />
+    </declare-styleable>
+</resources>

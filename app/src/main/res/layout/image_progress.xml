@@ -1,0 +1,28 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <app.mobile.examwarrior.widget.AspectRatioImageView
+        android:id="@+id/icon___"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        android:minHeight="200dp"
+        android:scaleType="centerCrop"
+        app:aspectRatio=".675"
+        app:aspectRatioEnabled="true"
+        app:dominantMeasurement="width" />
+
+    <ProgressBar
+        android:id="@+id/progress_img"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:drawingCacheQuality="low"
+        android:indeterminate="true"
+        android:theme="@style/AppTheme"
+        android:visibility="visible" />
+</merge>

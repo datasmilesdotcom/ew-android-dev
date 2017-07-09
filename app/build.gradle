@@ -1,0 +1,111 @@
+apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '26.0.0'
+    defaultConfig {
+        applicationId "app.mobile.examwarrior"
+        minSdkVersion 17
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // Vector drawable support compact
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/notice.txt'
+    }
+
+    repositories {
+        maven { url 'http://dl.bintray.com/madcyph3r/maven/' }
+        jcenter()
+        maven { url "https://jitpack.io" }
+        maven { url "https://clojars.org/repo/" }
+        maven { url "https://repo.commonsware.com.s3.amazonaws.com" }
+        maven {
+            url "https://maven.google.com"
+        }
+    }
+
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            useProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        buildTypes.each {
+            it.buildConfigField 'String', 'BASE_URL', BASE_URL
+            it.buildConfigField 'String', 'DB_NAME', DB_NAME
+            it.buildConfigField 'int', 'SCHEMA_VERSION', SCHEMA_VERSION
+        }
+    }
+}
+
+ext {
+    supprtLibraryVersion = '25.4.0'
+    exoplayerLibraryVersion = 'r2.4.3'
+    retrofitLibraryVersion = '2.1.0'
+    gsonLibraryVersion = '2.8.0'
+    realmAdapterVersion = '2.0.0'
+    glideVersion = '3.8.0'
+    evernoteSyncLibraryVersion = '1.1.10'
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    // Android default libs by GOOGLE
+    compile "com.android.support:design:${supprtLibraryVersion}"
+    compile "com.android.support:appcompat-v7:${supprtLibraryVersion}"
+    compile "com.android.support:recyclerview-v7:${supprtLibraryVersion}"
+    compile "com.android.support:cardview-v7:${supprtLibraryVersion}"
+    compile "com.android.support:support-vector-drawable:${supprtLibraryVersion}"
+    // Android network stack
+    compile "com.squareup.retrofit2:retrofit:${retrofitLibraryVersion}"
+    compile "com.squareup.retrofit2:converter-gson:${retrofitLibraryVersion}"
+    compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    compile "com.google.code.gson:gson:${gsonLibraryVersion}"
+    // Realm
+    compile "io.realm:android-adapters:${realmAdapterVersion}"
+    // Permission manager
+    compile 'com.github.ParkSangGwon:TedPermission:v1.0.12'
+    // Glide Image Loader
+    compile "com.github.bumptech.glide:glide:${glideVersion}"
+    // ExoPlayer
+    compile "com.google.android.exoplayer:exoplayer:${exoplayerLibraryVersion}"
+    compile 'com.cleveroad:slidingtutorial:1.0.8'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    // Evernote Sync Module
+    compile "com.evernote:android-job:${evernoteSyncLibraryVersion}"
+    // MathJax
+    compile 'jp.wasabeef:glide-transformations:2.0.1'
+    compile 'com.hendraanggrian:reveallayout:0.3.1'
+    compile 'com.github.florent37:diagonallayout:1.0.4'
+    implementation "com.android.support:support-v4:${supprtLibraryVersion}"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.github.fcannizzaro:jsoup-annotations:1.0.3'
+    compile project(':mathjaxandroid')
+    compile 'com.github.aakira:expandable-layout:1.6.0@aar'
+
+    compile 'com.android.support:cardview-v7:25.3.0'
+    compile 'com.android.support:recyclerview-v7:25.3.0'
+    compile files('libs/YouTubeAndroidPlayerApi.jar')
+    implementation 'com.android.support:support-v4:25.4.0'
+}

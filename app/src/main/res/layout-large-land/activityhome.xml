@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:fitsSystemWindows="true"
+    tools:context="app.mobile.examwarrior.ui.app_intro.homeActivity">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:background="@drawable/icnclouds"
+        android:layout_height="wrap_content" />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/icnimage1"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:id="@+id/linlogo"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <app.mobile.examwarrior.widget.AspectRatioImageView
+            android:layout_marginRight="10dp"
+            android:layout_width="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/icnapple_orig"
+            android:layout_height="wrap_content" />
+
+        <app.mobile.examwarrior.widget.AspectRatioImageView
+            android:layout_width="wrap_content"
+           android:layout_gravity="center_vertical"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/icnlogo"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_below="@+id/linlogo"
+        android:padding="5dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="WE MAKE LEARNING EASY , NTERESTING ,FUN AND FASTER"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

@@ -1,0 +1,77 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment"
+    android:name="app.mobile.examwarrior.ui.activity.TestActivityFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <FrameLayout
+        android:padding="10dp"
+        android:layout_above="@+id/bottom"
+        android:id="@+id/questions_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+    <RelativeLayout
+        android:id="@+id/bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingBottom="5dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:background="#E0E0E0"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:tint="#FDD835"
+            android:padding="5dp"
+            app:srcCompat="@drawable/dummy"
+            android:id="@+id/appCompatImageView" />
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:tint="#37474F"
+            android:padding="5dp"
+            app:srcCompat="@drawable/dummy"
+            android:id="@+id/appCompatImageView2"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/appCompatImageView"
+            android:layout_marginStart="11dp" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:tint="#AED581"
+            android:padding="5dp"
+            app:srcCompat="@drawable/dummy"
+            android:layout_marginStart="15dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/appCompatImageView2" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:clickable="true"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="5dp"
+            app:srcCompat="@drawable/dummy"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/appCompatImageView3" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/prev"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="5dp"
+            app:srcCompat="@drawable/dummy"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/appCompatImageView3" />
+    </RelativeLayout>
+
+</RelativeLayout>

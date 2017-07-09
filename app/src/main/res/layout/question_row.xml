@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:elevation="3dp"
+    app:contentPadding="7dp">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        >
+        <de.timfreiheit.mathjax.android.MathJaxView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/laTexView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            app:input="TeX"
+            android:gravity="center"
+            app:blacker="10"
+            android:layout_weight="1"
+            app:automaticLinebreaks="true"
+            app:minScaleAdjust="2"
+            app:horizontalScrollbarsEnabled="false"
+            app:output="SVG"/>
+    </ScrollView>
+
+</android.support.v7.widget.CardView>

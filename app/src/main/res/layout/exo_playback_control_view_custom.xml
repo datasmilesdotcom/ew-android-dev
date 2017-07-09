@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/exo_playback_control_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+
+        <LinearLayout
+            android:id="@+id/top"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#96000000"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingRight="50dp"
+            android:visibility="visible">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:padding="15dp"
+                android:tint="@color/colorPrimary"
+                app:srcCompat="@drawable/ic_back" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif"
+                android:gravity="center|left"
+                android:paddingLeft="10dp"
+                android:text="Video Title"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/colorPrimary"
+                android:textSize="22dp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/middle"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <app.mobile.examwarrior.util.VolBar
+                android:layout_width="18dp"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/seekbar_time"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:background="#96000000"
+            android:foregroundGravity="center"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/exo_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:text="00:00:00"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/colorPrimary" />
+
+            <com.google.android.exoplayer2.ui.DefaultTimeBar
+                android:id="@+id/exo_progress"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:touch_target_height="50dp" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/exo_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp"
+                android:text="00:00:00"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/colorPrimary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/controls"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#96000000"
+            android:orientation="horizontal"
+            android:paddingBottom="10dp"
+            android:visibility="visible">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/btn_lock"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="right"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:background="@null"
+                android:padding="5dp"
+                android:tint="@color/colorPrimary"
+                app:srcCompat="@drawable/ic_lock" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="70dp"
+                android:layout_marginRight="70dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/exo_prev"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="24dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:cropToPadding="false"
+                    android:minWidth="32dp"
+                    android:padding="7dp"
+                    android:tint="@color/colorPrimary"
+                    app:srcCompat="@drawable/ic_previous" />
+
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/exo_rew"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="24dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:minWidth="32dp"
+                    android:padding="7dp"
+                    android:tint="@color/colorPrimary"
+                    app:srcCompat="@drawable/ic_rewind" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/exo_pause"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="24dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:minWidth="32dp"
+                    android:padding="7dp"
+                    android:tint="@color/colorPrimary"
+                    app:srcCompat="@drawable/ic_pause" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/exo_play"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="24dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:minWidth="32dp"
+                    android:padding="7dp"
+                    android:tint="@color/colorPrimary"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_play" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/exo_ffwd"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="24dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:minWidth="32dp"
+                    android:padding="7dp"
+                    android:tint="@color/colorPrimary"
+                    app:srcCompat="@drawable/ic_forward" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/exo_next"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:minWidth="32dp"
+                    android:padding="7dp"
+                    android:tint="@color/colorPrimary"
+                    app:srcCompat="@drawable/ic_next" />
+            </LinearLayout>
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/btn_screen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp"
+                android:layout_weight="0"
+                android:alpha="1"
+                android:background="@null"
+                android:cropToPadding="false"
+                android:padding="5dp"
+                android:tint="@color/colorPrimary"
+                android:visibility="visible" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/btn_sub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="24dp"
+                android:layout_weight="0"
+                android:alpha="1"
+                android:background="@null"
+                android:cropToPadding="false"
+                android:padding="5dp"
+                android:tint="@color/colorPrimary"
+                android:visibility="visible"
+                app:srcCompat="@drawable/ic_subtitle" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/btn_settings"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="20dp"
+                android:layout_weight="0"
+                android:background="@null"
+                android:foregroundGravity="right"
+                android:padding="5dp"
+                android:text="Settings"
+                android:tint="@color/colorPrimary"
+                app:srcCompat="@drawable/ic_settings" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/unlock_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="#96000000"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:visibility="gone">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/btn_unlock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            app:srcCompat="@drawable/ic_unlock" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>
