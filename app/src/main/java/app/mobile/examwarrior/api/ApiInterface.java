@@ -12,6 +12,7 @@ import app.mobile.examwarrior.database.CourseDetail;
 import app.mobile.examwarrior.model.ChangePasswordRequestBody;
 import app.mobile.examwarrior.model.CourseCategories;
 import app.mobile.examwarrior.model.CourseDetailId;
+import app.mobile.examwarrior.model.CourseMoreCategories;
 import app.mobile.examwarrior.model.ForgetPasswordBody;
 import app.mobile.examwarrior.model.ForgetPasswordResponse;
 import app.mobile.examwarrior.model.LoginBody;
@@ -25,6 +26,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 
 public interface ApiInterface {
@@ -51,6 +53,9 @@ public interface ApiInterface {
 
     @GET("test/getAllCourseCategory")
     Call<List<CourseCategories>> getExlporeData();
+
+    @GET("test/getCourseCategory/{id}")
+    Call<List<CourseMoreCategories>> getExlporeMoreData(@Path("id") String id);
 
 
 }
