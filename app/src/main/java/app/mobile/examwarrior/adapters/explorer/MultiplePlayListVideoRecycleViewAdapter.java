@@ -2,6 +2,7 @@ package app.mobile.examwarrior.adapters.explorer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -56,7 +57,9 @@ public class MultiplePlayListVideoRecycleViewAdapter extends RecyclerView.Adapte
         if(arraylist.get(position).getCourse_cat_title() !=null){
             holder.textData.setText(arraylist.get(position).getCourse_cat_title().toUpperCase());
         }
-
+        Typeface face = Typeface.createFromAsset(activity.getAssets(),
+                "fonts/Montserrat-Bold.ttf");
+        holder.textData.setTypeface(face);
         holder.setDaa(arraylist.get(position).getMcourses());
         holder.horizontalVideoListAdapter.notifyDataSetChanged();
         holder.moreVideos.setOnClickListener(new View.OnClickListener() {
