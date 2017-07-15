@@ -21,11 +21,11 @@
             android:name="app.mobile.examwarrior.util.Glide_Module"
             android:value="GlideModule" />
 
-        <activity android:name=".DashboardActivity"/>
+        <activity android:name=".DashboardActivity" />
         <activity
             android:name=".ui.app_intro.AppIntroActivity"
-            android:theme="@style/AppIntroTheme"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppIntroTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -83,9 +83,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:label="@string/title_activity_demo"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme">
-
-        </activity>
+            android:theme="@style/AppTheme"></activity>
         <activity android:name=".ui.activity.PracticeActivity" />
         <activity
             android:name=".ui.activity.TestActivity"
@@ -113,9 +111,8 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/PlayerTheme">
-
-        </activity>
+            android:theme="@style/PlayerTheme"></activity>
+        <activity android:name=".ui.activity.ExploreActivity"></activity>
     </application>
 
 </manifest>

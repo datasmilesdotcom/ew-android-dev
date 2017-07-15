@@ -21,6 +21,7 @@ import com.cleveroad.slidingtutorial.TutorialPageOptionsProvider;
 import com.cleveroad.slidingtutorial.TutorialSupportFragment;
 
 import app.mobile.examwarrior.R;
+import app.mobile.examwarrior.ui.activity.ExploreActivity;
 import app.mobile.examwarrior.ui.activity.RegistrationActivity;
 import app.mobile.examwarrior.util.Utility;
 
@@ -123,24 +124,6 @@ public class AppIntroContainer extends TutorialSupportFragment
         }
     };
 
-    /*private final TutorialPageProvider<Fragment> mTutorialPageProvider = new TutorialPageProvider<Fragment>() {
-        @NonNull
-        @Override
-        public Fragment providePage(int position) {
-            position %= ACTUAL_PAGES_COUNT;
-            switch (position) {
-                case 0:
-                    return new FirstCustomPageSupportFragment();
-                case 1:
-                    return new SecondCustomPageSupportFragment();
-                case 2:
-                    return new ThirdCustomPageSupportFragment();
-                default: {
-                    throw new IllegalArgumentException("Unknown position: " + position);
-                }
-            }
-        }
-    };*/
 
     private int[] pagesColors;
 
@@ -237,7 +220,7 @@ public class AppIntroContainer extends TutorialSupportFragment
                 startActivity(new Intent(getActivity(), RegistrationActivity.class));
                 break;
             case R.id.explore:
-                Utility.showMessage("Coming soon");
+                startActivity(new Intent(getActivity(), ExploreActivity.class));
                 break;
         }
     }

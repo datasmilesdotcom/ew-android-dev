@@ -2,6 +2,7 @@ package app.mobile.examwarrior.ui.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.model.LoginBody;
 import app.mobile.examwarrior.model.User;
+import app.mobile.examwarrior.ui.activity.HomeActivity;
 import app.mobile.examwarrior.ui.activity.RegistrationActivity;
 import app.mobile.examwarrior.util.Utility;
 import app.mobile.examwarrior.util.validator.FormError;
@@ -195,6 +197,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                 @Override
                                 public void onSuccess() {
                                     Utility.showMessage("Navigate to home screen.");
+                                    startActivity(new Intent(getActivity(), HomeActivity.class));
                                 }
                             }, new Realm.Transaction.OnError() {
                                 @Override
