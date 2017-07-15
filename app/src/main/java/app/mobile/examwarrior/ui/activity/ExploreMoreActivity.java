@@ -119,19 +119,25 @@ public class ExploreMoreActivity extends AppCompatActivity implements ExploreCar
 
     }
 
-
+    //No need to implement them here
     @Override
     public void getMoreCources(String playListId) {
         Utility.showMessage("Yet to implement");
     }
 
+    //No need to implement them here
     @Override
     public void exploreCources(CourseCategories.McoursesBean itemsEntity) {
-        Utility.showMessage("Yet to implement");
+
     }
+
 
     @Override
     public void exploreCourcesMore(CourseMoreCategories.CoursesBean itemsEntity) {
-
+        Utility.showMessage("Yet to implement");
     }
+
+
+
+
 }
