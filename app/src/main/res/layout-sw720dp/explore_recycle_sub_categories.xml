@@ -19,7 +19,7 @@
             <ImageView
                 android:id="@+id/topicImage"
                 android:layout_width="240dp"
-                android:layout_height="170dp"
+                android:layout_height="135dp"
                 android:layout_marginBottom="4dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/placeholder_"
