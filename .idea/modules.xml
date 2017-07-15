@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Examworrior.iml" filepath="$PROJECT_DIR$/Examworrior.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\iaman\StudioProjects\ew-android-dev\Examworrior.iml" filepath="C:\Users\iaman\StudioProjects\ew-android-dev\Examworrior.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/ew-android-dev.iml" filepath="$PROJECT_DIR$/ew-android-dev.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mathjaxandroid/mathjaxandroid.iml" filepath="$PROJECT_DIR$/mathjaxandroid/mathjaxandroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/mathjaxandroid/mathjaxandroid.iml" filepath="$PROJECT_DIR$/mathjaxandroid/mathjaxandroid.iml" />
     </modules>
   </component>

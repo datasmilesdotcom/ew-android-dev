@@ -12,7 +12,7 @@
 
     <RelativeLayout
         android:id="@+id/sub_cat_container"
-        android:layout_width="150dp"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
         >
 
