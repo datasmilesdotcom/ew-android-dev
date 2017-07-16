@@ -134,7 +134,9 @@ public class ExploreMoreActivity extends AppCompatActivity implements ExploreCar
 
     @Override
     public void exploreCourcesMore(CourseMoreCategories.CoursesBean itemsEntity) {
-        Utility.showMessage("Yet to implement");
+        Intent intent = new Intent(this, CourseDetailsActivity.class);
+        intent.putExtra(CourseDetailsActivity.KEY_COURSE_ID, itemsEntity.getCOURSEID());
+        startActivity(intent);
     }
 
 

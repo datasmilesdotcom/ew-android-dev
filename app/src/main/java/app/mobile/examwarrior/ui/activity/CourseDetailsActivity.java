@@ -1,24 +1,21 @@
 package app.mobile.examwarrior.ui.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import app.mobile.examwarrior.R;
-import app.mobile.examwarrior.adapters.CoursesDetailsListAdapter;
 import app.mobile.examwarrior.adapters.CourseDetailsAdapter;
 import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.database.CourseDetail;
 import app.mobile.examwarrior.database.ModuleDetail;
-import app.mobile.examwarrior.database.ModuleItem;
 import app.mobile.examwarrior.expandable_list.listeners.CourseHeader;
 import app.mobile.examwarrior.model.CourseDetailId;
 import app.mobile.examwarrior.util.Utility;
@@ -26,7 +23,6 @@ import app.mobile.examwarrior.widget.CustomFontTextView;
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,27 +36,20 @@ public class CourseDetailsActivity extends AppCompatActivity {
     private Realm realm;
     private RealmResults<CourseDetail> courseDetailsList;
     private List<CourseHeader> courseHeaders = new ArrayList<>();
-    private CustomFontTextView courseName;
-    private CustomFontTextView courseShortDetail, course_level;
     private Call<List<CourseDetail>> coursesList;
-
+    private CustomFontTextView action_bar_title;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_details);
-        realm = Realm.getDefaultInstance();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_course_detail);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.exploreToolbar);
+        action_bar_title= (CustomFontTextView) findViewById(R.id.action_bar_title);
         setSupportActionBar(toolbar);
+        realm = Realm.getDefaultInstance();
+
         getCourseDetails(getIntent().getStringExtra(KEY_COURSE_ID));
         courses_detail_list = (RecyclerView) findViewById(R.id.courses_detail_list);
-        /*realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.delete(CourseDetail.class);
-                realm.delete(ModuleDetail.class);
-                realm.delete(ModuleItem.class);
-            }
-        });*/
+
 
         courseDetailsList = realm.where(CourseDetail.class).equalTo("courseId", getIntent().getStringExtra(KEY_COURSE_ID)).findAllAsync();
         courseDetailsList.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<CourseDetail>>() {
@@ -75,11 +64,8 @@ public class CourseDetailsActivity extends AppCompatActivity {
                     courses_detail_list.setAdapter(courseDetailsAdapter);
 
                     if (!Utility.isEmpty(courseDetails.get(0).getCourseShortDesc()))
-                        courseName.setText(courseDetails.get(0).getCourseName());
-                    if (!Utility.isEmpty(courseDetails.get(0).getCourseShortDesc()))
-                        courseShortDetail.setText(Html.fromHtml(courseDetails.get(0).getCourseShortDesc()));
-                    if (!Utility.isEmpty(courseDetails.get(0).getCourseLevel()))
-                        course_level.setText("CourseLevel " + courseDetails.get(0).getCourseLevel());
+                        action_bar_title.setText(courseDetails.get(0).getCourseName());
+
                 }
             }
         });
@@ -88,9 +74,6 @@ public class CourseDetailsActivity extends AppCompatActivity {
         if (animator instanceof DefaultItemAnimator) {
             ((DefaultItemAnimator) animator).setSupportsChangeAnimations(false);
         }
-        courseName = (CustomFontTextView) findViewById(R.id.course_name);
-        courseShortDetail = (CustomFontTextView) findViewById(R.id.course_short_detail);
-        course_level = (CustomFontTextView) findViewById(R.id.course_level);
 
     }
 

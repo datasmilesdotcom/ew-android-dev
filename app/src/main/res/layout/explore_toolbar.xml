@@ -27,8 +27,8 @@
                 android:layout_centerVertical="true"
                />
 
-            <TextView
-                android:id="@+id/textview"
+            <app.mobile.examwarrior.widget.CustomFontTextView
+                android:id="@+id/action_bar_title"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_centerHorizontal="true"
