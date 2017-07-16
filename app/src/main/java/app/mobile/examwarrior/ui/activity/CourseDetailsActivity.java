@@ -1,7 +1,7 @@
 package app.mobile.examwarrior.ui.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.mobile.examwarrior.R;
-import app.mobile.examwarrior.adapters.CoursesDetailsListAdapter;
 import app.mobile.examwarrior.adapters.CourseDetailsAdapter;
 import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.database.CourseDetail;
 import app.mobile.examwarrior.database.ModuleDetail;
-import app.mobile.examwarrior.database.ModuleItem;
 import app.mobile.examwarrior.expandable_list.listeners.CourseHeader;
 import app.mobile.examwarrior.model.CourseDetailId;
 import app.mobile.examwarrior.util.Utility;
@@ -26,7 +24,6 @@ import app.mobile.examwarrior.widget.CustomFontTextView;
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -67,12 +64,14 @@ public class CourseDetailsActivity extends AppCompatActivity {
             @Override
             public void onChange(RealmResults<CourseDetail> courseDetails, OrderedCollectionChangeSet orderedCollectionChangeSet) {
                 if (courseDetails.size() > 0) {
-                    if (courseDetails.get(0).getModuleDetail() != null)
+                    if (courseDetails.get(0).getModuleDetail() != null && courseHeaders.size() <= 0)
                         for (ModuleDetail moduleDetail : courseDetails.get(0).getModuleDetail()) {
                             courseHeaders.add(new CourseHeader(moduleDetail.getModuleName(), moduleDetail.getModuleId(), moduleDetail.getModuleItems()));
                         }
-                    courseDetailsAdapter = new CourseDetailsAdapter(CourseDetailsActivity.this, courseHeaders);
-                    courses_detail_list.setAdapter(courseDetailsAdapter);
+                    if (courseDetailsAdapter == null || courseDetailsAdapter.getItemCount() <= 0) {
+                        courseDetailsAdapter = new CourseDetailsAdapter(CourseDetailsActivity.this, courseHeaders);
+                        courses_detail_list.setAdapter(courseDetailsAdapter);
+                    }
 
                     if (!Utility.isEmpty(courseDetails.get(0).getCourseShortDesc()))
                         courseName.setText(courseDetails.get(0).getCourseName());
@@ -96,6 +95,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
 
     /**
      * Get course details for course
+     *
      * @param courseId
      */
     private void getCourseDetails(String courseId) {

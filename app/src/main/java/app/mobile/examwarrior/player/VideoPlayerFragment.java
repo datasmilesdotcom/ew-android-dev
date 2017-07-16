@@ -149,6 +149,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     private boolean needRetrySource;
     private TrackGroupArray lastSeenTrackGroupArray;
     private boolean shouldAutoPlay;
+    private AppCompatImageView btn_full_screen;
     private int resumeWindow;
     // Activity lifecycle
     private long resumePosition;
@@ -269,6 +270,8 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         if (progress != null) progress.setVisibility(View.VISIBLE);
         video_title = (AppCompatTextView) view.findViewById(R.id.title);
         btn_settings = (AppCompatImageView) view.findViewById(R.id.btn_settings);
+        btn_full_screen = (AppCompatImageView) view.findViewById(R.id.btn_full_screen);
+        btn_full_screen.setOnClickListener(this);
         AppCompatImageView btn_back = (AppCompatImageView) view.findViewById(R.id.btn_back);
         btn_back.setOnClickListener(this);
         btn_settings.setOnClickListener(this);
@@ -358,19 +361,20 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_settings:
-
-                getActivity().setRequestedOrientation(getResources().getBoolean(R.bool.is_landscape) ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-            /*try {
-                MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-                if (mappedTrackInfo != null) {
-                    trackSelectionHelper.showSelectionDialog(this, "Select",
-                            trackSelector.getCurrentMappedTrackInfo(), 0);
+                try {
+                    MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
+                    if (mappedTrackInfo != null) {
+                        trackSelectionHelper.showSelectionDialog(getActivity(), "Select",
+                                trackSelector.getCurrentMappedTrackInfo(), 0);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("TAG", "onClick: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e("TAG", "onClick: " + e.getMessage());
-            }*/
 
+                break;
+            case R.id.btn_full_screen:
+                getActivity().setRequestedOrientation(getResources().getBoolean(R.bool.is_landscape) ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
                 break;
             case R.id.retry_button:
                 initializePlayer();

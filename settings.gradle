@@ -1,1 +1,1 @@
-include ':app', ':mathjaxandroid'
+include ':app', ':mathjaxandroid', ':library'

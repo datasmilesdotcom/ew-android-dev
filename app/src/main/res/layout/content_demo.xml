@@ -9,15 +9,8 @@
     tools:context="app.mobile.examwarrior.demo.DemoActivity"
     tools:showIn="@layout/activity_demo">
 
-    <FrameLayout
-        android:id="@+id/sample"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
-
-    <FrameLayout
-        android:id="@+id/sample_"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
+   <android.support.v7.widget.RecyclerView
+       android:id="@+id/recyclerview"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"/>
 </LinearLayout>

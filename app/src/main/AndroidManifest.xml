@@ -21,16 +21,12 @@
             android:name="app.mobile.examwarrior.util.Glide_Module"
             android:value="GlideModule" />
 
-        <activity android:name=".DashboardActivity"/>
+        <activity android:name=".DashboardActivity" />
         <activity
             android:name=".ui.app_intro.AppIntroActivity"
-            android:theme="@style/AppIntroTheme"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppIntroTheme">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".ui.activity.SplashActivity"
@@ -84,7 +80,6 @@
             android:label="@string/title_activity_demo"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme">
-
         </activity>
         <activity android:name=".ui.activity.PracticeActivity" />
         <activity
@@ -114,7 +109,11 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/PlayerTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
