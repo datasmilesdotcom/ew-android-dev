@@ -1,11 +1,22 @@
 package app.mobile.examwarrior.ui.activity;
 
+import android.app.Dialog;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.view.Gravity;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +31,7 @@ import app.mobile.examwarrior.expandable_list.listeners.CourseHeader;
 import app.mobile.examwarrior.model.CourseDetailId;
 import app.mobile.examwarrior.util.Utility;
 import app.mobile.examwarrior.widget.CustomFontTextView;
+import de.timfreiheit.mathjax.android.MathJaxView;
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
@@ -38,12 +50,14 @@ public class CourseDetailsActivity extends AppCompatActivity {
     private List<CourseHeader> courseHeaders = new ArrayList<>();
     private Call<List<CourseDetail>> coursesList;
     private CustomFontTextView action_bar_title;
+    private String course_name,module_name,description_value="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.exploreToolbar);
         action_bar_title= (CustomFontTextView) findViewById(R.id.action_bar_title);
+        AppCompatImageView info= (AppCompatImageView) findViewById(R.id.info);
         setSupportActionBar(toolbar);
         realm = Realm.getDefaultInstance();
 
@@ -63,8 +77,14 @@ public class CourseDetailsActivity extends AppCompatActivity {
                     courseDetailsAdapter = new CourseDetailsAdapter(CourseDetailsActivity.this, courseHeaders);
                     courses_detail_list.setAdapter(courseDetailsAdapter);
 
-                    if (!Utility.isEmpty(courseDetails.get(0).getCourseShortDesc()))
+                    if (!Utility.isEmpty(courseDetails.get(0).getCourseShortDesc())) {
                         action_bar_title.setText(courseDetails.get(0).getCourseName());
+                        course_name = courseDetails.get(0).getCourseName();
+                    }
+                    if (!Utility.isEmpty(courseDetails.get(0).getCourseLongDesc()))
+                        description_value=  courseDetails.get(0).getCourseLongDesc();
+                    if (!Utility.isEmpty(courseDetails.get(0).getCourseSubGroup()))
+                        module_name=courseDetails.get(0).getCourseSubGroup();
 
                 }
             }
@@ -74,6 +94,14 @@ public class CourseDetailsActivity extends AppCompatActivity {
         if (animator instanceof DefaultItemAnimator) {
             ((DefaultItemAnimator) animator).setSupportsChangeAnimations(false);
         }
+
+        info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buildDialog();
+            }
+        });
+        info.setVisibility(View.VISIBLE);
 
     }
 
@@ -117,5 +145,28 @@ public class CourseDetailsActivity extends AppCompatActivity {
         //realm.close();
         coursesList.cancel();
         super.onDestroy();
+    }
+
+    private void buildDialog() {
+
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.course_details_description_dialog);
+
+        AppCompatTextView course_title = (AppCompatTextView) dialog.findViewById(R.id.course_name);
+        AppCompatTextView course_module = (AppCompatTextView) dialog.findViewById(R.id.modue_name);
+        MathJaxView description = (MathJaxView) dialog.findViewById(R.id.content);
+        course_title.setText("Course : "+course_name);
+        course_module.setText("Module :"+module_name);
+        description.setInputText(description_value);
+
+
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogTheme;
+
+        dialog.getWindow().getAttributes().gravity = Gravity.RIGHT|Gravity.TOP;
+        dialog.show();
+
+
     }
 }
