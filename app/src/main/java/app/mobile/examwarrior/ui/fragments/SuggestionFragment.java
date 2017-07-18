@@ -16,12 +16,8 @@ import com.xwray.groupie.ExpandableGroup;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.ViewHolder;
 
-import java.util.Vector;
-
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.demo.ToggleListener;
-import app.mobile.examwarrior.players.VideoAdapter;
-import app.mobile.examwarrior.players.YoutubeVideo;
 import app.mobile.examwarrior.util.decoration.HeaderItemDecoration;
 import app.mobile.examwarrior.util.decoration.InsetItemDecoration;
 import app.mobile.examwarrior.util.decoration.ItemOffsetDecoration;
@@ -51,13 +47,16 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     private ExpandableGroup relatedVideosGroup;
     private ExpandableGroup relatedCoursesGroup;
     private ExpandableGroup relatedSuggestionGroup;
+
     private GridLayoutManager layoutManager;
+
     private RelatedVideosViewHolder relatedVideosViewHolder;
     private RelatedCoursesViewHolder relatedCoursesViewHolder;
     private RelatedVideosHeader relatedVideosHeader;
     private RelatedCoursesHeader relatedCoursesHeader;
     private RelatedSuggestionHeader relatedSuggestionHeader;
     private RelatedSuggestionViewHolder relatedSuggestionViewHolder;
+
     private String mParam1;
     private String mParam2;
 
@@ -115,60 +114,6 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         recyclerView.addItemDecoration(new InsetItemDecoration(Color.WHITE, betweenPadding));
         betweenPadding = getResources().getDimensionPixelSize(R.dimen.padding_video_header);
         recyclerView.addItemDecoration(new ItemOffsetDecoration(betweenPadding, R.layout.video_header));
-
-
-        Vector<YoutubeVideo> youtubeVideos = new Vector<YoutubeVideo>();
-
-        //Load video List
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/PlgSC4YeBjY\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/25A7k9P3XfQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/HrYCPopHZPQ\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/WS2jxFG7h0w\" frameborder=\"0\" allowfullscreen></iframe>"));
-        youtubeVideos.add(new YoutubeVideo("<iframe width=\"100%\" height=\"100%\" src=\"https://www.youtube.com/embed/xzyWE2_91oI\" frameborder=\"0\" allowfullscreen></iframe>"));
-
-
-        VideoAdapter videoAdapter = new VideoAdapter(youtubeVideos);
 
         /************************************************************
          / Suggestion list adapter
