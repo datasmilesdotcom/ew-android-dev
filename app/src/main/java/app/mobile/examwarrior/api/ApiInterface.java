@@ -57,5 +57,8 @@ public interface ApiInterface {
     @GET("test/getCourseCategory/{id}")
     Call<List<CourseMoreCategories>> getExlporeMoreData(@Path("id") String id);
 
+    @GET("masterCourseCategoryDetails/details/{id}")
+    Call<CourseMoreCategories> getExlporeSubCategoryData(@Path("id") String id);
+
 
 }

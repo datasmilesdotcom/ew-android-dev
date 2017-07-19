@@ -84,6 +84,18 @@ public class CourseMoreCategories {
         private String COURSEID;
         private String COURSENAME;
         private String PIC;
+        /**
+         * Level : Basic
+         * CourseDesc : Informatica online training will help you master data integration concepts such as ETL and data mining using Informatica PowerCenter Designer 9x. It covers Informatica dev and admin concepts such as error handling, data migration, performance tuning, installation & configuration
+         * LastUpdateDt : 12-jun-2017
+         * Author : jeevan
+         */
+
+        private String Level;
+        private String CourseDesc;
+        private String LastUpdateDt;
+        private String Author;
+
 
         public String getCOURSEID() {
             return COURSEID;
@@ -107,6 +119,38 @@ public class CourseMoreCategories {
 
         public void setPIC(String PIC) {
             this.PIC = PIC;
+        }
+
+        public String getLevel() {
+            return Level;
+        }
+
+        public void setLevel(String Level) {
+            this.Level = Level;
+        }
+
+        public String getCourseDesc() {
+            return CourseDesc;
+        }
+
+        public void setCourseDesc(String CourseDesc) {
+            this.CourseDesc = CourseDesc;
+        }
+
+        public String getLastUpdateDt() {
+            return LastUpdateDt;
+        }
+
+        public void setLastUpdateDt(String LastUpdateDt) {
+            this.LastUpdateDt = LastUpdateDt;
+        }
+
+        public String getAuthor() {
+            return Author;
+        }
+
+        public void setAuthor(String Author) {
+            this.Author = Author;
         }
     }
 }

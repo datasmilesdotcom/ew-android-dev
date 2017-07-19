@@ -1,5 +1,6 @@
 package app.mobile.examwarrior.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -63,7 +64,7 @@ public class CourseCategories {
         this.mcourses = mcourses;
     }
 
-    public static class McoursesBean {
+    public static class McoursesBean implements Serializable{
         /**
          * mcourseid : informatica
          * mcoursename : informatica
