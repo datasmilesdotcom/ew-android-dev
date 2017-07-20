@@ -2,12 +2,14 @@ package app.mobile.examwarrior.ui.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.AppCompatTextView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,7 @@ import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.model.LoginBody;
 import app.mobile.examwarrior.model.User;
+import app.mobile.examwarrior.ui.activity.HomeActivity;
 import app.mobile.examwarrior.ui.activity.RegistrationActivity;
 import app.mobile.examwarrior.util.Utility;
 import app.mobile.examwarrior.util.validator.FormError;
@@ -40,6 +43,8 @@ import retrofit2.Response;
  * create an instance of this fragment.
  */
 public class LoginFragment extends Fragment implements View.OnClickListener {
+
+    public static final String TAG = LoginFragment.class.getSimpleName();
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -99,6 +104,19 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.delete(User.class);
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "onCreate: " + e.getMessage());
+        } finally {
+            realm.close();
         }
     }
 
@@ -189,12 +207,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                             realm.executeTransactionAsync(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
+
                                     realm.insertOrUpdate(response.body());
                                 }
                             }, new Realm.Transaction.OnSuccess() {
                                 @Override
                                 public void onSuccess() {
-                                    Utility.showMessage("Navigate to home screen.");
+                                    getActivity().startActivity(new Intent(getActivity(), HomeActivity.class));
+                                    getActivity().finish();
                                 }
                             }, new Realm.Transaction.OnError() {
                                 @Override

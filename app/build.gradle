@@ -6,7 +6,7 @@ android {
     buildToolsVersion '26.0.0'
     defaultConfig {
         applicationId "app.mobile.examwarrior"
-        minSdkVersion 17
+        minSdkVersion 18
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -57,7 +57,7 @@ android {
 
 ext {
     supprtLibraryVersion = '25.4.0'
-    exoplayerLibraryVersion = 'r2.4.3'
+    exoplayerLibraryVersion = 'r2.4.4'
     retrofitLibraryVersion = '2.1.0'
     gsonLibraryVersion = '2.8.0'
     realmAdapterVersion = '2.0.0'

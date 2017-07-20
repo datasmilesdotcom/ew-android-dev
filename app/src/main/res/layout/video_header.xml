@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="8dp">
 
-    <TextView
-        android:id="@+id/title"
+    <app.mobile.examwarrior.widget.CustomFontTextView
+        android:id="@+id/video_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="left"
-        android:text="Creating Map With Sorter Path"
         android:textColor="#000000"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        tool:text="Video title" />
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/introduction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/video_title"
         android:layout_marginTop="5dp"
         android:gravity="center_horizontal"
         android:text="5.8M views"
@@ -45,13 +46,14 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/iconlick" />
 
-            <TextView
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/up_vote_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="5dp"
                 android:gravity="center"
-                android:text="50 k"
+                android:text="0 k"
                 android:textColor="#000000" />
         </LinearLayout>
 
@@ -67,13 +69,14 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/unlikeicon" />
 
-            <TextView
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/down_vote_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="5dp"
                 android:gravity="center"
-                android:text="5 k"
+                android:text="0 k"
                 android:textColor="#000000" />
         </LinearLayout>
 
@@ -89,7 +92,8 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_share_black_24dp" />
 
-            <TextView
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/share"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"

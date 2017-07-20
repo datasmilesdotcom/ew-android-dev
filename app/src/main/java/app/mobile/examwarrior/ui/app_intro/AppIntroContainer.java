@@ -235,6 +235,7 @@ public class AppIntroContainer extends TutorialSupportFragment
         switch (v.getId()) {
             case R.id.register:
                 startActivity(new Intent(getActivity(), RegistrationActivity.class));
+                getActivity().finish();
                 break;
             case R.id.explore:
                 Utility.showMessage("Coming soon");
