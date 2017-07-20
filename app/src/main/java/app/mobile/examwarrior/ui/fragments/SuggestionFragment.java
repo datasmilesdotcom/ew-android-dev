@@ -16,8 +16,20 @@ import com.xwray.groupie.ExpandableGroup;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.ViewHolder;
 
+import java.net.HttpURLConnection;
+
+import app.mobile.examwarrior.BuildConfig;
 import app.mobile.examwarrior.R;
+import app.mobile.examwarrior.api.ApiInterface;
+import app.mobile.examwarrior.api.ServiceGenerator;
+import app.mobile.examwarrior.database.ModuleItem;
 import app.mobile.examwarrior.demo.ToggleListener;
+import app.mobile.examwarrior.model.RelatedCourse;
+import app.mobile.examwarrior.model.RelatedTopicsVideo;
+import app.mobile.examwarrior.model.RelatedVideo;
+import app.mobile.examwarrior.model.RelatedVideos;
+import app.mobile.examwarrior.model.RelatedVideosBody;
+import app.mobile.examwarrior.model.VideoEntity;
 import app.mobile.examwarrior.util.decoration.HeaderItemDecoration;
 import app.mobile.examwarrior.util.decoration.InsetItemDecoration;
 import app.mobile.examwarrior.util.decoration.ItemOffsetDecoration;
@@ -29,6 +41,12 @@ import app.mobile.view_holder.RelatedVideosHeader;
 import app.mobile.view_holder.RelatedVideosViewHolder;
 import app.mobile.view_holder.ShowMoreViewHolder;
 import app.mobile.view_holder.VideoContentDetailsAdapter;
+import io.realm.Realm;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static app.mobile.examwarrior.player.VideoPlayerFragment.KEY_MODULE_ITEM_ID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,9 +62,10 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private ModuleItem data;
     private ExpandableGroup relatedVideosGroup;
     private ExpandableGroup relatedCoursesGroup;
-    private ExpandableGroup relatedSuggestionGroup;
+    private ExpandableGroup relatedTopicVideosGroup;
 
     private GridLayoutManager layoutManager;
 
@@ -54,9 +73,10 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     private RelatedCoursesViewHolder relatedCoursesViewHolder;
     private RelatedVideosHeader relatedVideosHeader;
     private RelatedCoursesHeader relatedCoursesHeader;
-    private RelatedSuggestionHeader relatedSuggestionHeader;
-    private RelatedSuggestionViewHolder relatedSuggestionViewHolder;
+    private RelatedSuggestionHeader relatedTopicVideosHeader;
+    private RelatedSuggestionViewHolder relatedTopicVideosViewHolder;
 
+    private ShowMoreViewHolder relatedShowMoreViewHolder, relatedCourseShowMoreViewHolder, relatedTopicVideosShowMoreViewHolder;
     private String mParam1;
     private String mParam2;
 
@@ -105,6 +125,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         int betweenPadding = getResources().getDimensionPixelSize(R.dimen.padding_small);
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
@@ -123,57 +144,96 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         layoutManager.setSpanSizeLookup(suggestionListAdapter.getSpanSizeLookup());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(suggestionListAdapter);
+        data = getItemDetails(getActivity().getIntent().getStringExtra(KEY_MODULE_ITEM_ID));
 
         // Video content details header at first position
-        videoContentDetailsAdapter = new VideoContentDetailsAdapter();
-        suggestionListAdapter.add(0, videoContentDetailsAdapter);
+        //videoContentDetailsAdapter = new VideoContentDetailsAdapter(data, null);
+        //suggestionListAdapter.add(0, videoContentDetailsAdapter);
 
         // Related videos header and content
         relatedVideosHeader = new RelatedVideosHeader("Related Videos", "Description goes here.");
         relatedVideosHeader.setToggleListener(this);
         relatedVideosGroup = new ExpandableGroup(relatedVideosHeader);
-
-        for (int i = 0; i < 5; i++) {
-            relatedVideosViewHolder = new RelatedVideosViewHolder();
-            relatedVideosGroup.add(relatedVideosViewHolder);
-        }
-        ShowMoreViewHolder showMoreViewHolder2 = new ShowMoreViewHolder();
-        showMoreViewHolder2.setShowMoreClickListener(this);
-        showMoreViewHolder2.setPageGroup(1);
-        relatedVideosGroup.add(showMoreViewHolder2);
-        suggestionListAdapter.add(1, relatedVideosGroup);
+        suggestionListAdapter.add(suggestionListAdapter.getItemCount(), relatedVideosGroup);
 
         // Related courses header and content
         relatedCoursesHeader = new RelatedCoursesHeader("Related Courses", "Description goes here.");
         relatedCoursesHeader.setToggleListener(this);
         relatedCoursesGroup = new ExpandableGroup(relatedCoursesHeader);
 
-        for (int i = 0; i < 5; i++) {
-            relatedCoursesViewHolder = new RelatedCoursesViewHolder();
-            relatedCoursesGroup.add(relatedCoursesViewHolder);
-        }
-        ShowMoreViewHolder showMoreViewHolder = new ShowMoreViewHolder();
-        showMoreViewHolder.setShowMoreClickListener(this);
-        showMoreViewHolder.setPageGroup(1);
-        relatedCoursesGroup.add(showMoreViewHolder);
-        suggestionListAdapter.add(2, relatedCoursesGroup);
+
+        suggestionListAdapter.add(suggestionListAdapter.getItemCount(), relatedCoursesGroup);
 
         // Related header and content
 
-        relatedSuggestionHeader = new RelatedSuggestionHeader("Related Suggestion", "Description goes here.");
-        relatedSuggestionHeader.setToggleListener(this);
-        relatedSuggestionGroup = new ExpandableGroup(relatedSuggestionHeader);
+        relatedTopicVideosHeader = new RelatedSuggestionHeader("Related Topics Videos", "Description goes here.");
+        relatedTopicVideosHeader.setToggleListener(this);
+        relatedTopicVideosGroup = new ExpandableGroup(relatedTopicVideosHeader);
 
-        for (int i = 0; i < 5; i++) {
-            relatedSuggestionViewHolder = new RelatedSuggestionViewHolder();
-            relatedSuggestionGroup.add(relatedCoursesViewHolder);
-        }
-        ShowMoreViewHolder showMoreViewHolder1 = new ShowMoreViewHolder();
-        showMoreViewHolder1.setShowMoreClickListener(this);
-        showMoreViewHolder1.setPageGroup(1);
-        relatedSuggestionGroup.add(showMoreViewHolder1);
-        suggestionListAdapter.add(3, relatedSuggestionGroup);
+
+        suggestionListAdapter.add(suggestionListAdapter.getItemCount(), relatedTopicVideosGroup);
+
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        //apiInterface.getRelatedVideos("token",new RelatedVideosBody(data.getItemVideo(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
+        Call<RelatedVideos> call = apiInterface.getRelatedVideos("JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJzYXJqdSIsImlhdCI6MTQ5NzYyMTExNiwiZXhwIjoxNDk4MjI1OTE2fQ.raiwmRMC0C3G2axuQLOTYoSJNmoTdUyBZ5eiIskrjnA", new RelatedVideosBody("introduction-powercenter-1", "informatica-powercenter-basics"));
+        call.enqueue(new Callback<RelatedVideos>() {
+            @Override
+            public void onResponse(Call<RelatedVideos> call, Response<RelatedVideos> response) {
+                switch (response.code()) {
+                    case HttpURLConnection.HTTP_OK:
+                        RelatedVideos relatedVideos = response.body();
+                        for (RelatedVideo relatedVideo : relatedVideos.getRelatedVideos()) {
+                            relatedVideosViewHolder = new RelatedVideosViewHolder(relatedVideo);
+                            relatedVideosGroup.add(relatedVideosViewHolder);
+                        }
+                        relatedShowMoreViewHolder = new ShowMoreViewHolder();
+                        relatedShowMoreViewHolder.setShowMoreClickListener(SuggestionFragment.this);
+                        relatedVideosGroup.add(relatedShowMoreViewHolder);
+
+                        for (RelatedCourse relatedCourse : relatedVideos.getRelatedCourses()) {
+                            relatedCoursesViewHolder = new RelatedCoursesViewHolder(relatedCourse);
+                            relatedCoursesGroup.add(relatedCoursesViewHolder);
+                        }
+                        relatedCourseShowMoreViewHolder = new ShowMoreViewHolder();
+                        relatedCourseShowMoreViewHolder.setShowMoreClickListener(SuggestionFragment.this);
+                        relatedCoursesGroup.add(relatedCourseShowMoreViewHolder);
+
+                        for (RelatedTopicsVideo relatedTopicsVideo : relatedVideos.getRelatedTopicsVideos()) {
+                            relatedTopicVideosViewHolder = new RelatedSuggestionViewHolder(relatedTopicsVideo);
+                            relatedTopicVideosGroup.add(relatedTopicVideosViewHolder);
+                        }
+                        relatedTopicVideosShowMoreViewHolder = new ShowMoreViewHolder();
+                        relatedTopicVideosShowMoreViewHolder.setShowMoreClickListener(SuggestionFragment.this);
+                        relatedTopicVideosGroup.add(relatedTopicVideosShowMoreViewHolder);
+
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RelatedVideos> call, Throwable t) {
+
+            }
+        });
         //recyclerView.setAdapter(videoAdapter);
+    }
+
+    /***
+     * Set Current Video track title
+     * @param moduleId
+     */
+    private ModuleItem getItemDetails(final String moduleId) {
+        Realm realm = Realm.getDefaultInstance();
+
+        try {
+            ModuleItem item = realm.where(ModuleItem.class).equalTo("itemId", moduleId).findFirst();
+            return item;
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "setVideoTitle: " + e.getMessage());
+        } finally {
+            realm.close();
+        }
+        return null;
     }
 
     @Override
@@ -181,10 +241,12 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         try {
             if (suggestionListAdapter.getItem(viewHolder) instanceof RelatedVideosHeader) {
                 if (relatedCoursesGroup.isExpanded()) relatedCoursesGroup.onToggleExpanded();
-                if (relatedSuggestionGroup.isExpanded()) relatedSuggestionGroup.onToggleExpanded();
+                if (relatedTopicVideosGroup.isExpanded())
+                    relatedTopicVideosGroup.onToggleExpanded();
             } else if (suggestionListAdapter.getItem(viewHolder) instanceof RelatedCoursesHeader) {
                 if (relatedVideosGroup.isExpanded()) relatedVideosGroup.onToggleExpanded();
-                if (relatedSuggestionGroup.isExpanded()) relatedSuggestionGroup.onToggleExpanded();
+                if (relatedTopicVideosGroup.isExpanded())
+                    relatedTopicVideosGroup.onToggleExpanded();
             } else if (suggestionListAdapter.getItem(viewHolder) instanceof RelatedSuggestionHeader) {
                 if (relatedVideosGroup.isExpanded()) relatedVideosGroup.onToggleExpanded();
                 if (relatedCoursesGroup.isExpanded()) relatedCoursesGroup.onToggleExpanded();
@@ -201,16 +263,26 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         ExpandableGroup expandableGroup = (ExpandableGroup) suggestionListAdapter.getGroup(suggestionListAdapter.getItem(viewHolder));
         if (expandableGroup.getGroup(INITIAL_GROUP_POSITION) instanceof RelatedVideosHeader) {
             for (int i = 0; i < 5; i++) {
-                relatedVideosGroup.add(relatedVideosGroup.getChildCount() - 1, new RelatedVideosViewHolder());
+                //relatedVideosGroup.add(relatedVideosGroup.getChildCount() - 1, new RelatedVideosViewHolder());
             }
         } else if (expandableGroup.getGroup(INITIAL_GROUP_POSITION) instanceof RelatedCoursesHeader) {
             for (int i = 0; i < 5; i++) {
-                relatedCoursesGroup.add(relatedCoursesGroup.getChildCount() - 1, new RelatedCoursesViewHolder());
+                //relatedCoursesGroup.add(relatedCoursesGroup.getChildCount() - 1, new RelatedCoursesViewHolder());
             }
         } else if (expandableGroup.getGroup(INITIAL_GROUP_POSITION) instanceof RelatedSuggestionHeader) {
             for (int i = 0; i < 5; i++) {
-                relatedSuggestionGroup.add(relatedSuggestionGroup.getChildCount() - 1, new RelatedSuggestionViewHolder());
+                //relatedTopicVideosGroup.add(relatedTopicVideosGroup.getChildCount() - 1, new RelatedSuggestionViewHolder());
             }
         }
+    }
+
+    /**
+     * Update video details when received response
+     *
+     * @param body
+     */
+    public void updateVideoContent(VideoEntity body) {
+        videoContentDetailsAdapter = new VideoContentDetailsAdapter(data, body);
+        suggestionListAdapter.add(0, videoContentDetailsAdapter);
     }
 }

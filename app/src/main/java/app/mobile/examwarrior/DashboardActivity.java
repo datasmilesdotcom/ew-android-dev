@@ -11,7 +11,9 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 
+import app.mobile.examwarrior.prefs.AppPref;
 import app.mobile.examwarrior.ui.activity.HomeActivity;
+import app.mobile.examwarrior.ui.app_intro.AppIntroActivity;
 import app.mobile.examwarrior.util.Utility;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -42,7 +44,13 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void redirect() {
-        startActivity(new Intent(DashboardActivity.this, HomeActivity.class));
+        if (AppPref.getInstance().isSplashShown()) {
+            startActivity(new Intent(DashboardActivity.this, HomeActivity.class));
+        } else {
+            AppPref.getInstance().setSplashShown(true);
+            startActivity(new Intent(DashboardActivity.this, AppIntroActivity.class));
+        }
+
         this.finish();
     }
 }
