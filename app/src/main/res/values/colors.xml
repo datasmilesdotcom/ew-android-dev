@@ -10,11 +10,17 @@
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
-
+    <color name="extreme_gray">#F4F4F4</color>
     <color name="black_overlay">#66000000</color>
     <color name="white">#FFF</color>
 
     <color name="gray">#808080</color>
     <color name="light_grey_semi_transparent">#80313435</color>
     <color name="black">#000</color>
+
+
+    <color name="red_light">#ffff4444</color>
+    <color name="green_light">#ff99cc00</color>
+    <color name="orange_light">#ffffbb33</color>
+    <color name="blue_light">#ff33b5e5</color>
 </resources>

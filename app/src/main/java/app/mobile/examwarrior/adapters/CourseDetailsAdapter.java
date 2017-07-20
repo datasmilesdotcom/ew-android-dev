@@ -14,12 +14,7 @@ import app.mobile.examwarrior.expandable_list.ExpandableRecyclerViewAdapter;
 import app.mobile.examwarrior.expandable_list.listeners.CourseHeader;
 import app.mobile.examwarrior.expandable_list.model.ExpandableGroup;
 
-/**
- * Created by sandesh on 5/5/17, 2:24 AM.
- */
-
 public class CourseDetailsAdapter extends ExpandableRecyclerViewAdapter<CourseModuleViewHolder, ModuleItemViewHolder> {
-
 
     private Context context;
     private CourseModuleItemListener courseModuleItemListener;
@@ -41,7 +36,7 @@ public class CourseDetailsAdapter extends ExpandableRecyclerViewAdapter<CourseMo
     public CourseModuleViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.course_detail_list_row, parent, false);
-        return new CourseModuleViewHolder(view);
+        return new CourseModuleViewHolder(view, context);
     }
 
     @Override
@@ -68,9 +63,16 @@ public class CourseDetailsAdapter extends ExpandableRecyclerViewAdapter<CourseMo
     }
 
     @Override
-    public void onBindGroupViewHolder(CourseModuleViewHolder holder, int flatPosition, ExpandableGroup group) {
+    public void onBindGroupViewHolder(CourseModuleViewHolder holder,final int flatPosition, ExpandableGroup group) {
         CourseHeader data = (CourseHeader) group;
         holder.settitle(data.getTitle());
-        holder.setImage(data.getImage(), context);
+        holder.setImage(data.getImage(), context,flatPosition+1);
+        holder.directionArrow.setOnClickListener(new View.OnClickListener() {
+                                                     @Override
+                                                     public void onClick(View v) {
+                                                         toggleGroup(flatPosition);
+                                                     }
+                                                 }
+        );
     }
 }

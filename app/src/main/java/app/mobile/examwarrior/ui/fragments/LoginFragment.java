@@ -213,8 +213,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                             }, new Realm.Transaction.OnSuccess() {
                                 @Override
                                 public void onSuccess() {
+
                                     getActivity().startActivity(new Intent(getActivity(), HomeActivity.class));
                                     getActivity().finish();
+
                                 }
                             }, new Realm.Transaction.OnError() {
                                 @Override
