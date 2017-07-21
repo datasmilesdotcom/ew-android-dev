@@ -20,7 +20,7 @@ public class VideoEntity {
     private Object crtDt;
     @SerializedName("rating")
     @Expose
-    private Integer rating;
+    private double rating;
     @SerializedName("upd_dt")
     @Expose
     private String updDt;
@@ -29,7 +29,7 @@ public class VideoEntity {
     private Integer upv;
     @SerializedName("avg_rating")
     @Expose
-    private Integer avgRating;
+    private double avgRating;
     @SerializedName("upv_cnt")
     @Expose
     private String upvCnt;
@@ -79,11 +79,11 @@ public class VideoEntity {
         this.crtDt = crtDt;
     }
 
-    public Integer getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
@@ -103,11 +103,11 @@ public class VideoEntity {
         this.upv = upv;
     }
 
-    public Integer getAvgRating() {
+    public double getAvgRating() {
         return avgRating;
     }
 
-    public void setAvgRating(Integer avgRating) {
+    public void setAvgRating(double avgRating) {
         this.avgRating = avgRating;
     }
 

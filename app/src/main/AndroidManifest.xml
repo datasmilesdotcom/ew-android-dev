@@ -32,11 +32,7 @@
             android:name=".ui.app_intro.AppIntroActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppIntroTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".ui.activity.SplashActivity"
@@ -117,11 +113,10 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-
-            android:theme="@style/PlayerTheme"></activity>
+            android:theme="@style/PlayerTheme" />
         <activity android:name=".ui.activity.ExploreActivity" />
         <activity android:name=".ui.activity.ExploreMoreActivity" />
-        <activity android:name=".ui.activity.ExploreSubCategoryListActivity"></activity>
+        <activity android:name=".ui.activity.ExploreSubCategoryListActivity" />
 
     </application>
 

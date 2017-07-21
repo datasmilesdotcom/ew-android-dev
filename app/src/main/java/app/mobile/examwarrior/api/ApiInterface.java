@@ -10,7 +10,9 @@ import java.util.Map;
 import app.mobile.examwarrior.database.Course;
 import app.mobile.examwarrior.database.CourseDetail;
 import app.mobile.examwarrior.model.ChangePasswordRequestBody;
+import app.mobile.examwarrior.model.CourseCategories;
 import app.mobile.examwarrior.model.CourseDetailId;
+import app.mobile.examwarrior.model.CourseMoreCategories;
 import app.mobile.examwarrior.model.ForgetPasswordBody;
 import app.mobile.examwarrior.model.ForgetPasswordResponse;
 import app.mobile.examwarrior.model.LoginBody;
@@ -27,9 +29,11 @@ import app.mobile.examwarrior.model.VoteVideoResponse;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 
 public interface ApiInterface {
@@ -64,4 +68,13 @@ public interface ApiInterface {
 
     @POST("/videovotes/downvoteVideo")
     Call<VoteVideoResponse> downVoteVideo(@Header("Authorization") String auth_token, @Body VoteRequestBody voteRequestBody);
+
+    @GET("masterCourseCategoryDetails/details/{id}")
+    Call<CourseMoreCategories> getExlporeSubCategoryData(@Path("id") String id);
+
+    @GET("test/getAllCourseCategory")
+    Call<List<CourseCategories>> getExlporeData();
+
+    @GET("test/getCourseCategory/{id}")
+    Call<List<CourseMoreCategories>> getExlporeMoreData(@Path("id") String id);
 }
