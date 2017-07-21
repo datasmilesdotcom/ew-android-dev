@@ -61,10 +61,10 @@ public class DemoActivity extends AppCompatActivity implements ToggleListener {
         layoutManager.setSpanSizeLookup(groupAdapter.getSpanSizeLookup());
         recyclerview.setLayoutManager(layoutManager);
         recyclerview.setAdapter(groupAdapter);
-        final MyItem myItem = new MyItem();
+      /*  final MyItem myItem = new MyItem();
         myItem.setToggleListener(this);
         expandableGroup = new ExpandableGroup(myItem);
-        myItem.setExpandableGroup(expandableGroup);
+        myItem.setExpandableGroup(expandableGroup);*/
         final MyContent myContentrem = new MyContent();
         expandableGroup.add(myContentrem);
         //expandableGroup.add(myItem);
@@ -76,10 +76,10 @@ public class DemoActivity extends AppCompatActivity implements ToggleListener {
         groupAdapter.add(expandableGroup);
 
 
-        MyItem myItem1 = new MyItem();
+/*        MyItem myItem1 = new MyItem();
         myItem1.setToggleListener(this);
         expandableGroup1 = new ExpandableGroup(new MyItem());
-        myItem1.setExpandableGroup(expandableGroup1);
+        myItem1.setExpandableGroup(expandableGroup1);*/
         //expandableGroup.add(myItem);
 
         for (int i = 0; i < 3; i++) {
@@ -91,10 +91,10 @@ public class DemoActivity extends AppCompatActivity implements ToggleListener {
 //        ((ExpandableGroup) groupAdapter.getGroup(myItem)).add(groupAdapter.getItem(1));
 //        groupAdapter.remove(groupAdapter.getGroup(myItem).getItem(0));
 
-        MyItem myItem2 = new MyItem();
+      /*  MyItem myItem2 = new MyItem();
         myItem2.setToggleListener(this);
         expandableGroup2 = new ExpandableGroup(myItem2);
-        myItem2.setExpandableGroup(expandableGroup2);
+        myItem2.setExpandableGroup(expandableGroup2);*/
 
         //expandableGroup.add(myItem);
 
@@ -108,7 +108,7 @@ public class DemoActivity extends AppCompatActivity implements ToggleListener {
 
         /*RevealFrameLayout revealFrameLayout = (RevealFrameLayout) findViewById(R.id.frame);
         revealFrameLayout.clearAnimation();*/
-        Log.e(TAG, "onClick ****: " + ((ExpandableGroup) groupAdapter.getGroup(myItem)).getItemCount());
+       // Log.e(TAG, "onClick ****: " + ((ExpandableGroup) groupAdapter.getGroup(myItem)).getItemCount());
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,7 +133,7 @@ public class DemoActivity extends AppCompatActivity implements ToggleListener {
             @Override
             public void onClick(View view) {
                 try {
-                    expandableGroup.add(expandableGroup.getChildCount(), new MyItem());
+                   // expandableGroup.add(expandableGroup.getChildCount(), new MyItem());
                 } catch (Exception e) {
                     Log.e(TAG, "onClick: " + e.getCause());
                 }

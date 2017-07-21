@@ -8,9 +8,6 @@ import android.util.AttributeSet;
 import app.mobile.examwarrior.util.Utility;
 
 
-/**
- * Created by sandesh on 29/3/16.
- */
 public class CustomFontTextView extends AppCompatTextView {
     private static final String sScheme =
             "http://schemas.android.com/apk/res-auto";

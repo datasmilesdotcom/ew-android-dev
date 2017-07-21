@@ -104,6 +104,8 @@ dependencies {
     compile 'com.github.fcannizzaro:jsoup-annotations:1.0.3'
     compile project(':mathjaxandroid')
     compile 'com.github.aakira:expandable-layout:1.6.0@aar'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
 
     compile files('libs/YouTubeAndroidPlayerApi.jar')
     implementation 'com.android.support:support-v4:25.4.0'

@@ -100,4 +100,9 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">300dp</item>
     </style>
+
+    <style name="DialogTheme">
+        <item name="android:windowEnterAnimation">@anim/slide_left</item>
+        <item name="android:windowExitAnimation">@anim/slide_right</item>
+    </style>
 </resources>
