@@ -22,6 +22,8 @@ import app.mobile.examwarrior.model.Type;
 import app.mobile.examwarrior.model.User;
 import app.mobile.examwarrior.model.VideoEntity;
 import app.mobile.examwarrior.model.VideoEntityBody;
+import app.mobile.examwarrior.model.VoteRequestBody;
+import app.mobile.examwarrior.model.VoteVideoResponse;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.Body;
@@ -57,4 +59,9 @@ public interface ApiInterface {
     @POST("/videoentity/getRelatedInfo")
     Call<RelatedVideos> getRelatedVideos(@Header("Authorization") String auth_token, @Body RelatedVideosBody relatedVideosBody);
 
+    @POST("/videovotes/upvoteVideo")
+    Call<VoteVideoResponse> upVoteVideo(@Header("Authorization") String auth_token, @Body VoteRequestBody voteRequestBody);
+
+    @POST("/videovotes/downvoteVideo")
+    Call<VoteVideoResponse> downVoteVideo(@Header("Authorization") String auth_token, @Body VoteRequestBody voteRequestBody);
 }

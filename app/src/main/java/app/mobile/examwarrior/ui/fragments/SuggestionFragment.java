@@ -3,6 +3,7 @@ package app.mobile.examwarrior.ui.fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -29,7 +30,11 @@ import app.mobile.examwarrior.model.RelatedTopicsVideo;
 import app.mobile.examwarrior.model.RelatedVideo;
 import app.mobile.examwarrior.model.RelatedVideos;
 import app.mobile.examwarrior.model.RelatedVideosBody;
+import app.mobile.examwarrior.model.User;
 import app.mobile.examwarrior.model.VideoEntity;
+import app.mobile.examwarrior.model.VoteRequestBody;
+import app.mobile.examwarrior.model.VoteVideoResponse;
+import app.mobile.examwarrior.util.Utility;
 import app.mobile.examwarrior.util.decoration.HeaderItemDecoration;
 import app.mobile.examwarrior.util.decoration.InsetItemDecoration;
 import app.mobile.examwarrior.util.decoration.ItemOffsetDecoration;
@@ -47,13 +52,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static app.mobile.examwarrior.player.VideoPlayerFragment.KEY_MODULE_ITEM_ID;
+import static app.mobile.examwarrior.ui.activity.CourseDetailsActivity.KEY_COURSE_ID;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SuggestionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SuggestionFragment extends Fragment implements ToggleListener, ShowMoreViewHolder.ShowMoreClickListener {
+public class SuggestionFragment extends Fragment implements ToggleListener, ShowMoreViewHolder.ShowMoreClickListener, VideoContentDetailsAdapter.onVoteListener {
     public static final String TAG = SuggestionFragment.class.getSimpleName();
 
     private static final int INITIAL_GROUP_POSITION = 0;
@@ -61,6 +67,11 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private static final int STATUS_UPVOTED = 1;
+    private static final int STATUS_DOWNVOTED = 1;
+    private static final int STATUS_NOT_UPVOTE = 0;
+    private static final int STATUS_NOT_DOWNVOTE = 0;
 
     private ModuleItem data;
     private ExpandableGroup relatedVideosGroup;
@@ -82,6 +93,10 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
 
     private GroupAdapter<ViewHolder> suggestionListAdapter;
     private VideoContentDetailsAdapter videoContentDetailsAdapter;
+    private Handler handler = new Handler();
+    private VideoEntity videoEntity;
+    private Call<VoteVideoResponse> upVoteCall;
+    private Call<VoteVideoResponse> downVoteCall;
 
     public SuggestionFragment() {
         // Required empty public constructor
@@ -175,7 +190,20 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
 
         ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
         //apiInterface.getRelatedVideos("token",new RelatedVideosBody(data.getItemVideo(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
-        Call<RelatedVideos> call = apiInterface.getRelatedVideos("JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJzYXJqdSIsImlhdCI6MTQ5NzYyMTExNiwiZXhwIjoxNDk4MjI1OTE2fQ.raiwmRMC0C3G2axuQLOTYoSJNmoTdUyBZ5eiIskrjnA", new RelatedVideosBody("introduction-powercenter-1", "informatica-powercenter-basics"));
+        String token = null;
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            User user = realm.where(User.class).findFirst();
+            if (user != null) {
+                token = user.getToken();
+            }
+        } catch (Exception e) {
+
+        } finally {
+            realm.close();
+        }
+        token = "JWT " + token;
+        Call<RelatedVideos> call = apiInterface.getRelatedVideos(token, new RelatedVideosBody(data.getItemVideo(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
         call.enqueue(new Callback<RelatedVideos>() {
             @Override
             public void onResponse(Call<RelatedVideos> call, Response<RelatedVideos> response) {
@@ -282,7 +310,162 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
      * @param body
      */
     public void updateVideoContent(VideoEntity body) {
+        this.videoEntity = body;
         videoContentDetailsAdapter = new VideoContentDetailsAdapter(data, body);
+        videoContentDetailsAdapter.setOnVoteListener(SuggestionFragment.this);
         suggestionListAdapter.add(0, videoContentDetailsAdapter);
+    }
+
+    @Override
+    public void onUpVote(final ViewHolder item, int position, final VideoEntity videoEntity) {
+        if (!Utility.isNetworkAvailable()) {
+            Utility.showMessage(getString(R.string.network_connectivity_error_message));
+            return;
+        }
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                if (videoEntity.getUpv() == STATUS_NOT_UPVOTE && videoEntity.getDwn() == STATUS_NOT_DOWNVOTE) {
+                    // count by 1
+                    videoEntity.setUpv(STATUS_UPVOTED);
+                    videoEntity.setDwn(STATUS_NOT_DOWNVOTE);
+                    if (Integer.parseInt(videoEntity.getUpvCnt()) >= 0)
+                        videoEntity.setUpvCnt(Integer.toString(Integer.parseInt(videoEntity.getUpvCnt()) + 1));
+                    videoContentDetailsAdapter.setVideoEntity(videoEntity);
+                    videoContentDetailsAdapter.notifyChanged("UPVOTE");
+                    initUpVoteAPI(0, 1, data.getItemVideo());
+                } else if (videoEntity.getUpv() == STATUS_UPVOTED) {
+                    // if liked ==> dislike
+                    videoEntity.setUpv(STATUS_NOT_UPVOTE);
+                    videoEntity.setDwn(STATUS_NOT_DOWNVOTE);
+                    if (Integer.parseInt(videoEntity.getUpvCnt()) >= 0)
+                        videoEntity.setUpvCnt(Integer.toString(Integer.parseInt(videoEntity.getUpvCnt()) - 1));
+                    videoContentDetailsAdapter.setVideoEntity(videoEntity);
+                    videoContentDetailsAdapter.notifyChanged("UPVOTE");
+                    initUpVoteAPI(0, -1, data.getItemVideo());
+                } else if (videoEntity.getDwn() == STATUS_DOWNVOTED) {
+                    // count -1
+                    videoEntity.setUpv(STATUS_UPVOTED);
+                    videoEntity.setDwn(STATUS_NOT_DOWNVOTE);
+                    if (Integer.parseInt(videoEntity.getUpvCnt()) >= 0)
+                        videoEntity.setUpvCnt(Integer.toString(Integer.parseInt(videoEntity.getUpvCnt()) + 1));
+                    if (Integer.parseInt(videoEntity.getDwnCnt()) >= 0)
+                        videoEntity.setDwnCnt(Integer.toString(Integer.parseInt(videoEntity.getDwnCnt()) - 1));
+                    videoContentDetailsAdapter.setVideoEntity(videoEntity);
+                    videoContentDetailsAdapter.notifyChanged("UPVOTE");
+                    initUpVoteAPI(-1, 1, data.getItemVideo());
+                }
+
+
+            }
+        }, 500);
+
+    }
+
+    @Override
+    public void onDownVote(ViewHolder item, int position, final VideoEntity videoEntity) {
+        if (!Utility.isNetworkAvailable()) {
+            Utility.showMessage(getString(R.string.network_connectivity_error_message));
+            return;
+        }
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (videoEntity.getUpv() == STATUS_NOT_UPVOTE && videoEntity.getDwn() == STATUS_NOT_DOWNVOTE) {
+                    // count by 1
+                    videoEntity.setUpv(STATUS_NOT_UPVOTE);
+                    videoEntity.setDwn(STATUS_DOWNVOTED);
+                    if (Integer.parseInt(videoEntity.getDwnCnt()) >= 0)
+                        videoEntity.setDwnCnt(Integer.toString(Integer.parseInt(videoEntity.getDwnCnt()) + 1));
+                    videoContentDetailsAdapter.setVideoEntity(videoEntity);
+                    videoContentDetailsAdapter.notifyChanged("UPVOTE");
+                    initDownVoteAPI(1, 0, data.getItemVideo());
+                } else if (videoEntity.getUpv() == STATUS_UPVOTED) {
+                    // count -1
+                    videoEntity.setUpv(STATUS_NOT_UPVOTE);
+                    videoEntity.setDwn(STATUS_DOWNVOTED);
+                    if (Integer.parseInt(videoEntity.getUpvCnt()) >= 0)
+                        videoEntity.setUpvCnt(Integer.toString(Integer.parseInt(videoEntity.getUpvCnt()) - 1));
+                    if (Integer.parseInt(videoEntity.getDwnCnt()) >= 0)
+                        videoEntity.setDwnCnt(Integer.toString(Integer.parseInt(videoEntity.getDwnCnt()) + 1));
+                    videoContentDetailsAdapter.setVideoEntity(videoEntity);
+                    videoContentDetailsAdapter.notifyChanged("UPVOTE");
+                    initDownVoteAPI(1, -1, data.getItemVideo());
+                } else if (videoEntity.getDwn() == STATUS_DOWNVOTED) {
+                    // if liked ==> dislike
+                    videoEntity.setUpv(STATUS_NOT_UPVOTE);
+                    videoEntity.setDwn(STATUS_NOT_DOWNVOTE);
+                    if (Integer.parseInt(videoEntity.getDwnCnt()) >= 0)
+                        videoEntity.setDwnCnt(Integer.toString(Integer.parseInt(videoEntity.getDwnCnt()) - 1));
+                    videoContentDetailsAdapter.setVideoEntity(videoEntity);
+                    videoContentDetailsAdapter.notifyChanged("UPVOTE");
+                    initDownVoteAPI(-1, 0, data.getItemVideo());
+                }
+
+            }
+        }, 500);
+    }
+
+    private void initUpVoteAPI(int downCount, int upCount, String videoId) {
+
+        if (upVoteCall != null && !upVoteCall.isExecuted() && !upVoteCall.isCanceled()) {
+            upVoteCall.cancel();
+        }
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        upVoteCall = apiInterface.upVoteVideo(getToken(), new VoteRequestBody(downCount, upCount, videoId));
+        upVoteCall.enqueue(new Callback<VoteVideoResponse>() {
+            @Override
+            public void onResponse(Call<VoteVideoResponse> call, Response<VoteVideoResponse> response) {
+                VoteVideoResponse voteVideoResponse = response.body();
+                if (voteVideoResponse != null && !Utility.isEmpty(voteVideoResponse.getVdoId())) {
+                    Utility.showMessage("Liked video");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VoteVideoResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void initDownVoteAPI(int downCount, int upCount, String videoId) {
+        if (downVoteCall != null && !downVoteCall.isExecuted() && !downVoteCall.isCanceled()) {
+            downVoteCall.cancel();
+        }
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        downVoteCall = apiInterface.upVoteVideo(getToken(), new VoteRequestBody(downCount, upCount, videoId));
+        downVoteCall.enqueue(new Callback<VoteVideoResponse>() {
+            @Override
+            public void onResponse(Call<VoteVideoResponse> call, Response<VoteVideoResponse> response) {
+                VoteVideoResponse voteVideoResponse = response.body();
+                if (voteVideoResponse != null && !Utility.isEmpty(voteVideoResponse.getVdoId())) {
+                    Utility.showMessage("Disliked video");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VoteVideoResponse> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private String getToken() {
+        String token = null;
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            User user = realm.where(User.class).findFirst();
+            if (user != null) {
+                token = user.getToken();
+            }
+        } catch (Exception e) {
+
+        } finally {
+            realm.close();
+        }
+        token = "JWT " + token;
+        return token;
     }
 }

@@ -899,10 +899,9 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         } finally {
             realm.close();
         }
-
-
-        token = "JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJzYXJqdSIsImlhdCI6MTUwMDU0NjQwMiwiZXhwIjoxNTAxMTUxMjAyfQ.WVYw8-C0Qy2io8dFM6Qtf9dMix6qSiCMkhCT7qsa4ZQ";
-        videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody("introduction-powercenter-1"));
+        token = "JWT " + token;
+        videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody(item.getItemVideo()));
+        //videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody("introduction-powercenter-1"));
 
         videoDetails.enqueue(new Callback<VideoEntity>() {
             @Override
