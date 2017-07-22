@@ -1,6 +1,11 @@
 package app.mobile.examwarrior.ui.activity;
 
+
 import android.app.Dialog;
+
+import android.content.ComponentName;
+import android.content.Intent;
+
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
@@ -22,8 +27,13 @@ import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.database.CourseDetail;
 import app.mobile.examwarrior.database.ModuleDetail;
+import app.mobile.examwarrior.database.ModuleItem;
+import app.mobile.examwarrior.delegates.CourseModuleItemListener;
 import app.mobile.examwarrior.expandable_list.listeners.CourseHeader;
+import app.mobile.examwarrior.expandable_list.viewholders.ChildViewHolder;
 import app.mobile.examwarrior.model.CourseDetailId;
+import app.mobile.examwarrior.player.PlayerActivity;
+import app.mobile.examwarrior.player.VideoPlayerActivity;
 import app.mobile.examwarrior.util.Utility;
 import app.mobile.examwarrior.widget.CustomFontTextView;
 import de.timfreiheit.mathjax.android.MathJaxView;
@@ -31,15 +41,16 @@ import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CourseDetailsActivity extends AppCompatActivity {
+public class CourseDetailsActivity extends AppCompatActivity implements CourseModuleItemListener {
 
     public static final String KEY_COURSE_ID = "app.mobile.examwarrior.course.id";
-    CourseDetailsAdapter courseDetailsAdapter;
-    RecyclerView courses_detail_list;
+    private CourseDetailsAdapter courseDetailsAdapter;
+    private RecyclerView courses_detail_list;
     private Realm realm;
     private RealmResults<CourseDetail> courseDetailsList;
     private List<CourseHeader> courseHeaders = new ArrayList<>();
@@ -65,16 +76,16 @@ public class CourseDetailsActivity extends AppCompatActivity {
             @Override
             public void onChange(RealmResults<CourseDetail> courseDetails, OrderedCollectionChangeSet orderedCollectionChangeSet) {
                 if (courseDetails.size() > 0) {
-                    if (courseDetails.get(0).getModuleDetail() != null)
-                        for (ModuleDetail moduleDetail : courseDetails.get(0).getModuleDetail()) {
-                            courseHeaders.add(new CourseHeader(moduleDetail.getModuleName(), moduleDetail.getModuleId(), moduleDetail.getModuleItems()));
-                        }
-                    courseDetailsAdapter = new CourseDetailsAdapter(CourseDetailsActivity.this, courseHeaders);
-                    courses_detail_list.setAdapter(courseDetailsAdapter);
 
-                    if (!Utility.isEmpty(courseDetails.get(0).getCourseShortDesc())) {
-                        action_bar_title.setText(courseDetails.get(0).getCourseName());
-                        course_name = courseDetails.get(0).getCourseName();
+                    if (courseDetails.get(0).getModuleDetail() != null && courseHeaders.size() <= 0)
+                        for (ModuleDetail moduleDetail : courseDetails.get(0).getModuleDetail().sort("moduleWeight", Sort.ASCENDING)) {
+                            courseHeaders.add(new CourseHeader(moduleDetail.getModuleName(), moduleDetail.getModuleId(), moduleDetail.getModuleItems().sort("itemWeight", Sort.ASCENDING)));
+                        }
+                    if (courseDetailsAdapter == null || courseDetailsAdapter.getItemCount() <= 0) {
+                        courseDetailsAdapter = new CourseDetailsAdapter(CourseDetailsActivity.this, courseHeaders);
+                        courseDetailsAdapter.setCourseModuleItemListener(CourseDetailsActivity.this);
+                        courses_detail_list.setAdapter(courseDetailsAdapter);
+
                     }
                     if (!Utility.isEmpty(courseDetails.get(0).getCourseLongDesc()))
                         description_value=  courseDetails.get(0).getCourseLongDesc();
@@ -142,6 +153,7 @@ public class CourseDetailsActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+
     private void buildDialog() {
 
         final Dialog dialog = new Dialog(this);
@@ -162,6 +174,15 @@ public class CourseDetailsActivity extends AppCompatActivity {
         dialog.getWindow().getAttributes().gravity = Gravity.RIGHT|Gravity.TOP;
         dialog.show();
 
+    }
+
+    @Override
+    public void onModuleClickListener(ChildViewHolder holder, int position, ModuleItem data) {
+        Intent intent = new Intent(getIntent());
+        //intent.setAction(PlayerActivity.ACTION_VIEW_LIST);
+        intent.setComponent(new ComponentName(CourseDetailsActivity.this, VideoPlayerActivity.class));
+        intent.putExtra(PlayerActivity.KEY_MODULE_ITEM_ID, data.getItemId());
+        startActivity(intent);
 
     }
 }

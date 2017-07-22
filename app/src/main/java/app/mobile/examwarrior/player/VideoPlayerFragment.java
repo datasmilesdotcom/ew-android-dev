@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.telephony.PhoneStateListener;
@@ -74,6 +75,7 @@ import com.google.android.exoplayer2.util.Util;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,11 +83,20 @@ import java.util.UUID;
 
 import app.mobile.examwarrior.BuildConfig;
 import app.mobile.examwarrior.R;
+import app.mobile.examwarrior.api.ApiInterface;
+import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.app_controller.AppController;
 import app.mobile.examwarrior.database.ModuleItem;
+import app.mobile.examwarrior.model.User;
+import app.mobile.examwarrior.model.VideoEntity;
+import app.mobile.examwarrior.model.VideoEntityBody;
 import app.mobile.examwarrior.prefs.AppPref;
+import app.mobile.examwarrior.ui.fragments.SuggestionFragment;
 import app.mobile.examwarrior.util.Utility;
 import io.realm.Realm;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
@@ -132,6 +143,8 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         DEFAULT_COOKIE_MANAGER.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
     }
 
+    private Call<VideoEntity> videoDetails;
+    private VideoEntity videoInfo;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -168,7 +181,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
                 releasePlayer();
             } else if (state == TelephonyManager.CALL_STATE_IDLE) {
                 //Not in call: Play music
-                initializePlayer();
+                initializePlayer(videoInfo);
             } else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
                 //A call is dialing, active or on hold
             }
@@ -247,7 +260,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
             CookieHandler.setDefault(DEFAULT_COOKIE_MANAGER);
         }
-        Utility.showMessage(getResources().getBoolean(R.bool.is_landscape) ? "Land" : "Port");
+        //Utility.showMessage(getResources().getBoolean(R.bool.is_landscape) ? "Land" : "Port");
 
         View rootView = view.findViewById(R.id.root);
         rootView.setOnClickListener(this);
@@ -261,7 +274,8 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         initViews(view);
     }
 
-    private void initViews(View view) {
+    private void
+    initViews(View view) {
         mgr = (TelephonyManager) getActivity().getSystemService(TELEPHONY_SERVICE);
         if (mgr != null) {
             mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
@@ -289,7 +303,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     public void onStart() {
         super.onStart();
         if (Util.SDK_INT > 23) {
-            initializePlayer();
+            initializePlayer(videoInfo);
         }
     }
 
@@ -297,7 +311,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     public void onResume() {
         super.onResume();
         if ((Util.SDK_INT <= 23 || player == null)) {
-            initializePlayer();
+            initializePlayer(videoInfo);
         }
     }
 
@@ -337,7 +351,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            initializePlayer();
+            initializePlayer(videoInfo);
         } else {
             showToast(R.string.storage_permission_denied);
             getActivity().finish();
@@ -377,7 +391,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
                 getActivity().setRequestedOrientation(getResources().getBoolean(R.bool.is_landscape) ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
                 break;
             case R.id.retry_button:
-                initializePlayer();
+                initializePlayer(videoInfo);
                 break;
             case R.id.btn_back:
                 getActivity().onBackPressed();
@@ -485,11 +499,18 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     /***
      * Initialize Player
      */
-    private void initializePlayer() {
+    private void initializePlayer(VideoEntity videoInfo) {
+
+
         Intent intent = getActivity().getIntent();
         boolean needNewPlayer = player == null;
         if (video_title != null && intent.getStringExtra(KEY_MODULE_ITEM_ID) != null)
+//            Realm.getDefaultInstance().where(CourseDetail.class).equalTo("courseId", getIntent().getStringExtra(KEY_COURSE_ID)).findAllAsync()
             setVideoTitle(intent.getStringExtra(KEY_MODULE_ITEM_ID));
+        if (videoInfo == null) {
+            initVideoDetailsAPI("");
+            return;
+        }
         if (needNewPlayer) {
             boolean preferExtensionDecoders = intent.getBooleanExtra(PREFER_EXTENSION_DECODERS, false);
             UUID drmSchemeUuid = intent.hasExtra(DRM_SCHEME_UUID_EXTRA)
@@ -551,7 +572,8 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             Uri[] uris;
             String[] extensions;
             if (ACTION_VIEW.equals(action)) {
-                uris = new Uri[]{intent.getData()};
+
+                uris = new Uri[]{Uri.parse(videoInfo.getUrl())};
                 extensions = new String[]{intent.getStringExtra(EXTENSION_EXTRA)};
             } else if (ACTION_VIEW_LIST.equals(action)) {
                 String[] uriStrings = intent.getStringArrayExtra(URI_LIST_EXTRA);
@@ -567,8 +589,8 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
                 /*showToast(getString(R.string.unexpected_intent_action, action));
                 return;*/
             }
-            uris = new Uri[]{Uri.parse("https://storage.googleapis.com/wvmedia/clear/h264/tears/tears_sd.mpd"), Uri.parse("https://storage.googleapis.com/wvmedia/clear/h264/tears/tears_sd.mpd"), Uri.parse("https://storage.googleapis.com/wvmedia/clear/h264/tears/tears_sd.mpd")};
-            extensions = new String[]{"", "", ""};
+            uris = new Uri[]{Uri.parse(videoInfo.getUrl())};
+            extensions = new String[]{""};
             if (Util.maybeRequestReadExternalStoragePermission(getActivity(), uris)) {
                 // The player will be reinitialized if the permission is granted.
                 return;
@@ -684,6 +706,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         // Do nothing.
     }
 
+
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         switch (playbackState) {
@@ -699,7 +722,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
                 break;
             case ExoPlayer.STATE_ENDED:
                 if (progress != null) progress.setVisibility(View.GONE);
-                initializePlayer();
+                //initializePlayer();
                 showControls();
                 break;
             default:
@@ -761,7 +784,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         needRetrySource = true;
         if (isBehindLiveWindow(e)) {
             clearResumePosition();
-            initializePlayer();
+            initializePlayer(videoInfo);
         } else {
             updateResumePosition();
             updateButtonVisibilities();
@@ -858,4 +881,53 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         }
     }
 
+
+    private void initVideoDetailsAPI(String videoID) {
+        if (videoDetails != null) {
+            return;
+        }
+        ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
+        String token = null;
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            User user = realm.where(User.class).findFirst();
+            if (user != null) {
+                token = user.getToken();
+            }
+        } catch (Exception e) {
+
+        } finally {
+            realm.close();
+        }
+        token = "JWT " + token;
+        videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody(item.getItemVideo()));
+        //videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody("introduction-powercenter-1"));
+
+        videoDetails.enqueue(new Callback<VideoEntity>() {
+            @Override
+            public void onResponse(Call<VideoEntity> call, Response<VideoEntity> response) {
+                switch (response.code()) {
+                    case HttpURLConnection.HTTP_OK:
+                        videoInfo = response.body();
+                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                        SuggestionFragment suggestionFragment = (SuggestionFragment) fragmentManager.findFragmentByTag(SuggestionFragment.TAG);
+                        if (suggestionFragment != null) {
+                            suggestionFragment.updateVideoContent(videoInfo);
+                            initializePlayer(videoInfo);
+                        }
+                        break;
+                    default:
+                        Utility.showMessage("Failed in response");
+                        break;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VideoEntity> call, Throwable t) {
+                Utility.showMessage("Failed");
+            }
+        });
+
+
+    }
 }
