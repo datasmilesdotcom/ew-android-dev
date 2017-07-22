@@ -97,6 +97,8 @@ dependencies {
     compile "com.evernote:android-job:${evernoteSyncLibraryVersion}"
     // MathJax
     compile 'jp.wasabeef:glide-transformations:2.0.1'
+    compile 'io.github.kexanie.library:MathView:0.0.6'
+
     compile 'com.hendraanggrian:reveallayout:0.3.1'
     compile 'com.github.florent37:diagonallayout:1.0.4'
     implementation "com.android.support:support-v4:${supprtLibraryVersion}"

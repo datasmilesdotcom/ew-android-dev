@@ -20,6 +20,7 @@ import app.mobile.examwarrior.expandable_list.ExpandableRecyclerViewAdapter;
 import app.mobile.examwarrior.expandable_list.listeners.CourseHeader;
 import app.mobile.examwarrior.expandable_list.model.ExpandableGroup;
 import app.mobile.examwarrior.player.PlayerActivity;
+import app.mobile.examwarrior.ui.activity.PracticeActivity;
 import app.mobile.examwarrior.util.Utility;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
@@ -53,7 +54,7 @@ public class CourseDetailsAdapter extends ExpandableRecyclerViewAdapter<CourseMo
         holder.getChildTextView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, PlayerActivity.class);
+                Intent intent = new Intent(context, PracticeActivity.class);
                 intent.putExtra(PlayerActivity.KEY_MODULE_ITEM_ID, data.getItemId());
                 context.startActivity(intent);
             }

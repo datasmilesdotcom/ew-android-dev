@@ -1,62 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="app.mobile.examwarrior.ui.activity.PracticeActivity">
+    >
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview"
+    <app.mobile.examwarrior.widget.widgets.SlidingTabLayout
+        android:id="@+id/home_tab_layout"
         android:layout_width="match_parent"
-        android:visibility="gone"
-        android:layout_height="match_parent"/>
-    <FrameLayout
-        android:id="@+id/questions_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/linearLayout"
-        android:visibility="gone"
-        android:minHeight="100dp" />
+        android:layout_height="48dp"
+        android:background="#fff"
+        android:elevation="2dp"
+        app:indicatorColor="#657897"
+        app:shouldExpand="false"
+        app:tabBackgroundP="@layout/question_tab_nmber"
+        app:tabBackgroundTextViewId="@+id/home_tab_textview" />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_below="@+id/home_tab_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        />
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/text___"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <WebView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/laTexView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:minHeight="400dp" />
-
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:padding="10dp">
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/exo_prev"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Previous"
-            android:textColor="#FFF" />
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/exo_next"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Next"
-            android:textColor="#FFF" />
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>

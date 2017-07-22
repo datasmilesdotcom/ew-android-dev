@@ -2,7 +2,6 @@ package app.mobile.examwarrior.ui.activity;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
@@ -10,13 +9,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
