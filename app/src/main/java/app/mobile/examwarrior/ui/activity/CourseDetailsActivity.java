@@ -179,8 +179,7 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
     @Override
     public void onModuleClickListener(ChildViewHolder holder, int position, ModuleItem data) {
         Intent intent = new Intent(getIntent());
-        //intent.setAction(PlayerActivity.ACTION_VIEW_LIST);
-        intent.setComponent(new ComponentName(CourseDetailsActivity.this, VideoPlayerActivity.class));
+        intent.setComponent(new ComponentName(CourseDetailsActivity.this, PracticeActivity.class));
         intent.putExtra(PlayerActivity.KEY_MODULE_ITEM_ID, data.getItemId());
         startActivity(intent);
 

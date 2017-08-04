@@ -13,7 +13,7 @@
         android:background="#fff"
         android:elevation="2dp"
         app:indicatorColor="#657897"
-        app:shouldExpand="false"
+        app:shouldExpand="true"
         app:tabBackgroundP="@layout/question_tab_nmber"
         app:tabBackgroundTextViewId="@+id/home_tab_textview" />
     <android.support.v4.view.ViewPager
@@ -23,4 +23,12 @@
         android:layout_height="match_parent"
         />
 
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:id="@+id/initial_feed_progress"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:padding="3dp"
+        android:visibility="gone" />
 </RelativeLayout>

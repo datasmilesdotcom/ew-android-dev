@@ -10,17 +10,18 @@ import android.widget.Button;
 import java.util.ArrayList;
 
 import app.mobile.examwarrior.R;
+import app.mobile.examwarrior.database.AllQuestionsBean;
 import app.mobile.examwarrior.listener.NextClicklistener;
 import io.github.kexanie.library.MathView;
 
 
 public class BannerPagerAdapter extends PagerAdapter {
 
-    private ArrayList<String> playLists;
+    private ArrayList<AllQuestionsBean> playLists;
     private LayoutInflater inflater;
     private NextClicklistener saveImageClickListener;
 
-    public BannerPagerAdapter(Context context, ArrayList<String> playLists, NextClicklistener saveImageClickListener) {
+    public BannerPagerAdapter(Context context, ArrayList<AllQuestionsBean> playLists, NextClicklistener saveImageClickListener) {
         this.playLists = playLists;
         inflater = LayoutInflater.from(context);
         this.saveImageClickListener = saveImageClickListener;
@@ -40,14 +41,21 @@ public class BannerPagerAdapter extends PagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return String.valueOf(position+1).toUpperCase();
+        return String.valueOf(position+1);
     }
 
     @Override
     public Object instantiateItem(ViewGroup view, final int position) {
         View myImageLayout = inflater.inflate(R.layout.equation_page, view, false);
         MathView formula_one = (MathView) myImageLayout.findViewById(R.id.formula_one);
-        formula_one.setText(playLists.get(position));
+        formula_one.config(
+                "MathJax.Hub.Config({\n"+
+                        "  CommonHTML: { linebreaks: { automatic: true } },\n"+
+                        "  \"HTML-CSS\": { linebreaks: { automatic: true } },\n"+
+                        "         SVG: { linebreaks: { automatic: true } }\n"+
+                        "});");
+        formula_one.setText(playLists.get(position).getQuestion());
+        formula_one.getSettings().setLoadWithOverviewMode(true);
         Button next = (Button) myImageLayout.findViewById(R.id.next);
         next.setOnClickListener(new View.OnClickListener() {
             @Override

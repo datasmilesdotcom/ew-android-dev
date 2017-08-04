@@ -3,14 +3,18 @@ package app.mobile.examwarrior.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import app.mobile.examwarrior.BuildConfig;
+import app.mobile.examwarrior.RealmPrimitiveModel.RealmStringAns;
+import app.mobile.examwarrior.RealmPrimitiveModel.TagRealmListConverter;
 import app.mobile.examwarrior.app_controller.AppController;
 import app.mobile.examwarrior.util.Utility;
+import io.realm.RealmList;
 import okhttp3.Authenticator;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -28,7 +32,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ServiceGenerator {
 
     private static final String API_BASE_URL = BuildConfig.BASE_URL;
-    public static GsonBuilder gsonBuilder = new GsonBuilder();
+   // public static GsonBuilder gsonBuilder = new GsonBuilder();
+
+    public static GsonBuilder gsonBuilder = new GsonBuilder()
+            .registerTypeAdapter(new TypeToken<RealmList<RealmStringAns>>() {}.getType(),
+                    new TagRealmListConverter());
     private static Retrofit retrofit;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     // log rest calls
@@ -94,7 +102,8 @@ public class ServiceGenerator {
         httpClient.cache(new okhttp3.Cache(new File(AppController.getAppContext().getCacheDir(), "http"), 10 * 1024 * 1024));
         httpClient.readTimeout(1, TimeUnit.MINUTES);
         httpClient.connectTimeout(1, TimeUnit.MINUTES);
-        retrofit = builder.client(httpClient.build()).build();
+        Gson gson = gsonBuilder.create();
+        retrofit = builder.client(httpClient.build()).addConverterFactory(GsonConverterFactory.create(gson)).build();
         return retrofit.create(serviceClass);
     }
 }

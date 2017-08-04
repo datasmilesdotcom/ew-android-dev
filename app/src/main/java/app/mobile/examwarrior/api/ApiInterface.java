@@ -9,6 +9,7 @@ import java.util.Map;
 
 import app.mobile.examwarrior.database.Course;
 import app.mobile.examwarrior.database.CourseDetail;
+import app.mobile.examwarrior.database.Question;
 import app.mobile.examwarrior.model.ChangePasswordRequestBody;
 import app.mobile.examwarrior.model.CourseCategories;
 import app.mobile.examwarrior.model.CourseDetailId;
@@ -16,6 +17,7 @@ import app.mobile.examwarrior.model.CourseMoreCategories;
 import app.mobile.examwarrior.model.ForgetPasswordBody;
 import app.mobile.examwarrior.model.ForgetPasswordResponse;
 import app.mobile.examwarrior.model.LoginBody;
+import app.mobile.examwarrior.model.QuestionRequestBody;
 import app.mobile.examwarrior.model.RegistrationResponse;
 import app.mobile.examwarrior.model.RelatedVideos;
 import app.mobile.examwarrior.model.RelatedVideosBody;
@@ -77,4 +79,8 @@ public interface ApiInterface {
 
     @GET("test/getCourseCategory/{id}")
     Call<List<CourseMoreCategories>> getExlporeMoreData(@Path("id") String id);
+
+    @POST("practice/startUserExam")
+    Call<Question> getQuestions(@Header("Authorization") String auth_token, @Body QuestionRequestBody questionRequestBody);
+
 }
