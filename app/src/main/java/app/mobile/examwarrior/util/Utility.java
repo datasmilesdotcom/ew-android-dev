@@ -31,6 +31,7 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -516,5 +517,23 @@ public class Utility {
 
     }
 
+    public static String getSizeFromKb(int sizeInKb) {
+        String hrSize = "";
+        double m = sizeInKb / 1024.0;
+        double g = sizeInKb / 1048576.0;
+        double t = sizeInKb / 1073741824.0;
+        DecimalFormat dec = new DecimalFormat("0.00");
+        if (t > 1) {
+            hrSize = dec.format(t).concat("TB");
+        } else if (g > 1) {
+            hrSize = dec.format(g).concat("GB");
+        } else if (m > 1) {
+            hrSize = dec.format(m).concat("MB");
+        } else {
+            hrSize = dec.format(sizeInKb).concat("KB");
+        }
+
+        return hrSize;
+    }
 
 }

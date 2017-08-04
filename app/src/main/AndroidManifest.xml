@@ -62,6 +62,7 @@
                 <data android:scheme="asset" />
                 <data android:scheme="file" />
             </intent-filter>
+
             <intent-filter>
                 <action android:name="com.xcplayer.exoplayer.app.action.VIEW_LIST" />
 

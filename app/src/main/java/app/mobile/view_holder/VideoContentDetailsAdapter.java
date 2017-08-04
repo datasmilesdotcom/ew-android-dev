@@ -29,8 +29,8 @@ public class VideoContentDetailsAdapter extends Item<ViewHolder> {
     private AppCompatTextView up_vote_count, down_vote_count;
     private ModuleItem data;
     private VideoEntity videoEntity;
-    private onVoteListener onVoteListener;
-    private LinearLayout up_vote_view, down_vote_view;
+    private onItemListener onItemListener;
+    private LinearLayout up_vote_view, down_vote_view, save_Video;
     private AppCompatImageView ic_like, ic_dislike;
 
     public VideoContentDetailsAdapter(ModuleItem data, VideoEntity videoEntity) {
@@ -54,12 +54,12 @@ public class VideoContentDetailsAdapter extends Item<ViewHolder> {
         this.videoEntity = videoEntity;
     }
 
-    public VideoContentDetailsAdapter.onVoteListener getOnVoteListener() {
-        return onVoteListener;
+    public onItemListener getOnItemListener() {
+        return onItemListener;
     }
 
-    public void setOnVoteListener(VideoContentDetailsAdapter.onVoteListener onVoteListener) {
-        this.onVoteListener = onVoteListener;
+    public void setOnItemListener(onItemListener onItemListener) {
+        this.onItemListener = onItemListener;
     }
 
     @Override
@@ -71,18 +71,26 @@ public class VideoContentDetailsAdapter extends Item<ViewHolder> {
         down_vote_view = (LinearLayout) viewHolder.getRoot().findViewById(R.id.down_vote_view);
         ic_like = (AppCompatImageView) viewHolder.getRoot().findViewById(R.id.ic_like);
         ic_dislike = (AppCompatImageView) viewHolder.getRoot().findViewById(R.id.ic_dislike);
+        save_Video = viewHolder.getRoot().findViewById(R.id.save_Video);
+        save_Video.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onItemListener != null)
+                    onItemListener.onDownloadVideo(viewHolder, position, videoEntity);
+            }
+        });
         up_vote_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (onVoteListener != null)
-                    onVoteListener.onUpVote(viewHolder, position, videoEntity);
+                if (onItemListener != null)
+                    onItemListener.onUpVote(viewHolder, position, videoEntity);
             }
         });
         down_vote_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (onVoteListener != null)
-                    onVoteListener.onDownVote(viewHolder, position, videoEntity);
+                if (onItemListener != null)
+                    onItemListener.onDownVote(viewHolder, position, videoEntity);
             }
         });
         if (data != null) {
@@ -115,9 +123,11 @@ public class VideoContentDetailsAdapter extends Item<ViewHolder> {
         return R.layout.video_header;
     }
 
-    public interface onVoteListener {
+    public interface onItemListener {
         public void onUpVote(ViewHolder item, int position, VideoEntity videoEntity);
 
         public void onDownVote(ViewHolder item, int position, VideoEntity videoEntity);
+
+        public void onDownloadVideo(ViewHolder item, int position, VideoEntity videoEntity);
     }
 }

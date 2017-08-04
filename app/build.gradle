@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.0'
     defaultConfig {
         applicationId "app.mobile.examwarrior"
@@ -13,6 +13,12 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         // Vector drawable support compact
         vectorDrawables.useSupportLibrary = true
+
+        /*ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'mips', 'x86', 'x86_64'
+        }*/
+
+        resConfigs "en"
     }
 
     packagingOptions {
@@ -37,6 +43,9 @@ android {
         maven {
             url "https://maven.google.com"
         }
+        maven {
+            url 'https://mvn.jwplayer.com/content/repositories/releases/'
+        }
     }
 
 
@@ -44,6 +53,7 @@ android {
         release {
             minifyEnabled false
             useProguard true
+            //shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
@@ -53,10 +63,19 @@ android {
             it.buildConfigField 'int', 'SCHEMA_VERSION', SCHEMA_VERSION
         }
     }
+
+    /*splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a', 'mips', 'x86', 'x86_64'
+            universalApk = true
+        }
+    }*/
 }
 
 ext {
-    supprtLibraryVersion = '25.4.0'
+    supprtLibraryVersion = '26.0.0'
     exoplayerLibraryVersion = 'r2.4.4'
     retrofitLibraryVersion = '2.1.0'
     gsonLibraryVersion = '2.8.0'
@@ -107,7 +126,12 @@ dependencies {
     compile 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
 
     compile files('libs/YouTubeAndroidPlayerApi.jar')
-    implementation 'com.android.support:support-v4:25.4.0'
     //compile 'com.xwray:groupie:2.0.0-alpha2'
     compile project(path: ':library')
+    compile 'com.github.rubensousa:previewseekbar-exoplayer:1.0'
+    /*// Sample JW Player
+    compile 'com.longtailvideo.jwplayer:jwplayer-core:+'
+    compile 'com.longtailvideo.jwplayer:jwplayer-common:+'
+    compile 'com.longtailvideo.jwplayer:jwplayer-ima:+'        // Only required if using IMA features
+    compile 'com.longtailvideo.jwplayer:jwplayer-chromecast:+' // Only required if using Chromecast*/
 }

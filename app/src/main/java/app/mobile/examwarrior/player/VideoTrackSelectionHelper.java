@@ -11,6 +11,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
+import android.net.Uri;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,28 +30,30 @@ import com.google.android.exoplayer2.trackselection.RandomTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 
 import java.util.Arrays;
+import java.util.List;
 
 import app.mobile.examwarrior.R;
+import app.mobile.examwarrior.model.VideoEntity;
 
 /**
  * Helper class for displaying track selection dialogs.
  */
-/* package */ final class TrackSelectionHelper implements View.OnClickListener,
+/* package */
+public final class VideoTrackSelectionHelper implements View.OnClickListener,
         DialogInterface.OnClickListener {
 
     private static final TrackSelection.Factory FIXED_FACTORY = new FixedTrackSelection.Factory();
     private static final TrackSelection.Factory RANDOM_FACTORY = new RandomTrackSelection.Factory();
-
     private final MappingTrackSelector selector;
     private final TrackSelection.Factory adaptiveTrackSelectionFactory;
-
+    private List<Uri> uris;
     private MappedTrackInfo trackInfo;
     private int rendererIndex;
     private TrackGroupArray trackGroups;
     private boolean[] trackGroupsAdaptive;
     private boolean isDisabled;
     private SelectionOverride override;
-
+    private VideoEntity videoInfo;
     private CheckedTextView disableView;
     private CheckedTextView defaultView;
     private CheckedTextView enableRandomAdaptationView;
@@ -60,8 +64,8 @@ import app.mobile.examwarrior.R;
      * @param adaptiveTrackSelectionFactory A factory for adaptive {@link TrackSelection}s, or null
      *                                      if the selection helper should not support adaptive tracks.
      */
-    public TrackSelectionHelper(MappingTrackSelector selector,
-                                TrackSelection.Factory adaptiveTrackSelectionFactory) {
+    public VideoTrackSelectionHelper(MappingTrackSelector selector,
+                                     TrackSelection.Factory adaptiveTrackSelectionFactory) {
         this.selector = selector;
         this.adaptiveTrackSelectionFactory = adaptiveTrackSelectionFactory;
     }
@@ -85,6 +89,14 @@ import app.mobile.examwarrior.R;
         return tracks;
     }
 
+    public VideoEntity getVideoInfo() {
+        return videoInfo;
+    }
+
+    public void setVideoInfo(VideoEntity videoInfo) {
+        this.videoInfo = videoInfo;
+    }
+
     /**
      * Shows the selection dialog for a given renderer.
      *
@@ -94,11 +106,13 @@ import app.mobile.examwarrior.R;
      * @param rendererIndex The index of the renderer.
      */
     public void showSelectionDialog(Activity activity, CharSequence title, MappedTrackInfo trackInfo,
-                                    int rendererIndex) {
+                                    int rendererIndex, VideoEntity videoDetails) {
         this.trackInfo = trackInfo;
         this.rendererIndex = rendererIndex;
+        this.videoInfo = videoDetails;
 
         trackGroups = trackInfo.getTrackGroups(rendererIndex);
+
         trackGroupsAdaptive = new boolean[trackGroups.length];
         for (int i = 0; i < trackGroups.length; i++) {
             trackGroupsAdaptive[i] = adaptiveTrackSelectionFactory != null
@@ -106,9 +120,9 @@ import app.mobile.examwarrior.R;
                     != RendererCapabilities.ADAPTIVE_NOT_SUPPORTED
                     && trackGroups.get(i).length > 1;
         }
+
         isDisabled = selector.getRendererDisabled(rendererIndex);
         override = selector.getSelectionOverride(rendererIndex, trackGroups);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(title)
                 .setView(buildView(builder.getContext()))
@@ -144,20 +158,25 @@ import app.mobile.examwarrior.R;
         defaultView = (CheckedTextView) inflater.inflate(
                 android.R.layout.simple_list_item_single_choice, root, false);
         defaultView.setBackgroundResource(selectableItemBackgroundResourceId);
-        defaultView.setText(R.string.selection_default);
+        defaultView.setText("Auto");
         defaultView.setFocusable(true);
         defaultView.setOnClickListener(this);
         root.addView(inflater.inflate(R.layout.list_divider, root, false));
         root.addView(defaultView);
 
         // Per-track views.
+        boolean haveSupportedTracks = false;
         boolean haveAdaptiveTracks = false;
         trackViews = new CheckedTextView[trackGroups.length][];
         for (int groupIndex = 0; groupIndex < trackGroups.length; groupIndex++) {
             TrackGroup group = trackGroups.get(groupIndex);
+
             boolean groupIsAdaptive = trackGroupsAdaptive[groupIndex];
             haveAdaptiveTracks |= groupIsAdaptive;
             trackViews[groupIndex] = new CheckedTextView[group.length];
+            if (uris != null && !uris.isEmpty()) {
+                Log.e("tracks", "buildView: " + uris.get(groupIndex).toString());
+            }
             for (int trackIndex = 0; trackIndex < group.length; trackIndex++) {
                 if (trackIndex == 0) {
                     root.addView(inflater.inflate(R.layout.list_divider, root, false));
@@ -167,22 +186,31 @@ import app.mobile.examwarrior.R;
                 CheckedTextView trackView = (CheckedTextView) inflater.inflate(
                         trackViewLayoutId, root, false);
                 trackView.setBackgroundResource(selectableItemBackgroundResourceId);
-                trackView.setText(PlayerUtil.buildTrackName(group.getFormat(trackIndex)));
+                //trackView.setText(PlayerUtil.buildTrackName(group.getFormat(trackIndex)));
+
+
+                trackView.setText(String.format("%s p %sx%s", videoInfo.getVideo_urls().get(groupIndex).getRes(), group.getFormat(trackIndex).width, group.getFormat(trackIndex).height));
+
                 if (trackInfo.getTrackFormatSupport(rendererIndex, groupIndex, trackIndex)
                         == RendererCapabilities.FORMAT_HANDLED) {
                     trackView.setFocusable(true);
                     trackView.setTag(Pair.create(groupIndex, trackIndex));
                     trackView.setOnClickListener(this);
+                    haveSupportedTracks = true;
                 } else {
                     trackView.setFocusable(false);
                     trackView.setEnabled(false);
                 }
+
                 trackViews[groupIndex][trackIndex] = trackView;
                 root.addView(trackView);
             }
         }
 
-        if (haveAdaptiveTracks) {
+        if (!haveSupportedTracks) {
+            // Indicate that the default selection will be nothing.
+            defaultView.setText(R.string.selection_default_none);
+        } else if (haveAdaptiveTracks) {
             // View for using random adaptation.
             enableRandomAdaptationView = (CheckedTextView) inflater.inflate(
                     android.R.layout.simple_list_item_multiple_choice, root, false);
@@ -203,6 +231,10 @@ import app.mobile.examwarrior.R;
         disableView.setChecked(isDisabled);
         defaultView.setChecked(!isDisabled && override == null);
         for (int i = 0; i < trackViews.length; i++) {
+            if (override != null && override.groupIndex == i
+                    && override.containsTrack(0) && uris != null && !uris.isEmpty()) {
+                Log.e("tracks", "Selected: " + uris.get(i).toString());
+            }
             for (int j = 0; j < trackViews[i].length; j++) {
                 trackViews[i][j].setChecked(override != null && override.groupIndex == i
                         && override.containsTrack(j));
@@ -281,4 +313,11 @@ import app.mobile.examwarrior.R;
         override = new SelectionOverride(factory, group, tracks);
     }
 
+    public List<Uri> getUris() {
+        return uris;
+    }
+
+    public void setUris(List<Uri> uris) {
+        this.uris = uris;
+    }
 }

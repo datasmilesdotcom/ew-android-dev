@@ -7,6 +7,8 @@ package app.mobile.examwarrior.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class VideoEntity {
 
     @SerializedName("usr_id")
@@ -30,6 +32,10 @@ public class VideoEntity {
     @SerializedName("avg_rating")
     @Expose
     private double avgRating;
+
+    @SerializedName("video_urls")
+    @Expose
+    private List<Video_urls> video_urls;
     @SerializedName("upv_cnt")
     @Expose
     private String upvCnt;
@@ -39,21 +45,18 @@ public class VideoEntity {
     @SerializedName("dwn")
     @Expose
     private Integer dwn;
-    @SerializedName("url")
-    @Expose
-    private String url;
-    @SerializedName("url_360")
-    @Expose
-    private String url360;
-    @SerializedName("url_480")
-    @Expose
-    private String url480;
-    @SerializedName("url_720")
-    @Expose
-    private String url720;
+
     @SerializedName("subtitleUrl")
     @Expose
     private String subtitleUrl;
+
+    public List<Video_urls> getVideo_urls() {
+        return video_urls;
+    }
+
+    public void setVideo_urls(List<Video_urls> video_urls) {
+        this.video_urls = video_urls;
+    }
 
     public String getUsrId() {
         return usrId;
@@ -133,38 +136,6 @@ public class VideoEntity {
 
     public void setDwn(Integer dwn) {
         this.dwn = dwn;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUrl360() {
-        return url360;
-    }
-
-    public void setUrl360(String url360) {
-        this.url360 = url360;
-    }
-
-    public String getUrl480() {
-        return url480;
-    }
-
-    public void setUrl480(String url480) {
-        this.url480 = url480;
-    }
-
-    public String getUrl720() {
-        return url720;
-    }
-
-    public void setUrl720(String url720) {
-        this.url720 = url720;
     }
 
     public String getSubtitleUrl() {

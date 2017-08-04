@@ -22,10 +22,10 @@
             android:id="@+id/top"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@drawable/background_player_title"
+            android:background="@drawable/title_bg"
             android:gravity="center"
             android:orientation="horizontal"
-            android:paddingRight="50dp"
+            android:paddingRight="10dp"
             android:visibility="visible">
 
             <android.support.v7.widget.AppCompatImageView
@@ -36,7 +36,6 @@
                 android:background="@null"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:padding="15dp"
-                android:tint="@color/colorPrimary"
                 app:srcCompat="@drawable/ic_back" />
 
             <android.support.v7.widget.AppCompatTextView
@@ -49,11 +48,19 @@
                 android:maxLines="1"
                 android:paddingLeft="10dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 tool:text="Video Title" />
 
+            <Spinner
+                android:id="@+id/player_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/title_bg"
+                android:entries="@array/speeds"
+                android:theme="@android:style/Theme.DeviceDefault"
+                tool:entries="@array/speeds" />
 
         </LinearLayout>
 
@@ -73,6 +80,7 @@
 
 
             <LinearLayout
+                android:id="@+id/player_control_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -211,7 +219,7 @@
         <LinearLayout
             android:id="@+id/controls"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="30dp"
             android:background="#96000000"
             android:orientation="horizontal"
             android:visibility="visible">
@@ -221,7 +229,6 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
                 android:alpha="1"

@@ -70,6 +70,7 @@ import java.util.Locale;
     private static final String TAG = "EventLogger";
     private static final int MAX_TIMELINE_ITEM_LINES = 3;
     private static final NumberFormat TIME_FORMAT;
+
     static {
         TIME_FORMAT = NumberFormat.getInstance(Locale.US);
         TIME_FORMAT.setMinimumFractionDigits(2);
@@ -91,16 +92,80 @@ import java.util.Locale;
 
     // ExoPlayer.EventListener
 
+    private static String getTimeString(long timeMs) {
+        return timeMs == C.TIME_UNSET ? "?" : TIME_FORMAT.format((timeMs) / 1000f);
+    }
+
+    private static String getStateString(int state) {
+        switch (state) {
+            case ExoPlayer.STATE_BUFFERING:
+                return "B";
+            case ExoPlayer.STATE_ENDED:
+                return "E";
+            case ExoPlayer.STATE_IDLE:
+                return "I";
+            case ExoPlayer.STATE_READY:
+                return "R";
+            default:
+                return "?";
+        }
+    }
+
+    private static String getFormatSupportString(int formatSupport) {
+        switch (formatSupport) {
+            case RendererCapabilities.FORMAT_HANDLED:
+                return "YES";
+            case RendererCapabilities.FORMAT_EXCEEDS_CAPABILITIES:
+                return "NO_EXCEEDS_CAPABILITIES";
+            case RendererCapabilities.FORMAT_UNSUPPORTED_SUBTYPE:
+                return "NO_UNSUPPORTED_TYPE";
+            case RendererCapabilities.FORMAT_UNSUPPORTED_TYPE:
+                return "NO";
+            default:
+                return "?";
+        }
+    }
+
+    private static String getAdaptiveSupportString(int trackCount, int adaptiveSupport) {
+        if (trackCount < 2) {
+            return "N/A";
+        }
+        switch (adaptiveSupport) {
+            case RendererCapabilities.ADAPTIVE_SEAMLESS:
+                return "YES";
+            case RendererCapabilities.ADAPTIVE_NOT_SEAMLESS:
+                return "YES_NOT_SEAMLESS";
+            case RendererCapabilities.ADAPTIVE_NOT_SUPPORTED:
+                return "NO";
+            default:
+                return "?";
+        }
+    }
+
+    private static String getTrackStatusString(TrackSelection selection, TrackGroup group,
+                                               int trackIndex) {
+        return getTrackStatusString(selection != null && selection.getTrackGroup() == group
+                && selection.indexOf(trackIndex) != C.INDEX_UNSET);
+    }
+
+    private static String getTrackStatusString(boolean enabled) {
+        return enabled ? "[X]" : "[ ]";
+    }
+
     @Override
     public void onLoadingChanged(boolean isLoading) {
         Log.d(TAG, "loading [" + isLoading + "]");
     }
+
+    // MetadataRenderer.Output
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int state) {
         Log.d(TAG, "state [" + getSessionTimeString() + ", " + playWhenReady + ", "
                 + getStateString(state) + "]");
     }
+
+    // AudioRendererEventListener
 
     @Override
     public void onPositionDiscontinuity() {
@@ -120,14 +185,14 @@ import java.util.Locale;
         Log.d(TAG, "sourceInfo [periodCount=" + periodCount + ", windowCount=" + windowCount);
         for (int i = 0; i < Math.min(periodCount, MAX_TIMELINE_ITEM_LINES); i++) {
             timeline.getPeriod(i, period);
-            Log.d(TAG, "  " +  "period [" + getTimeString(period.getDurationMs()) + "]");
+            Log.d(TAG, "  " + "period [" + getTimeString(period.getDurationMs()) + "]");
         }
         if (periodCount > MAX_TIMELINE_ITEM_LINES) {
             Log.d(TAG, "  ...");
         }
         for (int i = 0; i < Math.min(windowCount, MAX_TIMELINE_ITEM_LINES); i++) {
             timeline.getWindow(i, window);
-            Log.d(TAG, "  " +  "window [" + getTimeString(window.getDurationMs()) + ", "
+            Log.d(TAG, "  " + "window [" + getTimeString(window.getDurationMs()) + ", "
                     + window.isSeekable + ", " + window.isDynamic + "]");
         }
         if (windowCount > MAX_TIMELINE_ITEM_LINES) {
@@ -207,8 +272,6 @@ import java.util.Locale;
         Log.d(TAG, "]");
     }
 
-    // MetadataRenderer.Output
-
     @Override
     public void onMetadata(Metadata metadata) {
         Log.d(TAG, "onMetadata [");
@@ -216,7 +279,7 @@ import java.util.Locale;
         Log.d(TAG, "]");
     }
 
-    // AudioRendererEventListener
+    // VideoRendererEventListener
 
     @Override
     public void onAudioEnabled(DecoderCounters counters) {
@@ -251,12 +314,12 @@ import java.util.Locale;
                 + elapsedSinceLastFeedMs + "]", null);
     }
 
-    // VideoRendererEventListener
-
     @Override
     public void onVideoEnabled(DecoderCounters counters) {
         Log.d(TAG, "videoEnabled [" + getSessionTimeString() + "]");
     }
+
+    // DefaultDrmSessionManager.EventListener
 
     @Override
     public void onVideoDecoderInitialized(String decoderName, long elapsedRealtimeMs,
@@ -280,18 +343,20 @@ import java.util.Locale;
         Log.d(TAG, "droppedFrames [" + getSessionTimeString() + ", " + count + "]");
     }
 
+    // ExtractorMediaSource.EventListener
+
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
                                    float pixelWidthHeightRatio) {
         // Do nothing.
     }
 
+    // AdaptiveMediaSourceEventListener
+
     @Override
     public void onRenderedFirstFrame(Surface surface) {
         Log.d(TAG, "renderedFirstFrame [" + surface + "]");
     }
-
-    // DefaultDrmSessionManager.EventListener
 
     @Override
     public void onDrmSessionManagerError(Exception e) {
@@ -313,14 +378,12 @@ import java.util.Locale;
         Log.d(TAG, "drmKeysLoaded [" + getSessionTimeString() + "]");
     }
 
-    // ExtractorMediaSource.EventListener
-
     @Override
     public void onLoadError(IOException error) {
         printInternalError("loadError", error);
     }
 
-    // AdaptiveMediaSourceEventListener
+    // Internal methods
 
     @Override
     public void onLoadStarted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
@@ -349,6 +412,9 @@ import java.util.Locale;
                                 int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs,
                                 long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
         // Do nothing.
+        //dataSpec.uri;
+        Log.e(TAG, "onLoadCompleted: " + dataSpec.uri.toString());
+        //((TrackSelector)trackSelectionData).getCurrentMappedTrackInfo();
     }
 
     @Override
@@ -361,8 +427,6 @@ import java.util.Locale;
                                           Object trackSelectionData, long mediaTimeMs) {
         // Do nothing.
     }
-
-    // Internal methods
 
     private void printInternalError(String type, Exception e) {
         Log.e(TAG, "internalError [" + getSessionTimeString() + ", " + type + "]", e);
@@ -406,65 +470,5 @@ import java.util.Locale;
 
     private String getSessionTimeString() {
         return getTimeString(SystemClock.elapsedRealtime() - startTimeMs);
-    }
-
-    private static String getTimeString(long timeMs) {
-        return timeMs == C.TIME_UNSET ? "?" : TIME_FORMAT.format((timeMs) / 1000f);
-    }
-
-    private static String getStateString(int state) {
-        switch (state) {
-            case ExoPlayer.STATE_BUFFERING:
-                return "B";
-            case ExoPlayer.STATE_ENDED:
-                return "E";
-            case ExoPlayer.STATE_IDLE:
-                return "I";
-            case ExoPlayer.STATE_READY:
-                return "R";
-            default:
-                return "?";
-        }
-    }
-
-    private static String getFormatSupportString(int formatSupport) {
-        switch (formatSupport) {
-            case RendererCapabilities.FORMAT_HANDLED:
-                return "YES";
-            case RendererCapabilities.FORMAT_EXCEEDS_CAPABILITIES:
-                return "NO_EXCEEDS_CAPABILITIES";
-            case RendererCapabilities.FORMAT_UNSUPPORTED_SUBTYPE:
-                return "NO_UNSUPPORTED_TYPE";
-            case RendererCapabilities.FORMAT_UNSUPPORTED_TYPE:
-                return "NO";
-            default:
-                return "?";
-        }
-    }
-
-    private static String getAdaptiveSupportString(int trackCount, int adaptiveSupport) {
-        if (trackCount < 2) {
-            return "N/A";
-        }
-        switch (adaptiveSupport) {
-            case RendererCapabilities.ADAPTIVE_SEAMLESS:
-                return "YES";
-            case RendererCapabilities.ADAPTIVE_NOT_SEAMLESS:
-                return "YES_NOT_SEAMLESS";
-            case RendererCapabilities.ADAPTIVE_NOT_SUPPORTED:
-                return "NO";
-            default:
-                return "?";
-        }
-    }
-
-    private static String getTrackStatusString(TrackSelection selection, TrackGroup group,
-                                               int trackIndex) {
-        return getTrackStatusString(selection != null && selection.getTrackGroup() == group
-                && selection.indexOf(trackIndex) != C.INDEX_UNSET);
-    }
-
-    private static String getTrackStatusString(boolean enabled) {
-        return enabled ? "[X]" : "[ ]";
     }
 }
