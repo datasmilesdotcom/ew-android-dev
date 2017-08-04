@@ -203,7 +203,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
             realm.close();
         }
         token = "JWT " + token;
-        Call<RelatedVideos> call = apiInterface.getRelatedVideos(token, new RelatedVideosBody(data.getItemVideo(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
+        Call<RelatedVideos> call = apiInterface.getRelatedVideos(token, new RelatedVideosBody(data.getItemTypeId(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
         call.enqueue(new Callback<RelatedVideos>() {
             @Override
             public void onResponse(Call<RelatedVideos> call, Response<RelatedVideos> response) {
@@ -334,7 +334,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
                         videoEntity.setUpvCnt(Integer.toString(Integer.parseInt(videoEntity.getUpvCnt()) + 1));
                     videoContentDetailsAdapter.setVideoEntity(videoEntity);
                     videoContentDetailsAdapter.notifyChanged("UPVOTE");
-                    initUpVoteAPI(0, 1, data.getItemVideo());
+                    initUpVoteAPI(0, 1, data.getItemTypeId());
                 } else if (videoEntity.getUpv() == STATUS_UPVOTED) {
                     // if liked ==> dislike
                     videoEntity.setUpv(STATUS_NOT_UPVOTE);
@@ -343,7 +343,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
                         videoEntity.setUpvCnt(Integer.toString(Integer.parseInt(videoEntity.getUpvCnt()) - 1));
                     videoContentDetailsAdapter.setVideoEntity(videoEntity);
                     videoContentDetailsAdapter.notifyChanged("UPVOTE");
-                    initUpVoteAPI(0, -1, data.getItemVideo());
+                    initUpVoteAPI(0, -1, data.getItemTypeId());
                 } else if (videoEntity.getDwn() == STATUS_DOWNVOTED) {
                     // count -1
                     videoEntity.setUpv(STATUS_UPVOTED);
@@ -354,7 +354,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
                         videoEntity.setDwnCnt(Integer.toString(Integer.parseInt(videoEntity.getDwnCnt()) - 1));
                     videoContentDetailsAdapter.setVideoEntity(videoEntity);
                     videoContentDetailsAdapter.notifyChanged("UPVOTE");
-                    initUpVoteAPI(-1, 1, data.getItemVideo());
+                    initUpVoteAPI(-1, 1, data.getItemTypeId());
                 }
 
 
@@ -380,7 +380,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
                         videoEntity.setDwnCnt(Integer.toString(Integer.parseInt(videoEntity.getDwnCnt()) + 1));
                     videoContentDetailsAdapter.setVideoEntity(videoEntity);
                     videoContentDetailsAdapter.notifyChanged("UPVOTE");
-                    initDownVoteAPI(1, 0, data.getItemVideo());
+                    initDownVoteAPI(1, 0, data.getItemTypeId());
                 } else if (videoEntity.getUpv() == STATUS_UPVOTED) {
                     // count -1
                     videoEntity.setUpv(STATUS_NOT_UPVOTE);
@@ -391,7 +391,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
                         videoEntity.setDwnCnt(Integer.toString(Integer.parseInt(videoEntity.getDwnCnt()) + 1));
                     videoContentDetailsAdapter.setVideoEntity(videoEntity);
                     videoContentDetailsAdapter.notifyChanged("UPVOTE");
-                    initDownVoteAPI(1, -1, data.getItemVideo());
+                    initDownVoteAPI(1, -1, data.getItemTypeId());
                 } else if (videoEntity.getDwn() == STATUS_DOWNVOTED) {
                     // if liked ==> dislike
                     videoEntity.setUpv(STATUS_NOT_UPVOTE);
@@ -400,7 +400,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
                         videoEntity.setDwnCnt(Integer.toString(Integer.parseInt(videoEntity.getDwnCnt()) - 1));
                     videoContentDetailsAdapter.setVideoEntity(videoEntity);
                     videoContentDetailsAdapter.notifyChanged("UPVOTE");
-                    initDownVoteAPI(-1, 0, data.getItemVideo());
+                    initDownVoteAPI(-1, 0, data.getItemTypeId());
                 }
 
             }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.telephony.PhoneStateListener;
@@ -34,6 +36,7 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -51,12 +54,15 @@ import com.google.android.exoplayer2.source.BehindLiveWindowException;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MergingMediaSource;
+import com.google.android.exoplayer2.source.SingleSampleMediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.text.CaptionStyleCompat;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
@@ -70,6 +76,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 
 import java.net.CookieHandler;
@@ -120,7 +127,6 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             "app.mobile.examwarrior.player.action.VIEW_LIST";
     public static final String URI_LIST_EXTRA = "uri_list";
     public static final String EXTENSION_LIST_EXTRA = "extension_list";
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -143,12 +149,12 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         DEFAULT_COOKIE_MANAGER.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
     }
 
-    private Call<VideoEntity> videoDetails;
     private VideoEntity videoInfo;
-    // TODO: Rename and change types of parameters
+    private Call<VideoEntity> videoDetails;
     private String mParam1;
     private String mParam2;
     private Handler mainHandler;
+    private Handler exceptionHandler;
     private EventLogger eventLogger;
     private SimpleExoPlayerView simpleExoPlayerView;
     private LinearLayout debugRootView;
@@ -215,7 +221,6 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
      * @param param2 Parameter 2.
      * @return A new instance of fragment VideoPlayerFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static VideoPlayerFragment newInstance(String param1, String param2) {
         VideoPlayerFragment fragment = new VideoPlayerFragment();
         Bundle args = new Bundle();
@@ -502,10 +507,12 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     private void initializePlayer(VideoEntity videoInfo) {
 
 
+        // edge case
+        if (getActivity() == null) return;
         Intent intent = getActivity().getIntent();
+        if (intent == null) return;
         boolean needNewPlayer = player == null;
         if (video_title != null && intent.getStringExtra(KEY_MODULE_ITEM_ID) != null)
-//            Realm.getDefaultInstance().where(CourseDetail.class).equalTo("courseId", getIntent().getStringExtra(KEY_COURSE_ID)).findAllAsync()
             setVideoTitle(intent.getStringExtra(KEY_MODULE_ITEM_ID));
         if (videoInfo == null) {
             initVideoDetailsAPI("");
@@ -564,6 +571,12 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
 
             simpleExoPlayerView.setPlayer(player);
             player.setPlayWhenReady(true);
+            simpleExoPlayerView.getSubtitleView().setPadding(10, 10, 10, 2);
+            CaptionStyleCompat captionStyleCompat = new CaptionStyleCompat(Color.WHITE, ContextCompat.getColor(getActivity(), R.color.subtitle_bkg), Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_NONE, Color.TRANSPARENT, null);
+            simpleExoPlayerView.getSubtitleView().setApplyEmbeddedStyles(false);
+            simpleExoPlayerView.getSubtitleView().setStyle(captionStyleCompat);
+
+            //simpleExoPlayerView.getSubtitleView().setFractionalTextSize(0.09f, true);
             debugViewHelper = new DebugTextViewHelper(player, debugTextView);
             debugViewHelper.start();
         }
@@ -597,11 +610,29 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             }
 
             MediaSource[] mediaSources = new MediaSource[uris.length];
+            MediaSource subtitleSource = null;
             for (int i = 0; i < uris.length; i++) {
+                // Build the video MediaSource.
+                //MediaSource videoSource = new ExtractorMediaSource(videoUri, ...);
                 mediaSources[i] = buildMediaSource(uris[i], extensions[i]);
+                if (!Utility.isEmpty(videoInfo.getSubtitleUrl())) {
+                    // Build the subtitle MediaSource.
+                    subtitleSource = new SingleSampleMediaSource(Uri.parse(videoInfo.getSubtitleUrl()), mediaDataSourceFactory,
+                            Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP, null, Format.NO_VALUE, Format.NO_VALUE, "se", null), 0);
+
+                }
             }
-            MediaSource mediaSource = mediaSources.length == 1 ? mediaSources[0]
-                    : new ConcatenatingMediaSource(mediaSources);
+            // Plays the video with the sideloaded subtitle.
+            MergingMediaSource mergedSource =
+                    new MergingMediaSource(mediaSources[0]);
+            if (subtitleSource != null) {
+                mergedSource =
+                        new MergingMediaSource(mediaSources[0], subtitleSource);
+            }
+            /*MediaSource mediaSource = mediaSources.length == 1 ? mergedSource
+                    : new ConcatenatingMediaSource(mergedSource);*/
+            MediaSource mediaSource = new ConcatenatingMediaSource(mergedSource);
+
             boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
             if (haveResumePosition) {
                 player.seekTo(resumeWindow, resumePosition);
@@ -756,31 +787,74 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     @Override
     public void onPlayerError(ExoPlaybackException e) {
         String errorString = null;
-        if (e.type == ExoPlaybackException.TYPE_RENDERER) {
-            Exception cause = e.getRendererException();
-            if (cause instanceof MediaCodecRenderer.DecoderInitializationException) {
-                // Special case for decoder initialization failures.
-                MediaCodecRenderer.DecoderInitializationException decoderInitializationException =
-                        (MediaCodecRenderer.DecoderInitializationException) cause;
-                if (decoderInitializationException.decoderName == null) {
-                    if (decoderInitializationException.getCause() instanceof MediaCodecUtil.DecoderQueryException) {
-                        errorString = getString(R.string.error_querying_decoders);
-                    } else if (decoderInitializationException.secureDecoderRequired) {
-                        errorString = getString(R.string.error_no_secure_decoder,
-                                decoderInitializationException.mimeType);
-                    } else {
-                        errorString = getString(R.string.error_no_decoder,
-                                decoderInitializationException.mimeType);
+        switch (e.type) {
+            case ExoPlaybackException.TYPE_SOURCE:
+                String errorUri = ((HttpDataSource.InvalidResponseCodeException) e.getCause()).dataSpec.uri.toString();
+                Log.e(TAG, "TYPE_SOURCE: " + errorUri);
+                if (videoInfo != null) {
+                    if (!Utility.isEmpty(videoInfo.getSubtitleUrl()) && videoInfo.getSubtitleUrl().equals(errorUri)) {
+                        videoInfo.setSubtitleUrl(null);
+                        exceptionHandler = new Handler();
+                        exceptionHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                needRetrySource = true;
+                                initializePlayer(videoInfo);
+                            }
+                        }, 500);
+
+                        errorString = "Invalid subtitle format";
+                    } else if (!Utility.isEmpty(videoInfo.getUrl()) && videoInfo.getUrl().equals(errorUri)) {
+                        errorString = "Can not play this video";
+                        //handleBehindLiveWindow(e);
                     }
-                } else {
-                    errorString = getString(R.string.error_instantiating_decoder,
-                            decoderInitializationException.decoderName);
                 }
-            }
+                break;
+
+            case ExoPlaybackException.TYPE_RENDERER:
+                Exception cause = e.getRendererException();
+                if (cause instanceof MediaCodecRenderer.DecoderInitializationException) {
+                    // Special case for decoder initialization failures.
+                    MediaCodecRenderer.DecoderInitializationException decoderInitializationException =
+                            (MediaCodecRenderer.DecoderInitializationException) cause;
+                    if (decoderInitializationException.decoderName == null) {
+                        if (decoderInitializationException.getCause() instanceof MediaCodecUtil.DecoderQueryException) {
+                            errorString = getString(R.string.error_querying_decoders);
+                        } else if (decoderInitializationException.secureDecoderRequired) {
+                            errorString = getString(R.string.error_no_secure_decoder,
+                                    decoderInitializationException.mimeType);
+                        } else {
+                            errorString = getString(R.string.error_no_decoder,
+                                    decoderInitializationException.mimeType);
+                        }
+                    } else {
+                        errorString = getString(R.string.error_instantiating_decoder,
+                                decoderInitializationException.decoderName);
+                    }
+                }
+                handleBehindLiveWindow(e);
+                break;
+
+            case ExoPlaybackException.TYPE_UNEXPECTED:
+                errorString = "Error while playing video";
+                //handleBehindLiveWindow(e);
+                break;
         }
+        /*if (e.type == ExoPlaybackException.TYPE_RENDERER) {
+
+        }*/
         if (errorString != null) {
             showToast(errorString);
         }
+
+    }
+
+    /**
+     * Handle LiveWindow exception but not for Subtitle error
+     *
+     * @param e
+     */
+    private void handleBehindLiveWindow(ExoPlaybackException e) {
         needRetrySource = true;
         if (isBehindLiveWindow(e)) {
             clearResumePosition();
@@ -900,7 +974,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             realm.close();
         }
         token = "JWT " + token;
-        videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody(item.getItemVideo()));
+        videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody(item.getItemTypeId()));
         //videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody("introduction-powercenter-1"));
 
         videoDetails.enqueue(new Callback<VideoEntity>() {

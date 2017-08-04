@@ -3,8 +3,6 @@ package app.mobile.examwarrior.database;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.List;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -13,9 +11,17 @@ import io.realm.annotations.PrimaryKey;
 
 public class ModuleItem extends RealmObject implements Parcelable {
 
-    public ModuleItem() {
-    }
+    public static final Creator<ModuleItem> CREATOR = new Creator<ModuleItem>() {
+        @Override
+        public ModuleItem createFromParcel(Parcel source) {
+            return new ModuleItem(source);
+        }
 
+        @Override
+        public ModuleItem[] newArray(int size) {
+            return new ModuleItem[size];
+        }
+    };
     @SerializedName("itemId")
     @Expose
     @PrimaryKey
@@ -35,44 +41,38 @@ public class ModuleItem extends RealmObject implements Parcelable {
     @SerializedName("itemType")
     @Expose
     private String itemType;
-    @SerializedName("itemVideo")
-    @Expose
-    private String itemVideo;
     @SerializedName("itemContainsSlide")
     @Expose
     private Boolean itemContainsSlide;
     @SerializedName("materialInfo")
     @Expose
     private String materialInfo;
+    @SerializedName("itemTypeId")
+    @Expose
+    private String itemTypeId;
 
-    protected ModuleItem(Parcel in) {
-        itemId = in.readString();
-        itemName = in.readString();
-        itemWeight = in.readDouble();
-        itemDescription = in.readString();
-        if (in.readByte() == 0) {
-            itemNumber = null;
-        } else {
-            itemNumber = in.readInt();
-        }
-        itemType = in.readString();
-        itemVideo = in.readString();
-        byte tmpItemContainsSlide = in.readByte();
-        itemContainsSlide = tmpItemContainsSlide == 0 ? null : tmpItemContainsSlide == 1;
-        materialInfo = in.readString();
+    public ModuleItem() {
     }
 
-    public static final Creator<ModuleItem> CREATOR = new Creator<ModuleItem>() {
-        @Override
-        public ModuleItem createFromParcel(Parcel in) {
-            return new ModuleItem(in);
-        }
+    protected ModuleItem(Parcel in) {
+        this.itemId = in.readString();
+        this.itemName = in.readString();
+        this.itemWeight = in.readDouble();
+        this.itemDescription = in.readString();
+        this.itemNumber = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.itemType = in.readString();
+        this.itemContainsSlide = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.materialInfo = in.readString();
+        this.itemTypeId = in.readString();
+    }
 
-        @Override
-        public ModuleItem[] newArray(int size) {
-            return new ModuleItem[size];
-        }
-    };
+    public String getItemTypeId() {
+        return itemTypeId;
+    }
+
+    public void setItemTypeId(String itemTypeId) {
+        this.itemTypeId = itemTypeId;
+    }
 
     public String getItemId() {
         return itemId;
@@ -122,14 +122,6 @@ public class ModuleItem extends RealmObject implements Parcelable {
         this.itemType = itemType;
     }
 
-    public String getItemVideo() {
-        return itemVideo;
-    }
-
-    public void setItemVideo(String itemVideo) {
-        this.itemVideo = itemVideo;
-    }
-
     public Boolean getItemContainsSlide() {
         return itemContainsSlide;
     }
@@ -153,19 +145,14 @@ public class ModuleItem extends RealmObject implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(itemId);
-        dest.writeString(itemName);
-        dest.writeDouble(itemWeight);
-        dest.writeString(itemDescription);
-        if (itemNumber == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(itemNumber);
-        }
-        dest.writeString(itemType);
-        dest.writeString(itemVideo);
-        dest.writeByte((byte) (itemContainsSlide == null ? 0 : itemContainsSlide ? 1 : 2));
-        dest.writeString(materialInfo);
+        dest.writeString(this.itemId);
+        dest.writeString(this.itemName);
+        dest.writeDouble(this.itemWeight);
+        dest.writeString(this.itemDescription);
+        dest.writeValue(this.itemNumber);
+        dest.writeString(this.itemType);
+        dest.writeValue(this.itemContainsSlide);
+        dest.writeString(this.materialInfo);
+        dest.writeString(this.itemTypeId);
     }
 }

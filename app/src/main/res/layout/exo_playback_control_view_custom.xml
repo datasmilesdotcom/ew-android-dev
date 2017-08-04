@@ -22,7 +22,7 @@
             android:id="@+id/top"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="#96000000"
+            android:background="@drawable/background_player_title"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingRight="50dp"
@@ -173,7 +173,7 @@
             android:layout_gravity="center_vertical"
             android:background="#96000000"
             android:foregroundGravity="center"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:orientation="horizontal"
             android:visibility="visible">
 
@@ -190,7 +190,7 @@
 
             <com.google.android.exoplayer2.ui.DefaultTimeBar
                 android:id="@+id/exo_progress"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 app:touch_target_height="50dp" />

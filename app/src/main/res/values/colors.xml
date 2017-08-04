@@ -24,4 +24,5 @@
     <color name="green_light">#ff99cc00</color>
     <color name="orange_light">#ffffbb33</color>
     <color name="blue_light">#ff33b5e5</color>
+    <color name="subtitle_bkg">#B3000000</color>
 </resources>
