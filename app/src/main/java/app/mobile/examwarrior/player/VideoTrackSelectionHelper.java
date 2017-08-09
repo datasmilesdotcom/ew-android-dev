@@ -188,8 +188,13 @@ public final class VideoTrackSelectionHelper implements View.OnClickListener,
                 trackView.setBackgroundResource(selectableItemBackgroundResourceId);
                 //trackView.setText(PlayerUtil.buildTrackName(group.getFormat(trackIndex)));
 
+                // If stream is adaptive show only resolution
+                if (videoInfo.isAdaptiveStreaming()) {
+                    trackView.setText(String.format("Resolution %sx%s", group.getFormat(trackIndex).width, group.getFormat(trackIndex).height));
+                } else {
+                    trackView.setText(String.format("%sp %sx%s", videoInfo.getVideo_urls().get(groupIndex).getRes(), group.getFormat(trackIndex).width, group.getFormat(trackIndex).height));
+                }
 
-                trackView.setText(String.format("%s p %sx%s", videoInfo.getVideo_urls().get(groupIndex).getRes(), group.getFormat(trackIndex).width, group.getFormat(trackIndex).height));
 
                 if (trackInfo.getTrackFormatSupport(rendererIndex, groupIndex, trackIndex)
                         == RendererCapabilities.FORMAT_HANDLED) {

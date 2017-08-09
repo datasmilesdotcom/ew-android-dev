@@ -50,6 +50,30 @@ public class VideoEntity {
     @Expose
     private String subtitleUrl;
 
+    @SerializedName("isStreaming")
+    @Expose
+    private boolean isAdaptiveStreaming;
+
+    @SerializedName("video_url")
+    @Expose
+    private String adaptiveUrl;
+
+    public boolean isAdaptiveStreaming() {
+        return isAdaptiveStreaming;
+    }
+
+    public void setAdaptiveStreaming(boolean adaptiveStreaming) {
+        isAdaptiveStreaming = adaptiveStreaming;
+    }
+
+    public String getAdaptiveUrl() {
+        return adaptiveUrl;
+    }
+
+    public void setAdaptiveUrl(String adaptiveUrl) {
+        this.adaptiveUrl = adaptiveUrl;
+    }
+
     public List<Video_urls> getVideo_urls() {
         return video_urls;
     }

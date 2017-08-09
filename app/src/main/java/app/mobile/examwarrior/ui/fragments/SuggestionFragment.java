@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
+import android.widget.ProgressBar;
 
 import com.xwray.groupie.ExpandableGroup;
 import com.xwray.groupie.GroupAdapter;
@@ -38,12 +40,15 @@ import com.xwray.groupie.ViewHolder;
 
 import java.io.File;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import app.mobile.examwarrior.BuildConfig;
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.database.ModuleItem;
+import app.mobile.examwarrior.database.OfflineVideo;
 import app.mobile.examwarrior.demo.ToggleListener;
 import app.mobile.examwarrior.model.RelatedCourse;
 import app.mobile.examwarrior.model.RelatedTopicsVideo;
@@ -73,7 +78,6 @@ import retrofit2.Response;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
 import static app.mobile.examwarrior.player.VideoPlayerFragment.KEY_MODULE_ITEM_ID;
-import static app.mobile.examwarrior.ui.activity.CourseDetailsActivity.KEY_COURSE_ID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -119,6 +123,9 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     private DownloadManager downloadManager;
     private BroadcastReceiver receiver;
     private Context context;
+    private RecyclerView recyclerView;
+    private AppCompatTextView error_text;
+    private ProgressBar content_progress;
 
     public SuggestionFragment() {
         // Required empty public constructor
@@ -162,10 +169,12 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
+        error_text = view.findViewById(R.id.error_text);
+        content_progress = view.findViewById(R.id.content_progress);
+        error_text.setVisibility(View.GONE);
         int betweenPadding = getResources().getDimensionPixelSize(R.dimen.padding_small);
 
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
 
         recyclerView.addItemDecoration(new HeaderItemDecoration(Color.WHITE, betweenPadding));
@@ -173,9 +182,16 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         betweenPadding = getResources().getDimensionPixelSize(R.dimen.padding_video_header);
         recyclerView.addItemDecoration(new ItemOffsetDecoration(betweenPadding, R.layout.video_header));
 
+
+        //recyclerView.setAdapter(videoAdapter);
+    }
+
+    private void refreshDataFromPlayer() {
         /************************************************************
          / Suggestion list adapter
          /*************************************************************/
+        //edge case
+        if (recyclerView == null) return;
         suggestionListAdapter = new GroupAdapter<>();
         layoutManager = new GridLayoutManager(getActivity(), suggestionListAdapter.getSpanCount());
         layoutManager.setSpanSizeLookup(suggestionListAdapter.getSpanSizeLookup());
@@ -213,7 +229,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
         //apiInterface.getRelatedVideos("token",new RelatedVideosBody(data.getItemVideo(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
         String token = getToken();
-        Call<RelatedVideos> call = apiInterface.getRelatedVideos(token, new RelatedVideosBody(data.getItemTypeId(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
+        Call<RelatedVideos> call = apiInterface.getRelatedVideos(token, new RelatedVideosBody("creating-map-with-sorter-transformation-1", "informatica-powercenter-basics"));
         call.enqueue(new Callback<RelatedVideos>() {
             @Override
             public void onResponse(Call<RelatedVideos> call, Response<RelatedVideos> response) {
@@ -253,7 +269,6 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
 
             }
         });
-        //recyclerView.setAdapter(videoAdapter);
     }
 
     /***
@@ -319,11 +334,29 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
      *
      * @param body
      */
-    public void updateVideoContent(VideoEntity body) {
+    public void updateVideoContent(VideoEntity body, boolean isLoading, boolean isError) {
+        content_progress.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        error_text.setVisibility(isError ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(View.GONE);
+        if (isLoading || isError || body == null) return;
+        recyclerView.setVisibility(View.VISIBLE);
+        refreshDataFromPlayer();
         this.videoEntity = body;
         videoContentDetailsAdapter = new VideoContentDetailsAdapter(data, body);
         videoContentDetailsAdapter.setOnItemListener(SuggestionFragment.this);
         suggestionListAdapter.add(0, videoContentDetailsAdapter);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                OfflineVideo offloneVideo = getOfflineVideo(videoEntity.getVdoId());
+                if (offloneVideo != null && offloneVideo.isValid()) {
+                    List<Boolean> booleans = new ArrayList<>();
+                    booleans.add(true);
+                    videoContentDetailsAdapter.notifyChanged(booleans);
+                }
+            }
+        }, 500);
+
     }
 
     @Override
@@ -422,7 +455,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
      *
      * @return
      */
-    public boolean isSizeAvailable(int size) {
+    public boolean isSizeAvailable(long size) {
         long SourceSize = 0L;
         long DestinationSize = 0L;
         SourceSize = (size) / (1024 * 1024);
@@ -436,6 +469,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
 
     @Override
     public void onDownloadVideo(ViewHolder item, int position, VideoEntity videoEntity) {
+
         //Get download file name
         int currentApiVersion = android.os.Build.VERSION.SDK_INT;
         if (currentApiVersion >= Build.VERSION_CODES.M) {
@@ -628,6 +662,11 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         return myFile.exists();
     }
 
+    private String filePath(String fileName) {
+        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + FOLDER_NAME + File.separator + fileName);
+        return myFile.getAbsolutePath();
+    }
+
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -665,12 +704,12 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         // add a list
         String[] downloadInfo = new String[videoEntity.getVideo_urls().size()];
         for (int i = 0; i < videoEntity.getVideo_urls().size(); i++) {
-            downloadInfo[i] = String.format("%s p size %s", videoEntity.getVideo_urls().get(i).getRes(), Utility.getSizeFromKb(videoEntity.getVideo_urls().get(i).getVideoFileSize()));
+            downloadInfo[i] = String.format("%sp size %s", videoEntity.getVideo_urls().get(i).getRes(), Utility.getSizeFromKb(videoEntity.getVideo_urls().get(i).getVideoFileSize()));
         }
         builder.setItems(downloadInfo, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                int fileSize = videoEntity.getVideo_urls().get(which).getVideoFileSize();
+                long fileSize = videoEntity.getVideo_urls().get(which).getVideoFileSize();
                 String videoUrl = videoEntity.getVideo_urls().get(which).getDownloadUrl();
                 if (Utility.isEmpty(videoUrl)) {
                     Utility.showMessage("Not valid url");
@@ -684,6 +723,7 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
                     if (isSizeAvailable(fileSize)) {
                         Utility.showMessage("Downloading video");
                         downLoadVideo(videoUrl);
+                        saveOfflineVideo(videoEntity.getVdoId(), name, videoUrl, filePath(name));
                     } else {
                         Utility.showMessage("No space available to download this video");
                     }
@@ -700,5 +740,65 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    /**
+     * Save offline video
+     *
+     * @param videoId
+     * @param videoUrl
+     * @param videoLocalPath
+     */
+    private void saveOfflineVideo(final String videoId, final String videoName, final String videoUrl, final String videoLocalPath) {
+        Realm realm = null;
+        try {
+            realm = Realm.getDefaultInstance();
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    OfflineVideo offlineVideo = new OfflineVideo();
+                    offlineVideo.setVideoId(videoId);
+                    offlineVideo.setVideoName(videoName);
+                    offlineVideo.setVideoUrl(videoUrl);
+                    offlineVideo.setLocalPath(videoLocalPath);
+                    realm.insertOrUpdate(offlineVideo);
+                }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+
+                }
+            }, new Realm.Transaction.OnError() {
+                @Override
+                public void onError(Throwable error) {
+
+                }
+            });
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "saveOfflineVideo: " + e.getMessage());
+        } finally {
+            if (realm != null) realm.close();
+        }
+    }
+
+    /**
+     * Get offline video if available
+     *
+     * @param videoId
+     * @return
+     */
+    private OfflineVideo getOfflineVideo(String videoId) {
+        OfflineVideo offlineVideo = null;
+        Realm realm = null;
+        try {
+            realm = Realm.getDefaultInstance();
+            offlineVideo =
+                    realm.copyFromRealm(realm.where(OfflineVideo.class).equalTo("videoId", videoId).findFirst());
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "getOfflineVideo: " + e.getMessage());
+        } finally {
+            if (realm != null) realm.close();
+        }
+        return offlineVideo;
     }
 }

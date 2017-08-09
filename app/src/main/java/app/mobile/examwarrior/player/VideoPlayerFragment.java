@@ -81,7 +81,9 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
+import com.google.gson.Gson;
 
+import java.io.File;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -98,7 +100,9 @@ import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.app_controller.AppController;
+import app.mobile.examwarrior.database.ModuleDetail;
 import app.mobile.examwarrior.database.ModuleItem;
+import app.mobile.examwarrior.database.OfflineVideo;
 import app.mobile.examwarrior.model.User;
 import app.mobile.examwarrior.model.VideoEntity;
 import app.mobile.examwarrior.model.VideoEntityBody;
@@ -106,11 +110,14 @@ import app.mobile.examwarrior.prefs.AppPref;
 import app.mobile.examwarrior.ui.fragments.SuggestionFragment;
 import app.mobile.examwarrior.util.Utility;
 import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.content.Context.TELEPHONY_SERVICE;
+import static app.mobile.examwarrior.player.PlayerActivity.KEY_MODULE_ID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -148,7 +155,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
      * Local Members
      *//////////////////////////////////////////////////////////////////////////////////////////////
     private static final long MAX_POSITION_FOR_SEEK_TO_PREVIOUS = 3000;
-
+    private static int currentIndex = 0;
 
     static {
         DEFAULT_COOKIE_MANAGER = new CookieManager();
@@ -185,17 +192,20 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     private AppCompatTextView video_title;
     private AudioManager mAudioManager;
     private ModuleItem item = null;
+    private RealmResults<ModuleItem> moduleItems;
     private Spinner spinnerSpeeds;
+    private AppCompatImageView btn_prev, btn_next;
     private AppCompatImageView btn_settings, btn_sub, btn_screen;
+    private File localFile = null;
     private PhoneStateListener phoneStateListener = new PhoneStateListener() {
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
                 //Incoming call: Pause music
-                releasePlayer();
+                if (player != null) player.setPlayWhenReady(false);
             } else if (state == TelephonyManager.CALL_STATE_IDLE) {
                 //Not in call: Play music
-                initializePlayer(videoInfo);
+                if (player != null) player.setPlayWhenReady(true);
             } else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
                 //A call is dialing, active or on hold
             }
@@ -305,9 +315,10 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         btn_settings.setOnClickListener(this);
         btn_sub = (AppCompatImageView) view.findViewById(R.id.btn_sub);
         btn_sub.setOnClickListener(this);
-        view.findViewById(R.id.exo_next).setOnClickListener(this);
-        view.findViewById(R.id.exo_prev).setOnClickListener(this);
-        view.findViewById(R.id.exo_prev).setOnClickListener(this);
+        btn_prev = view.findViewById(R.id.btn_prev);
+        btn_prev.setOnClickListener(this);
+        btn_next = view.findViewById(R.id.btn_next);
+        btn_next.setOnClickListener(this);
         btn_screen = (AppCompatImageView) view.findViewById(R.id.btn_screen);
         btn_screen.setImageResource(RESIZE_MODE.get(CURRENT_RESIZE_MODE));
         btn_screen.setOnClickListener(this);
@@ -318,7 +329,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 PlaybackParameters playbackParameters = new PlaybackParameters(Float.valueOf(speeds[position]), 1f);
                 //player.setPlaybackParameters(Float.valueOf(speeds[position]));
-                player.setPlaybackParameters(playbackParameters);
+                if (player != null) player.setPlaybackParameters(playbackParameters);
             }
 
             @Override
@@ -360,6 +371,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    // Activity input
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -372,19 +384,6 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         }
 
         super.onConfigurationChanged(newConfig);
-    }
-
-    // Activity input
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            initializePlayer(videoInfo);
-        } else {
-            showToast(R.string.storage_permission_denied);
-            getActivity().finish();
-        }
     }
 
 
@@ -401,6 +400,17 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     // PlaybackControlView.VisibilityListener implementation
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            initializePlayer(videoInfo);
+        } else {
+            showToast(R.string.storage_permission_denied);
+            getActivity().finish();
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_settings:
@@ -408,7 +418,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
                     if (videoInfo == null) return;
                     MappingTrackSelector.MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
                     if (mappedTrackInfo != null) {
-                        videoTrackSelectionHelper.showSelectionDialog(getActivity(), "Select",
+                        videoTrackSelectionHelper.showSelectionDialog(getActivity(), "Select Quality",
                                 trackSelector.getCurrentMappedTrackInfo(), C.TRACK_TYPE_DEFAULT, videoInfo);
                     }
                 } catch (Exception e) {
@@ -438,15 +448,49 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
                     Log.e("TAG", "onClick: " + e.getMessage());
                 }
                 break;
-            case R.id.exo_prev:
-                previous();
+            case R.id.btn_prev:
+                //previous();
+                try {
+                    if (item != null && moduleItems != null && moduleItems.size() > 0) {
+                        int index = moduleItems.indexOf(item);
+                        if (index >= 0) {
+                            item = moduleItems.get(index - 1);
+                            getActivity().getIntent().putExtra(KEY_MODULE_ITEM_ID, item.getItemId());
+                            videoInfo = null;
+                            videoDetails = null;
+                            initializePlayer(null);
+                        } else {
+                        }
+                    }
+
+                } catch (Exception e) {
+                    if (BuildConfig.DEBUG) Log.e(TAG, "onClick: " + e.getMessage());
+                }
                 break;
-            case R.id.exo_next:
-                next();
+            case R.id.btn_next:
+                //next();
+                try {
+                    if (item != null && moduleItems != null && moduleItems.size() > 0) {
+                        int index = moduleItems.indexOf(item);
+                        if (index < moduleItems.size() - 1) {
+                            item = moduleItems.get(index + 1);
+                            getActivity().getIntent().putExtra(KEY_MODULE_ITEM_ID, item.getItemId());
+                            videoInfo = null;
+                            videoDetails = null;
+                            initializePlayer(null);
+                        } else {
+                            Utility.showMessage("Last item");
+                        }
+                    }
+
+                } catch (Exception e) {
+                    if (BuildConfig.DEBUG) Log.e(TAG, "onClick: " + e.getMessage());
+                }
                 break;
 
             case R.id.btn_screen:
                 toggleResizeMode();
+
                 break;
         }
     }
@@ -500,18 +544,29 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    // Internal methods
+
     /***
      * Set Current Video track title
      * @param moduleId
      */
     private void setVideoTitle(final String moduleId) {
         Realm realm = Realm.getDefaultInstance();
-
         try {
             item = realm.where(ModuleItem.class).equalTo("itemId", moduleId).findFirst();
             if (item != null && item.isValid()) {
                 video_title.setText(item.getItemName());
+                if (moduleItems == null || moduleItems.isEmpty()) {
+                    ModuleDetail moduleDetail = realm.where(ModuleDetail.class).equalTo("moduleId", getActivity().getIntent().getStringExtra(KEY_MODULE_ID)).findFirst();
+                    if (moduleDetail != null && moduleDetail.isValid()) {
+                        moduleItems = moduleDetail.getModuleItems().sort("itemWeight", Sort.ASCENDING);
+                    }
+                }
+                int currentIndex = moduleItems.indexOf(item);
+                btn_next.setVisibility(currentIndex < moduleItems.size() - 1 ? View.VISIBLE : View.INVISIBLE);
+                btn_prev.setVisibility(currentIndex > 0 ? View.VISIBLE : View.INVISIBLE);
             }
+
         } catch (Exception e) {
             if (BuildConfig.DEBUG) Log.e(TAG, "setVideoTitle: " + e.getMessage());
         } finally {
@@ -519,9 +574,8 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    // Internal methods
-
     @Override
+
     public void onVisibilityChange(int visibility) {
         debugRootView.setVisibility(visibility);
     }
@@ -539,10 +593,53 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         boolean needNewPlayer = player == null;
         if (video_title != null && intent.getStringExtra(KEY_MODULE_ITEM_ID) != null)
             setVideoTitle(intent.getStringExtra(KEY_MODULE_ITEM_ID));
+        videoInfo = new Gson().fromJson("{\n" +
+                "\"usr_id\":\"sandesh\",\n" +
+                "\"vdo_id\":\"introduction-powercenter-1\",\n" +
+                "\"crt_dt\":null,\n" +
+                "\"rating\":0,\n" +
+                "\"upd_dt\":null,\n" +
+                "\"upv\":1,\n" +
+                "\"avg_rating\":5,\n" +
+                "\"upv_cnt\":\"2\",\n" +
+                "\"dwn_cnt\":\"0\",\n" +
+                "\"dwn\":0,\n" +
+                "\"video_urls\":[\n" +
+                "{\n" +
+                "\"res\":\"360\",\n" +
+                "\"videoFileSize\":30000,\n" +
+                "\"video_url\":\"http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4\",\n" +
+                "\"downloadUrl\":\"http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"res\":\"480\",\n" +
+                "\"videoFileSize\":30000,\n" +
+                "\"video_url\":\"http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4\",\n" +
+                "\"downloadUrl\":\"http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"res\":\"720\",\n" +
+                "\"videoFileSize\":30000,\n" +
+                "\"video_url\":\"http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4\",\n" +
+                "\"downloadUrl\":\"http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4\"\n" +
+                "}\n" +
+                "],\n" +
+                "\"subtitleUrl\":\"\",\n" +
+                "\"isStreaming\":true,\n" +
+                "\"video_url\":\"http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4\"\n" +
+                "}", VideoEntity.class);
+        this.videoInfo = videoInfo;
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        final SuggestionFragment suggestionFragment = (SuggestionFragment) fragmentManager.findFragmentByTag(SuggestionFragment.TAG);
+        if (suggestionFragment != null) {
+            suggestionFragment.updateVideoContent(videoInfo, false, false);
+        }
         if (videoInfo == null) {
+            needRetrySource = true;
             initVideoDetailsAPI("");
             return;
         }
+
 
         if (needNewPlayer) {
             boolean preferExtensionDecoders = intent.getBooleanExtra(PREFER_EXTENSION_DECODERS, false);
@@ -633,16 +730,29 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
                 /*showToast(getString(R.string.unexpected_intent_action, action));
                 return;*/
             }
-            videoInfo.setVideo_urls(Collections.unmodifiableList(videoInfo.getVideo_urls()));
-            uris = new Uri[videoInfo.getVideo_urls().size()];
-            extensions = new String[videoInfo.getVideo_urls().size()];
 
-            for (int i = 0; i < videoInfo.getVideo_urls().size(); i++) {
-                uris[i] = Uri.parse(videoInfo.getVideo_urls().get(i).getVideo_url());
-                extensions[i] = "";
+
+            videoInfo.setVideo_urls(Collections.unmodifiableList(videoInfo.getVideo_urls()));
+            if (videoInfo.isAdaptiveStreaming()) {
+                uris = new Uri[]{Uri.parse(videoInfo.getAdaptiveUrl())};
+                extensions = new String[]{""};
+            } else {
+                uris = new Uri[videoInfo.getVideo_urls().size()];
+                extensions = new String[videoInfo.getVideo_urls().size()];
+                for (int i = 0; i < videoInfo.getVideo_urls().size(); i++) {
+                    uris[i] = Uri.parse(videoInfo.getVideo_urls().get(i).getVideo_url());
+                    extensions[i] = "";
+                }
             }
 
-
+            OfflineVideo offlineVideo = getOfflineVideo(videoInfo.getVdoId());
+            if (offlineVideo != null) {
+                localFile = new File(offlineVideo.getLocalPath());
+                if (localFile.exists()) {
+                    uris = new Uri[]{Uri.fromFile(localFile)};
+                    extensions = new String[]{""};
+                }
+            }
             if (Util.maybeRequestReadExternalStoragePermission(getActivity(), uris)) {
                 // The player will be reinitialized if the permission is granted.
                 return;
@@ -1059,22 +1169,28 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         token = "JWT " + token;
         videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody(item.getItemTypeId()));
         //videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody("introduction-powercenter-1"));
-
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        final SuggestionFragment suggestionFragment = (SuggestionFragment) fragmentManager.findFragmentByTag(SuggestionFragment.TAG);
+        if (suggestionFragment != null) {
+            suggestionFragment.updateVideoContent(videoInfo, true, false);
+        }
         videoDetails.enqueue(new Callback<VideoEntity>() {
             @Override
             public void onResponse(Call<VideoEntity> call, Response<VideoEntity> response) {
                 switch (response.code()) {
                     case HttpURLConnection.HTTP_OK:
                         videoInfo = response.body();
-                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                        SuggestionFragment suggestionFragment = (SuggestionFragment) fragmentManager.findFragmentByTag(SuggestionFragment.TAG);
                         if (suggestionFragment != null) {
-                            suggestionFragment.updateVideoContent(videoInfo);
+                            suggestionFragment.updateVideoContent(videoInfo, false, false);
                             initializePlayer(videoInfo);
                         }
                         break;
                     default:
                         Utility.showMessage("Failed in response");
+                        if (suggestionFragment != null) {
+                            suggestionFragment.updateVideoContent(videoInfo, false, true);
+                        }
+                        releasePlayer();
                         break;
                 }
             }
@@ -1082,6 +1198,10 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             @Override
             public void onFailure(Call<VideoEntity> call, Throwable t) {
                 Utility.showMessage("Failed");
+                if (suggestionFragment != null) {
+                    suggestionFragment.updateVideoContent(videoInfo, false, true);
+                }
+                releasePlayer();
             }
         });
 
@@ -1091,5 +1211,27 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
     @Override
     public void onSourceInfoRefreshed(Timeline timeline, Object manifest) {
         Log.e(TAG, "onSourceInfoRefreshed: " + timeline.getWindowCount());
+    }
+
+
+    /**
+     * Get offline video if available
+     *
+     * @param videoId
+     * @return
+     */
+    private OfflineVideo getOfflineVideo(String videoId) {
+        OfflineVideo offlineVideo = null;
+        Realm realm = null;
+        try {
+            realm = Realm.getDefaultInstance();
+            offlineVideo =
+                    realm.copyFromRealm(realm.where(OfflineVideo.class).equalTo("videoId", videoId).findFirst());
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "getOfflineVideo: " + e.getMessage());
+        } finally {
+            if (realm != null) realm.close();
+        }
+        return offlineVideo;
     }
 }

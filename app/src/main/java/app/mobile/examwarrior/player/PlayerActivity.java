@@ -115,6 +115,7 @@ public class PlayerActivity extends Activity implements OnClickListener, ExoPlay
 
     public static final String ACTION_VIEW = "app.mobile.examwarrior.player.action.VIEW";
     public static final String KEY_MODULE_ITEM_ID = "app.mobile.examwarrior.player.action.moduleItem_id";
+    public static final String KEY_MODULE_ID = "app.mobile.examwarrior.player.action.module_id";
 
     public static final String EXTENSION_EXTRA = "extension";
 

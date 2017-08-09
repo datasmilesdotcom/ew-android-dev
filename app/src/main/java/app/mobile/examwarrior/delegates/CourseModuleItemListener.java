@@ -1,6 +1,7 @@
 package app.mobile.examwarrior.delegates;
 
 import app.mobile.examwarrior.database.ModuleItem;
+import app.mobile.examwarrior.expandable_list.listeners.CourseHeader;
 import app.mobile.examwarrior.expandable_list.viewholders.ChildViewHolder;
 
 /**
@@ -9,5 +10,5 @@ import app.mobile.examwarrior.expandable_list.viewholders.ChildViewHolder;
 
 public interface CourseModuleItemListener {
 
-    public void onModuleClickListener(ChildViewHolder holder, int position, ModuleItem data);
+    public void onModuleClickListener(ChildViewHolder holder, int position, ModuleItem data, CourseHeader groupHeader);
 }

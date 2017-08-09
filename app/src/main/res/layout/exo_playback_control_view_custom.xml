@@ -90,7 +90,7 @@
                 android:orientation="horizontal">
 
                 <android.support.v7.widget.AppCompatImageView
-                    android:id="@+id/exo_prev"
+                    android:id="@+id/btn_prev"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center"
@@ -158,7 +158,7 @@
                     app:srcCompat="@drawable/ic_forward" />
 
                 <android.support.v7.widget.AppCompatImageView
-                    android:id="@+id/exo_next"
+                    android:id="@+id/btn_next"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_gravity="center"

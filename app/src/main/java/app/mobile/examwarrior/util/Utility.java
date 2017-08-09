@@ -517,7 +517,7 @@ public class Utility {
 
     }
 
-    public static String getSizeFromKb(int sizeInKb) {
+    public static String getSizeFromKb(long sizeInKb) {
         String hrSize = "";
         double m = sizeInKb / 1024.0;
         double g = sizeInKb / 1048576.0;

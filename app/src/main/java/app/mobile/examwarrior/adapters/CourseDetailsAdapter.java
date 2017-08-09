@@ -47,7 +47,7 @@ public class CourseDetailsAdapter extends ExpandableRecyclerViewAdapter<CourseMo
     }
 
     @Override
-    public void onBindChildViewHolder(final ModuleItemViewHolder holder, int flatPosition, ExpandableGroup group, final int childIndex) {
+    public void onBindChildViewHolder(final ModuleItemViewHolder holder, int flatPosition, final ExpandableGroup group, final int childIndex) {
 
 
         final ModuleItem data = ((CourseHeader) group).getItems().get(childIndex);
@@ -56,17 +56,17 @@ public class CourseDetailsAdapter extends ExpandableRecyclerViewAdapter<CourseMo
             @Override
             public void onClick(View v) {
                 if (courseModuleItemListener != null) {
-                    courseModuleItemListener.onModuleClickListener(holder, childIndex, data);
+                    courseModuleItemListener.onModuleClickListener(holder, childIndex, data, (CourseHeader) group);
                 }
             }
         });
     }
 
     @Override
-    public void onBindGroupViewHolder(CourseModuleViewHolder holder,final int flatPosition, ExpandableGroup group) {
+    public void onBindGroupViewHolder(CourseModuleViewHolder holder, final int flatPosition, ExpandableGroup group) {
         CourseHeader data = (CourseHeader) group;
         holder.settitle(data.getTitle());
-        holder.setImage(data.getImage(), context,flatPosition+1);
+        holder.setImage(data.getImage(), context, flatPosition + 1);
         holder.directionArrow.setOnClickListener(new View.OnClickListener() {
                                                      @Override
                                                      public void onClick(View v) {

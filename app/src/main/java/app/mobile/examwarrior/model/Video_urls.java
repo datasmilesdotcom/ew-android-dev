@@ -15,7 +15,7 @@ public class Video_urls {
     private String video_url;
     @SerializedName("videoFileSize")
     @Expose
-    private Integer videoFileSize;
+    private long videoFileSize;
     @SerializedName("downloadUrl")
     @Expose
     private String downloadUrl;
@@ -36,11 +36,11 @@ public class Video_urls {
         this.video_url = video_url;
     }
 
-    public Integer getVideoFileSize() {
+    public long getVideoFileSize() {
         return videoFileSize;
     }
 
-    public void setVideoFileSize(Integer videoFileSize) {
+    public void setVideoFileSize(long videoFileSize) {
         this.videoFileSize = videoFileSize;
     }
 
