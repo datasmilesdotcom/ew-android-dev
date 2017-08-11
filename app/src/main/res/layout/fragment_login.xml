@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingBottom="20dp"
@@ -61,7 +61,7 @@
                 android:background="@drawable/shape_edittext"
                 android:drawablePadding="10dp"
                 android:fontFamily="sans-serif-condensed"
-                android:hint="Password"
+                android:hint="@string/password"
                 android:inputType="textPassword"
                 android:maxLength="16"
                 android:maxLines="1"
@@ -90,6 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:clickable="true"
+            android:focusable="true"
             android:fontFamily="sans-serif-condensed"
             android:gravity="center"
             android:padding="5dp"
@@ -104,6 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:clickable="true"
+            android:focusable="true"
             android:fontFamily="sans-serif-condensed"
             android:gravity="center"
             android:padding="5dp"

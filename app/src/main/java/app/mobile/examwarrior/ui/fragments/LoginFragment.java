@@ -3,6 +3,7 @@ package app.mobile.examwarrior.ui.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -149,12 +150,18 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 validateData();
                 break;
             case R.id.link_forget_password:
-                ((RegistrationActivity) getContext()).changePage(0);
+                //((RegistrationActivity) getContext()).changePage(0);
+                openLinkInWebView("https://examwarrior.com/forgotpassword");
                 break;
             case R.id.link_signup:
-                ((RegistrationActivity) getContext()).changePage(2);
+                //((RegistrationActivity) getContext()).changePage(2);
+                openLinkInWebView("https://examwarrior.com/register");
                 break;
         }
+    }
+
+    private void openLinkInWebView(String url) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
 
     /**
