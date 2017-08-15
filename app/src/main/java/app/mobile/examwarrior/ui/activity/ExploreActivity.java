@@ -37,9 +37,10 @@ public class ExploreActivity extends AppCompatActivity implements ExploreCardCli
     private Activity activity;
 
     private CircleProgressBar progressBar;
-    private ArrayList<CourseCategories> listOfPlayLists=new ArrayList<CourseCategories>();
+    private ArrayList<CourseCategories> listOfPlayLists = new ArrayList<CourseCategories>();
 
     private ImageView backButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +52,7 @@ public class ExploreActivity extends AppCompatActivity implements ExploreCardCli
 
 
         listView = (RecyclerView) findViewById(R.id.allFeedsData);
-        backButton=(ImageView )findViewById(R.id.imageview_back);
+        backButton = (ImageView) findViewById(R.id.imageview_back);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         listView.setItemAnimator(new DefaultItemAnimator());
         listView.setLayoutManager(linearLayoutManager);
@@ -92,7 +93,8 @@ public class ExploreActivity extends AppCompatActivity implements ExploreCardCli
         courseCategoriesCall.enqueue(new Callback<List<CourseCategories>>() {
 
             @Override
-            public void onResponse(Call<List<CourseCategories>> call, retrofit2.Response<List<CourseCategories>> response) {if (response.isSuccessful()) {
+            public void onResponse(Call<List<CourseCategories>> call, retrofit2.Response<List<CourseCategories>> response) {
+                if (response.isSuccessful()) {
                     listOfPlayLists.clear();
                     listOfPlayLists.addAll(response.body());
                     adapter.notifyDataSetChanged();
@@ -111,16 +113,16 @@ public class ExploreActivity extends AppCompatActivity implements ExploreCardCli
 
     @Override
     public void getMoreCources(String playListId) {
-        Intent exploreMore=new Intent(this,ExploreMoreActivity.class);
-        exploreMore.putExtra("CategoryId",playListId);
+        Intent exploreMore = new Intent(this, ExploreMoreActivity.class);
+        exploreMore.putExtra("CategoryId", playListId);
         startActivity(exploreMore);
 
     }
 
     @Override
     public void exploreCources(CourseCategories.McoursesBean itemsEntity) {
-        Intent exploreMore=new Intent(this,ExploreSubCategoryListActivity.class);
-        exploreMore.putExtra("CategoryId",itemsEntity);
+        Intent exploreMore = new Intent(this, ExploreSubCategoryListActivity.class);
+        exploreMore.putExtra("CategoryId", itemsEntity);
         startActivity(exploreMore);
     }
 

@@ -42,11 +42,14 @@ public class ExploreHorizontalMoreAdapter extends RecyclerView.Adapter<ExploreHo
     @Override
     public void onBindViewHolder(MyHolder holder, final int position) {
 
-        holder.textTitle.setText(videoItems.get(position).getCOURSENAME().toUpperCase());
+        holder.textTitle.setText(videoItems.get(position).getCourseName().toUpperCase());
+        if(videoItems.get(position).getImageUrl() !=null && !videoItems.get(position).getImageUrl().equals(""))
         Picasso.with(activity)
-                .load(videoItems.get(position).getPIC())
+                .load(videoItems.get(position).getImageUrl())
                 .error(R.drawable.placeholder_)
                 .into(holder.coverImage);
+        else
+            holder.coverImage.setImageResource(R.drawable.placeholder_);
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -44,13 +44,13 @@ public class ExploreSubCatListAdapter extends RecyclerView.Adapter<ExploreSubCat
     @Override
     public void onBindViewHolder(MyHolder holder, final int position) {
 
-        holder.textTitle.setText(videoItems.get(position).getCOURSENAME().toUpperCase());
-        holder.description.setText(videoItems.get(position).getCourseDesc());
-        holder.author_name.setText("Author : "+videoItems.get(position).getAuthor());
-        holder.last_updated.setText("Last Uupdate : "+videoItems.get(position).getLastUpdateDt());
-        holder.level.setText("Leval : "+videoItems.get(position).getLevel());
+        holder.textTitle.setText(videoItems.get(position).getCourseName().toUpperCase());
+        holder.description.setText(videoItems.get(position).getCourseLongDesc());
+        holder.author_name.setText("Author : "+videoItems.get(position).getAuthor().get(0).getAuthorName());
+        holder.last_updated.setText("Last Uupdate : "+videoItems.get(position).getUpdatedAt());
+        holder.level.setText("Leval : "+videoItems.get(position).getCourseLevel());
         Picasso.with(activity)
-                .load(videoItems.get(position).getPIC())
+                .load(videoItems.get(position).getImageUrl())
                 .error(R.drawable.placeholder_)
                 .into(holder.coverImage);
         holder.root.setOnClickListener(new View.OnClickListener() {

@@ -2,8 +2,8 @@ package app.mobile.examwarrior.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,10 +14,8 @@ import android.widget.ImageView;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import app.mobile.examwarrior.R;
-import app.mobile.examwarrior.adapters.explorer.ExploreCategoryAdapter;
 import app.mobile.examwarrior.adapters.explorer.ExploreSubCatListAdapter;
 import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
@@ -37,10 +35,11 @@ public class ExploreSubCategoryListActivity extends AppCompatActivity implements
     private Activity activity;
 
     private CircleProgressBar progressBar;
-    private ArrayList<CourseMoreCategories.CoursesBean> listOfPlayLists=new ArrayList<>();
+    private ArrayList<CourseMoreCategories.CoursesBean> listOfPlayLists = new ArrayList<>();
 
     private ImageView backButton;
     private CustomFontTextView action_bar_title;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,14 +47,14 @@ public class ExploreSubCategoryListActivity extends AppCompatActivity implements
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.exploreToolbar);
         setSupportActionBar(toolbar);
-        action_bar_title= (CustomFontTextView) findViewById(R.id.action_bar_title);
+        action_bar_title = (CustomFontTextView) findViewById(R.id.action_bar_title);
         activity = this;
 
         Intent intent = getIntent();
-        CourseCategories.McoursesBean subcatogry = (CourseCategories.McoursesBean)intent.getSerializableExtra("CategoryId");
+        CourseCategories.McoursesBean subcatogry = (CourseCategories.McoursesBean) intent.getSerializableExtra("CategoryId");
         action_bar_title.setText(subcatogry.getMcoursename().toUpperCase());
         listView = (RecyclerView) findViewById(R.id.sub_category_list);
-        backButton=(ImageView)findViewById(R.id.imageview_back);
+        backButton = (ImageView) findViewById(R.id.imageview_back);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         listView.setItemAnimator(new DefaultItemAnimator());
         listView.setLayoutManager(linearLayoutManager);
@@ -90,11 +89,12 @@ public class ExploreSubCategoryListActivity extends AppCompatActivity implements
         courseCategoriesCall.enqueue(new Callback<CourseMoreCategories>() {
 
             @Override
-            public void onResponse(Call<CourseMoreCategories> call, retrofit2.Response<CourseMoreCategories> response) {if (response.isSuccessful()) {
-                listOfPlayLists.clear();
-                listOfPlayLists.addAll(response.body().getCourses());
-                adapter.notifyDataSetChanged();
-            }
+            public void onResponse(Call<CourseMoreCategories> call, retrofit2.Response<CourseMoreCategories> response) {
+                if (response.isSuccessful()) {
+                    listOfPlayLists.clear();
+                    listOfPlayLists.addAll(response.body().getCourses());
+                    adapter.notifyDataSetChanged();
+                }
                 progressBar.setVisibility(View.GONE);
             }
 
@@ -119,7 +119,7 @@ public class ExploreSubCategoryListActivity extends AppCompatActivity implements
     @Override
     public void exploreCourcesMore(CourseMoreCategories.CoursesBean itemsEntity) {
         Intent intent = new Intent(this, CourseDetailsActivity.class);
-        intent.putExtra(CourseDetailsActivity.KEY_COURSE_ID, itemsEntity.getCOURSEID());
+        intent.putExtra(CourseDetailsActivity.KEY_COURSE_ID, itemsEntity.getCourseId());
         startActivity(intent);
     }
 }

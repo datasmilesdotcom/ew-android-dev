@@ -15,15 +15,14 @@ import android.widget.TextView;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import app.mobile.examwarrior.R;
-import app.mobile.examwarrior.adapters.explorer.ExploreCategoryAdapter;
 import app.mobile.examwarrior.adapters.explorer.ExploreCategoryMoreAdapter;
 import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.listener.ExploreCardClickListener;
 import app.mobile.examwarrior.model.CourseCategories;
+import app.mobile.examwarrior.model.CourseMore;
 import app.mobile.examwarrior.model.CourseMoreCategories;
 import app.mobile.examwarrior.util.Utility;
 import retrofit2.Call;
@@ -96,15 +95,15 @@ public class ExploreMoreActivity extends AppCompatActivity implements ExploreCar
         }
 
         ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
-        Call<List<CourseMoreCategories>> courseCategoriesCall = apiInterface.getExlporeMoreData(categoryId);
-        courseCategoriesCall.enqueue(new Callback<List<CourseMoreCategories>>() {
+        Call<CourseMore> courseCategoriesCall = apiInterface.getExlporeMoreData(categoryId);
+        courseCategoriesCall.enqueue(new Callback<CourseMore>() {
 
             @Override
-            public void onResponse(Call<List<CourseMoreCategories>> call, Response<List<CourseMoreCategories>> response) {if (response.isSuccessful()) {
+            public void onResponse(Call<CourseMore> call, Response<CourseMore> response) {if (response.isSuccessful()) {
                     listOfPlayLists.clear();
-                    listOfPlayLists.addAll(response.body());
+                    listOfPlayLists.addAll(response.body().getMcourses());
                     adapter.notifyDataSetChanged();
-                    if(response.body().isEmpty()){
+                    if(response.body().getMcourses().isEmpty()){
                         emptyRecords.setVisibility(View.VISIBLE);
                     }
                 }
@@ -112,7 +111,7 @@ public class ExploreMoreActivity extends AppCompatActivity implements ExploreCar
             }
 
             @Override
-            public void onFailure(Call<List<CourseMoreCategories>> call, Throwable t) {
+            public void onFailure(Call<CourseMore> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
             }
         });
@@ -135,7 +134,7 @@ public class ExploreMoreActivity extends AppCompatActivity implements ExploreCar
     @Override
     public void exploreCourcesMore(CourseMoreCategories.CoursesBean itemsEntity) {
         Intent intent = new Intent(this, CourseDetailsActivity.class);
-        intent.putExtra(CourseDetailsActivity.KEY_COURSE_ID, itemsEntity.getCOURSEID());
+        intent.putExtra(CourseDetailsActivity.KEY_COURSE_ID, itemsEntity.getCourseId());
         startActivity(intent);
     }
 

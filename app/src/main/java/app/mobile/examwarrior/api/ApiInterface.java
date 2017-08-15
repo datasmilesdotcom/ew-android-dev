@@ -13,6 +13,7 @@ import app.mobile.examwarrior.database.Question;
 import app.mobile.examwarrior.model.ChangePasswordRequestBody;
 import app.mobile.examwarrior.model.CourseCategories;
 import app.mobile.examwarrior.model.CourseDetailId;
+import app.mobile.examwarrior.model.CourseMore;
 import app.mobile.examwarrior.model.CourseMoreCategories;
 import app.mobile.examwarrior.model.ForgetPasswordBody;
 import app.mobile.examwarrior.model.ForgetPasswordResponse;
@@ -71,14 +72,14 @@ public interface ApiInterface {
     @POST("/videovotes/downvoteVideo")
     Call<VoteVideoResponse> downVoteVideo(@Header("Authorization") String auth_token, @Body VoteRequestBody voteRequestBody);
 
-    @GET("masterCourseCategoryDetails/details/{id}")
+    @GET("courseCategoryMaster/mobile/coursesByMCourses/{id}")
     Call<CourseMoreCategories> getExlporeSubCategoryData(@Path("id") String id);
 
-    @GET("test/getAllCourseCategory")
+    @GET("courseMasterDetails/mobile/courseCategory")
     Call<List<CourseCategories>> getExlporeData();
 
-    @GET("test/getCourseCategory/{id}")
-    Call<List<CourseMoreCategories>> getExlporeMoreData(@Path("id") String id);
+    @GET("courseMasterDetails/mobile/coursesByCat/{id}")
+    Call<CourseMore> getExlporeMoreData(@Path("id") String id);
 
     @POST("practice/startUserExam")
     Call<Question> getQuestions(@Header("Authorization") String auth_token, @Body QuestionRequestBody questionRequestBody);

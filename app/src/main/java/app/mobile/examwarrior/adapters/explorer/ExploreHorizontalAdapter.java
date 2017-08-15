@@ -43,7 +43,7 @@ public class ExploreHorizontalAdapter extends RecyclerView.Adapter<ExploreHorizo
 
         holder.textTitle.setText(videoItems.get(position).getMcoursename().toUpperCase());
         Picasso.with(activity)
-                .load(videoItems.get(position).getPic())
+                .load(videoItems.get(position).getMcourse_pic())
                 .error(R.drawable.placeholder_)
                 .into(holder.coverImage);
         holder.root.setOnClickListener(new View.OnClickListener() {

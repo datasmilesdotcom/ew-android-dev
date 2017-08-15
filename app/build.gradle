@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.0'
     defaultConfig {
         applicationId "app.mobile.examwarrior"
         minSdkVersion 18
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -56,7 +56,7 @@ android {
 }
 
 ext {
-    supprtLibraryVersion = '25.4.0'
+    supprtLibraryVersion = '26.0.0'
     exoplayerLibraryVersion = 'r2.4.4'
     retrofitLibraryVersion = '2.1.0'
     gsonLibraryVersion = '2.8.0'
