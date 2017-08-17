@@ -22,7 +22,11 @@
             android:value="GlideModule" />
 
         <activity android:name=".DashboardActivity">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".ui.app_intro.AppIntroActivity"
@@ -87,7 +91,28 @@
         <activity
             android:name=".ui.activity.TestActivity"
             android:label="@string/title_activity_test"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme" >
+
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+
+
+        <activity
+            android:name=".ui.activity.TestActivity1"
+            android:label="@string/title_activity_test1"
+            android:theme="@style/AppTheme" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".demo.QuestionPagerActivity"
             android:label="@string/title_activity_question_pager"
@@ -111,11 +136,11 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/PlayerTheme">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <activity android:name=".ui.activity.ExploreActivity" />
         <activity android:name=".ui.activity.ExploreMoreActivity" />

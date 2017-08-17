@@ -7,13 +7,23 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <FrameLayout
+
+    <app.mobile.examwarrior.widget.LockableViewPager
+        android:id="@+id/pager"
+        android:layout_above="@+id/bottom"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </app.mobile.examwarrior.widget.LockableViewPager>
+
+    <!--<FrameLayout
         android:padding="10dp"
         android:layout_above="@+id/bottom"
         android:id="@+id/questions_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
+-->
 
     <RelativeLayout
         android:id="@+id/bottom"
