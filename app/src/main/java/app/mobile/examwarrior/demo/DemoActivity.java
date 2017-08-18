@@ -108,7 +108,7 @@ public class DemoActivity extends AppCompatActivity implements ToggleListener {
 
         /*RevealFrameLayout revealFrameLayout = (RevealFrameLayout) findViewById(R.id.frame);
         revealFrameLayout.clearAnimation();*/
-       // Log.e(TAG, "onClick ****: " + ((ExpandableGroup) groupAdapter.getGroup(myItem)).getItemCount());
+        // Log.e(TAG, "onClick ****: " + ((ExpandableGroup) groupAdapter.getGroup(myItem)).getItemCount());
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,12 +133,13 @@ public class DemoActivity extends AppCompatActivity implements ToggleListener {
             @Override
             public void onClick(View view) {
                 try {
-                   // expandableGroup.add(expandableGroup.getChildCount(), new MyItem());
+                    // expandableGroup.add(expandableGroup.getChildCount(), new MyItem());
                 } catch (Exception e) {
                     Log.e(TAG, "onClick: " + e.getCause());
                 }
             }
         });
+
     }
 
     /**
@@ -164,7 +165,7 @@ public class DemoActivity extends AppCompatActivity implements ToggleListener {
 
     @Override
     public void onToggle(ViewHolder viewHolder, int position, boolean isExpanded) {
-        if (isExpanded ) {
+        if (isExpanded) {
             groupAdapter.getGroup(viewHolder.getItem());
         }
     }

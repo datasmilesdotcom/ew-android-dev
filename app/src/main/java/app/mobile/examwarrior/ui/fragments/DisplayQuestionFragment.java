@@ -5,8 +5,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatTextView;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +13,9 @@ import android.widget.LinearLayout;
 
 import com.fcannizzaro.jsoup.annotations.interfaces.ForEach;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import app.mobile.examwarrior.R;
-import de.timfreiheit.mathjax.android.MathJaxView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -140,7 +134,7 @@ public class DisplayQuestionFragment extends Fragment {
 //            Log.e(TAG, "onViewCreated: " + data.select("h2").text());
 //            //Log.e(TAG, "onViewCreated: " + element1.getElementsByTag(element1.tag().getName()));
 //        }
-        /*List<Question> question1 = (List<Question>) JP.fromList(element, Question.class);
+        /*List<QuestionsList> question1 = (List<QuestionsList>) JP.fromList(element, QuestionsList.class);
         //Log.e(TAG, "onViewCreated: " + question1.getName());
         Log.e(TAG, "onViewCreated: " + elements.size());*/
     }
