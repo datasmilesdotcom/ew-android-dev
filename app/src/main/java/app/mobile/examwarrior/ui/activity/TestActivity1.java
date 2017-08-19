@@ -1,23 +1,77 @@
 package app.mobile.examwarrior.ui.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.TextView;
 
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.ui.fragments.DisplayQuestionFragment;
+import app.mobile.examwarrior.ui.fragments.ForgetPasswordFragment;
 import app.mobile.examwarrior.widget.LockableViewPager;
 
 public class TestActivity1 extends AppCompatActivity {
 
     String[] que;
     String path = "file:///android_asset/";
+    long startTime = 0L;
+    long updatedTime = 0L;
+    long timeSwapBuff = 0L;
+    long timeInMilliseconds = 0L;
+    long startTotalTime = 0L;
+    long updatedTotalTime = 0L;
+    long timeTotalSwapBuff = 0L;
+    long timeTotalInMilliseconds = 0L;
     private android.support.v4.app.FragmentManager fragmentManager;
     private LockableViewPager mPager;
     private DemoFragmentAdapter mAdapter;
+    private TextView tvTotalTime, tvAnsTime;
+    private Handler customHandler = new Handler();
+    private Handler customHandlerTotal = new Handler();
+    private Runnable updateTimerThread = new Runnable() {
+
+        public void run() {
+
+            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuff + timeInMilliseconds;
+            int secs = (int) (updatedTime / 1000);
+            int mins = secs / 60;
+            secs = secs % 60;
+            int hour = mins / 60;
+            mins = mins % 60;
+            //int milliseconds = (int) (updatedTime % 1000);
+            tvAnsTime.setText(String.format("%02d", hour) + ":"
+                    + String.format("%02d", mins) + ":"
+                    + String.format("%02d", secs));
+            customHandler.postDelayed(this, 0);
+        }
+    };
+    private Runnable updateTotalTimerThread = new Runnable() {
+
+        public void run() {
+
+            timeTotalInMilliseconds = SystemClock.uptimeMillis() - startTotalTime;
+            updatedTotalTime = timeTotalSwapBuff + timeTotalInMilliseconds;
+            int secs = (int) (updatedTotalTime / 1000);
+            int mins = secs / 60;
+            secs = secs % 60;
+            int hour = mins / 60;
+            mins = mins % 60;
+            //int milliseconds = (int) (updatedTime % 1000);
+            tvTotalTime.setText(String.format("%02d", hour) + ":"
+                    + String.format("%02d", mins) + ":"
+                    + String.format("%02d", secs));
+            customHandlerTotal.postDelayed(this, 0);
+        }
+    };
+
+    int pager_pos=-1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,21 +82,80 @@ public class TestActivity1 extends AppCompatActivity {
 
         mAdapter = new DemoFragmentAdapter(getSupportFragmentManager());
         mPager = (LockableViewPager) findViewById(R.id.pager);
-
+        tvTotalTime = (TextView) findViewById(R.id.tvTotalTime);
+        tvAnsTime = (TextView) findViewById(R.id.tvAnsTime);
         mPager.setAdapter(mAdapter);
-        findViewById(R.id.appCompatImageView3).setOnClickListener(new View.OnClickListener() {
+
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    System.out.println("viewpager onPageScrolled :"+position);
+                if (pager_pos!=position) {
+                    pager_pos=position;
+                    startTime = SystemClock.uptimeMillis();
+                    customHandler.postDelayed(updateTimerThread, 0);
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                System.out.println("viewpager onPageSelected :"+position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        findViewById(R.id.left_nav).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPager.arrowScroll(View.FOCUS_LEFT);
+            }
+        });
+
+        findViewById(R.id.right_nav).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPager.arrowScroll(View.FOCUS_RIGHT );
+            }
+        });
+
+        findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPager.setCurrentItem(getItem(+1), true);
+
+                System.out.println("next :" + getItem(+1));
+                int pos=getItem(+1);
+                mPager.setCurrentItem(pos, true);
+
+                if (pos != 20) {
+                    startTime = SystemClock.uptimeMillis();
+                    customHandler.postDelayed(updateTimerThread, 0);
+                }
+
             }
         });
 
         findViewById(R.id.prev).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPager.setCurrentItem(getItem(-1), true);
+
+                int pos = getItem(-1);
+                mPager.setCurrentItem(pos, true);
+                if (pos != -1) {
+                    startTime = SystemClock.uptimeMillis();
+                    customHandler.postDelayed(updateTimerThread, 0);
+                }
             }
         });
+
+        startTime = SystemClock.uptimeMillis();
+        customHandler.postDelayed(updateTimerThread, 0);
+
+        startTotalTime = SystemClock.uptimeMillis();
+        customHandlerTotal.postDelayed(updateTotalTimerThread, 0);
     }
 
     private int getItem(int i) {
@@ -58,7 +171,6 @@ public class TestActivity1 extends AppCompatActivity {
                 + "<script>var s ='$$" + equation + "$$';M.parseMath(s);document.write(s);</script></body>";
         return js;
     }
-
 
     private class DemoFragmentAdapter extends FragmentPagerAdapter {
 
@@ -76,4 +188,5 @@ public class TestActivity1 extends AppCompatActivity {
             return que.length;
         }
     }
+
 }

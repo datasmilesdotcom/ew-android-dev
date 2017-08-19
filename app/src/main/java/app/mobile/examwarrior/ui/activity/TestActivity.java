@@ -37,7 +37,7 @@ public class TestActivity extends AppCompatActivity {
             addFragment(R.id.questions_container, DisplayQuestionFragment.newInstance(getString(path, que[i]), ""), "");
         }
 
-        findViewById(R.id.appCompatImageView3).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 i = i+1;
