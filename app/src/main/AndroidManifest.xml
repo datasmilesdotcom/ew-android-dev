@@ -22,11 +22,11 @@
             android:value="GlideModule" />
 
         <activity android:name=".DashboardActivity">
-            <!--<intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.app_intro.AppIntroActivity"
@@ -106,11 +106,11 @@
             android:label="@string/title_activity_test1"
             android:theme="@style/AppTheme" >
 
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
 
         <activity

@@ -1154,19 +1154,19 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             return;
         }
         ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
-        String token = null;
-        Realm realm = Realm.getDefaultInstance();
-        try {
-            User user = realm.where(User.class).findFirst();
-            if (user != null) {
-                token = user.getToken();
-            }
-        } catch (Exception e) {
+            String token = null;
+            Realm realm = Realm.getDefaultInstance();
+            try {
+                User user = realm.where(User.class).findFirst();
+                if (user != null) {
+                    token = user.getToken();
+                }
+            } catch (Exception e) {
 
-        } finally {
-            realm.close();
-        }
-        token = "JWT " + token;
+            } finally {
+                realm.close();
+            }
+            token = "JWT " + token;
         videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody(item.getItemTypeId()));
         //videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody("introduction-powercenter-1"));
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();

@@ -8,21 +8,22 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-
-import java.io.InputStream;
-
 import app.mobile.examwarrior.R;
-import app.mobile.examwarrior.database.Questions;
-import app.mobile.examwarrior.database.QuestionsList;
+import app.mobile.examwarrior.api.ApiInterface;
+import app.mobile.examwarrior.api.ServiceGenerator;
+import app.mobile.examwarrior.database.StartUserExam;
+import app.mobile.examwarrior.model.StartTestBody;
+import app.mobile.examwarrior.model.User;
 import app.mobile.examwarrior.ui.fragments.DisplayQuestionFragment;
 import app.mobile.examwarrior.widget.LockableViewPager;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class TestActivity1 extends AppCompatActivity {
 
@@ -37,12 +38,13 @@ public class TestActivity1 extends AppCompatActivity {
     long updatedTotalTime = 0L;
     long timeTotalSwapBuff = 0L;
     long timeTotalInMilliseconds = 0L;
-    RealmResults<Questions> lstQues;
+    RealmResults<StartUserExam> AllQues;
     int pager_pos = -1;
+    private Call<StartUserExam> StartTestDetails;
     private android.support.v4.app.FragmentManager fragmentManager;
     private LockableViewPager mPager;
     private DemoFragmentAdapter mAdapter;
-    private Realm realm;
+    //private Realm realm;
     private TextView tvTotalTime, tvAnsTime;
     private Handler customHandler = new Handler();
     private Handler customHandlerTotal = new Handler();
@@ -82,23 +84,20 @@ public class TestActivity1 extends AppCompatActivity {
             customHandlerTotal.postDelayed(this, 0);
         }
     };
+    private StartUserExam userExam;
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-
         //   que = new String[]{"\\[\\text\"average speed\" = \\text\"distance traveled\" / \\text\"elapsed time\"\\]", "\\Δ FEC≅ \\ΔGBD", "a{x^34} + 87x + 9 = 0", "a{x^2} + 87x + 9 = 0", "a{x^31} + 87x + 9 = 0", "a{x^42} + 87x + 9 = 0", "y-y_0=m(x-x_0)", "\\cos^2θ+\\sin^2θ=1", "∑↙{i=0}↖n i={n(n+1)}/2", "{1+√5}/2=1+1/{1+1/{1+⋯}}", "f'(x)=\\lim↙{h→0}{f(x+h)-f(x)}/h", "\\[∀x_0∀ε>0∃δ>0∋{|x-x_0|}&lt;δ⇒{|f(x)-f(x_0)|}&lt;ε\\]", "\\[∫_\\Δd\\bo ω=∫_{∂\\Δ}\\bo ω\\]", "(\\table \\cos θ, - \\sin θ; \\sin θ, \\cos θ)$ gives a rotation by", "$v↖{→}⋅w↖{→} = vw\\cos θ$", "$\\{x:x^2∈\\ℚ\\}$ has measure 0 in $\\ℝ$.", "\\[1/7 = 0.\\ov 142857\\]", "\\[√^n{a}√^n{b} = √^n{ab}\\]", "\\[\\table a, =, b+c; , =, d\\]", "\\[\\text\"average speed\" = \\text\"distance traveled\" / \\text\"elapsed time\"\\]"};
 
-        realm = Realm.getDefaultInstance();
-        putQuestionListIntoDatabaseFromAssets();
-        lstQues = realm.where(Questions.class).findAll();
-        mAdapter = new DemoFragmentAdapter(getSupportFragmentManager());
-        mPager = (LockableViewPager) findViewById(R.id.pager);
-        tvTotalTime = (TextView) findViewById(R.id.tvTotalTime);
-        tvAnsTime = (TextView) findViewById(R.id.tvAnsTime);
-        mPager.setAdapter(mAdapter);
+        initViews();
+        initStartUserExamAPI();
 
+  /*     putQuestionListIntoDatabaseFromAssets();
+        lstQues = realm.where(AllQuestion.class).findAll();*/
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -172,21 +171,14 @@ public class TestActivity1 extends AppCompatActivity {
 
     }
 
-    private int getItem(int i) {
-        return mPager.getCurrentItem() + i;
+    private void initViews() {
+        mPager = findViewById(R.id.pager);
+        tvTotalTime = findViewById(R.id.tvTotalTime);
+        tvAnsTime = findViewById(R.id.tvAnsTime);
+        realm = Realm.getDefaultInstance();
     }
 
-    private String getString(String path, String equation) {
-        final String js = "<html><head>"
-                + "<link rel='stylesheet' href='" + path + "jqmath-0.4.3.css'>"
-                + "<script src='" + path + "jquery-1.4.3.min.js'></script>"
-                + "<script src='" + path + "jqmath-etc-0.4.6.min.js'></script>"
-                + "</head>Find the value of <body>"
-                + "<script>var s ='$$" + equation + "$$';M.parseMath(s);document.write(s);</script></body>";
-        return js;
-    }
-
-    private void putQuestionListIntoDatabaseFromAssets() {
+/*    private void putQuestionListIntoDatabaseFromAssets() {
         String json = null;
         try {
             InputStream inputStream = getAssets().open("questions/Questions.json");
@@ -201,6 +193,63 @@ public class TestActivity1 extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }*/
+
+    private int getItem(int i) {
+        return mPager.getCurrentItem() + i;
+    }
+
+    private String getString(String path, String equation) {
+        final String js = "<html><head>"
+                + "<link rel='stylesheet' href='" + path + "jqmath-0.4.3.css'>"
+                + "<script src='" + path + "jquery-1.4.3.min.js'></script>"
+                + "<script src='" + path + "jqmath-etc-0.4.6.min.js'></script>"
+                + "</head>Find the value of <body>"
+                + "<script>var s ='$$" + equation + "$$';M.parseMath(s);document.write(s);</script></body>";
+        return js;
+    }
+
+    private void initStartUserExamAPI() {
+        ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
+        String token = null;
+        realm = Realm.getDefaultInstance();
+        try {
+            User user = realm.where(User.class).findFirst();
+            if (user != null) {
+                token = user.getToken();
+            }
+        } catch (Exception e) {
+
+        } finally {
+            realm.close();
+        }
+        token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJzYXJqdSIsImlhdCI6MTUwMzA1NDE1MCwiZXhwIjoxNTAzNjU4OTUwfQ.K_F9XXUCRMU79JeyFsVNCgYAhYOpsUOZ8E0valBccUc";
+        token = "JWT " + token;
+        StartTestBody mStartTestBody= new StartTestBody();
+        mStartTestBody.setTopicId("super-test-3");
+        mStartTestBody.setShouldStartNew(true);
+        StartTestDetails = apiInterface.getQuestionsList(token, mStartTestBody);
+        StartTestDetails.enqueue(new Callback<StartUserExam>() {
+            @Override
+            public void onResponse(Call<StartUserExam> call, Response<StartUserExam> response) {
+                userExam = response.body();
+                if(userExam!=null)
+                {
+                    mAdapter = new DemoFragmentAdapter(getSupportFragmentManager());
+                    mPager.setAdapter(mAdapter);
+                }
+
+                /*realm.beginTransaction();
+                realm.createObjectFromJson(StartUserExam.class, json);
+                realm.commitTransaction();*/
+            }
+
+            @Override
+            public void onFailure(Call<StartUserExam> call, Throwable t) {
+
+            }
+        });
+
     }
 
     private class DemoFragmentAdapter extends FragmentPagerAdapter {
@@ -211,12 +260,12 @@ public class TestActivity1 extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-             return DisplayQuestionFragment.newInstance(getString(path, lstQues.get(position).getQuestion().toString()), "");
+            return DisplayQuestionFragment.newInstance(userExam.getAllQuestions().get(position));
         }
 
         @Override
         public int getCount() {
-            return lstQues.size();
+            return userExam.getTotalQuestions();
         }
     }
 
