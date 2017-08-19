@@ -11,9 +11,10 @@ import io.realm.annotations.PrimaryKey;
  * Awesome Pojo Generator
  */
 public class Questions extends RealmObject {
-    @PrimaryKey
+
     @SerializedName("questionId")
     @Expose
+    @PrimaryKey
     private String questionId;
     @SerializedName("question")
     @Expose

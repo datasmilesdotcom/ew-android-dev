@@ -192,8 +192,6 @@
     <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
     <string name="intro_text_one">Welcome to next level \ne-learning app.</string>
     <string name="intro_text_three">get access of material\nfrom anywhere.</string>
-<!--
     <string name="password">Password</string>
--->
 
 </resources>
