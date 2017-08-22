@@ -6,20 +6,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.google.gson.Gson;
-
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
 import app.mobile.examwarrior.R;
-import app.mobile.examwarrior.database.Questions;
-import app.mobile.examwarrior.database.QuestionsList;
 import app.mobile.examwarrior.ui.fragments.SuggestionFragment;
-import io.realm.internal.IOException;
 
 public class VideoPlayerActivity extends AppCompatActivity {
 
@@ -34,28 +25,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
             addFragment(R.id.course_player_view, VideoPlayerFragment.newInstance("", ""), VideoPlayerFragment.TAG);
             addFragment(R.id.related_videos, SuggestionFragment.newInstance("", ""), SuggestionFragment.TAG);
 
-            String json = null;
-            try {
-                InputStream inputStream = getAssets().open("questions/Questions.json");
-                int size = inputStream.available();
-                byte[] buffer = new byte[size];
-                inputStream.read(buffer);
-                inputStream.close();
-                json = new String(buffer, "UTF-8");
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
-            Gson gson = new Gson();
-            QuestionsList questionsList = gson.fromJson(json, QuestionsList.class);
-            for (Questions questions :
-                    questionsList.getQuestions()) {
-                Log.e(TAG, "getQuestionId: " + questions.getQuestionId());
-            }
         }
     }
 

@@ -34,6 +34,7 @@ import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.widget.ProgressBar;
 
+import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.xwray.groupie.ExpandableGroup;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.ViewHolder;
@@ -59,6 +60,7 @@ import app.mobile.examwarrior.model.User;
 import app.mobile.examwarrior.model.VideoEntity;
 import app.mobile.examwarrior.model.VoteRequestBody;
 import app.mobile.examwarrior.model.VoteVideoResponse;
+import app.mobile.examwarrior.sync.QuestionSyncJob;
 import app.mobile.examwarrior.util.Utility;
 import app.mobile.examwarrior.util.decoration.HeaderItemDecoration;
 import app.mobile.examwarrior.util.decoration.InsetItemDecoration;
@@ -327,6 +329,9 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
                 //relatedTopicVideosGroup.add(relatedTopicVideosGroup.getChildCount() - 1, new RelatedSuggestionViewHolder());
             }*/
         }
+        PersistableBundleCompat persistableBundleCompat = new PersistableBundleCompat();
+        persistableBundleCompat.putString("key", "value");
+        QuestionSyncJob.scheduleJob(persistableBundleCompat);
     }
 
     /**

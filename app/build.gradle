@@ -75,13 +75,13 @@ android {
 }
 
 ext {
-    supprtLibraryVersion = '26.0.0'
+    supprtLibraryVersion = '26.0.1'
     exoplayerLibraryVersion = 'r2.4.4'
     retrofitLibraryVersion = '2.1.0'
     gsonLibraryVersion = '2.8.0'
     realmAdapterVersion = '2.0.0'
     glideVersion = '3.8.0'
-    evernoteSyncLibraryVersion = '1.1.10'
+    evernoteSyncLibraryVersion = '1.1.11'
 }
 
 dependencies {
