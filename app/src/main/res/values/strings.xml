@@ -186,6 +186,7 @@
     <string name="title_activity_demo">DemoActivity</string>
     <string name="change_password">Change password</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_test1">TestActivity1</string>
     <string name="title_activity_question_pager">QuestionPagerActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>

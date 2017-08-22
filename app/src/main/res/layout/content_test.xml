@@ -8,12 +8,46 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <app.mobile.examwarrior.widget.LockableViewPager
+            android:id="@+id/pager"
+            android:layout_above="@+id/bottom"
+            android:padding="10dp"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </app.mobile.examwarrior.widget.LockableViewPager>
+
+        <ImageView
+            android:id="@+id/left_nav"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical|left"
+            app:srcCompat="@drawable/ic_chevron_left_black_24dp"
+             />
+
+        <ImageView
+            android:id="@+id/right_nav"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical|right"
+            app:srcCompat="@drawable/ic_chevron_right_black_24dp"   />
+
+
+    </FrameLayout>
+
+
+    <!--<FrameLayout
         android:padding="10dp"
         android:layout_above="@+id/bottom"
         android:id="@+id/questions_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
+-->
 
     <RelativeLayout
         android:id="@+id/bottom"
@@ -62,7 +96,7 @@
             android:padding="5dp"
             app:srcCompat="@drawable/dummy"
             android:layout_alignParentEnd="true"
-            android:id="@+id/appCompatImageView3" />
+            android:id="@+id/next" />
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/prev"
@@ -71,7 +105,7 @@
             android:padding="5dp"
             app:srcCompat="@drawable/dummy"
             android:layout_alignParentTop="true"
-            android:layout_toStartOf="@+id/appCompatImageView3" />
+            android:layout_toStartOf="@+id/next" />
     </RelativeLayout>
 
 </RelativeLayout>

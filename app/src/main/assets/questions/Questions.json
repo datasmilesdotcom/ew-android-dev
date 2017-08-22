@@ -255,7 +255,7 @@
     },
     {
       "questionId": "sql-select-1",
-      "question": "You query the database with this SQL statement:SELECT id_number, NVL(100 / quantity, 0)FROM product;Which SQL SELECT statement capabilities are performed by this query?",
+        "question": "You query the database with this SQL statement:SELECT id_number, NVL(100 / quantity, 0)FROM product;Which SQL SELECT statement capabilities are performed by this query?",
       "options": [
         {
           "text": "selection only",

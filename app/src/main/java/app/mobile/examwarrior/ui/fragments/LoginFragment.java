@@ -209,7 +209,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 switch (response.code()) {
                     case HttpURLConnection.HTTP_OK:
                         Utility.showMessage("Registration Successful");
-                        Realm realm = Realm.getDefaultInstance();
+                        Realm realm =   Realm.getDefaultInstance();
                         try {
                             realm.executeTransactionAsync(new Realm.Transaction() {
                                 @Override

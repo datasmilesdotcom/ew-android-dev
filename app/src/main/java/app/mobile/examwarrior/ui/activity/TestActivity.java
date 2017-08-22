@@ -34,17 +34,17 @@ public class TestActivity extends AppCompatActivity {
             }
         });
         if (savedInstanceState == null) {
-            addFragment(R.id.questions_container, DisplayQuestionFragment.newInstance(getString(path, que[i]), ""), "");
+            //addFragment(R.id.questions_container, DisplayQuestionFragment.newInstance(getString(path, que[i]), ""), "");
         }
 
-        findViewById(R.id.appCompatImageView3).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 i = i+1;
                 if(i >= que.length){
                     i=0;
                 }
-                replaceFragment(R.id.questions_container, DisplayQuestionFragment.newInstance(getString(path, que[i]), ""), "", "");
+              //  replaceFragment(R.id.questions_container, DisplayQuestionFragment.newInstance(getString(path, que[i]), ""), "", "");
             }
         });
 
@@ -55,7 +55,7 @@ public class TestActivity extends AppCompatActivity {
                 if(i <=0){
                     i=que.length-1;
                 }
-                replaceFragment(R.id.questions_container, DisplayQuestionFragment.newInstance(getString(path, que[i]), ""), "", "");
+               // replaceFragment(R.id.questions_container, DisplayQuestionFragment.newInstance(getString(path, que[i]), ""), "", "");
             }
         });
     }
