@@ -1,29 +1,54 @@
 package app.mobile.examwarrior.ui.fragments;
 
 
+import android.Manifest;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.StatFs;
+import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
+import android.webkit.URLUtil;
+import android.widget.ProgressBar;
 
 import com.xwray.groupie.ExpandableGroup;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.ViewHolder;
 
+import java.io.File;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import app.mobile.examwarrior.BuildConfig;
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.database.ModuleItem;
+import app.mobile.examwarrior.database.OfflineVideo;
 import app.mobile.examwarrior.demo.ToggleListener;
 import app.mobile.examwarrior.model.RelatedCourse;
 import app.mobile.examwarrior.model.RelatedTopicsVideo;
@@ -51,17 +76,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.Context.DOWNLOAD_SERVICE;
 import static app.mobile.examwarrior.player.VideoPlayerFragment.KEY_MODULE_ITEM_ID;
-import static app.mobile.examwarrior.ui.activity.CourseDetailsActivity.KEY_COURSE_ID;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SuggestionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SuggestionFragment extends Fragment implements ToggleListener, ShowMoreViewHolder.ShowMoreClickListener, VideoContentDetailsAdapter.onVoteListener {
+public class SuggestionFragment extends Fragment implements ToggleListener, ShowMoreViewHolder.ShowMoreClickListener, VideoContentDetailsAdapter.onItemListener {
     public static final String TAG = SuggestionFragment.class.getSimpleName();
 
+    private static final String FOLDER_NAME = "/EW_Video_Storage";
     private static final int INITIAL_GROUP_POSITION = 0;
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -72,31 +98,34 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     private static final int STATUS_DOWNVOTED = 1;
     private static final int STATUS_NOT_UPVOTE = 0;
     private static final int STATUS_NOT_DOWNVOTE = 0;
-
+    private static final int REQUEST_STORAGE = 1;
     private ModuleItem data;
     private ExpandableGroup relatedVideosGroup;
     private ExpandableGroup relatedCoursesGroup;
     private ExpandableGroup relatedTopicVideosGroup;
-
     private GridLayoutManager layoutManager;
-
     private RelatedVideosViewHolder relatedVideosViewHolder;
     private RelatedCoursesViewHolder relatedCoursesViewHolder;
     private RelatedVideosHeader relatedVideosHeader;
     private RelatedCoursesHeader relatedCoursesHeader;
     private RelatedSuggestionHeader relatedTopicVideosHeader;
     private RelatedSuggestionViewHolder relatedTopicVideosViewHolder;
-
     private ShowMoreViewHolder relatedShowMoreViewHolder, relatedCourseShowMoreViewHolder, relatedTopicVideosShowMoreViewHolder;
     private String mParam1;
     private String mParam2;
-
     private GroupAdapter<ViewHolder> suggestionListAdapter;
     private VideoContentDetailsAdapter videoContentDetailsAdapter;
     private Handler handler = new Handler();
     private VideoEntity videoEntity;
     private Call<VoteVideoResponse> upVoteCall;
     private Call<VoteVideoResponse> downVoteCall;
+    private long enqueue;
+    private DownloadManager downloadManager;
+    private BroadcastReceiver receiver;
+    private Context context;
+    private RecyclerView recyclerView;
+    private AppCompatTextView error_text;
+    private ProgressBar content_progress;
 
     public SuggestionFragment() {
         // Required empty public constructor
@@ -140,10 +169,12 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
+        error_text = view.findViewById(R.id.error_text);
+        content_progress = view.findViewById(R.id.content_progress);
+        error_text.setVisibility(View.GONE);
         int betweenPadding = getResources().getDimensionPixelSize(R.dimen.padding_small);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
 
         recyclerView.addItemDecoration(new HeaderItemDecoration(Color.WHITE, betweenPadding));
@@ -151,9 +182,16 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         betweenPadding = getResources().getDimensionPixelSize(R.dimen.padding_video_header);
         recyclerView.addItemDecoration(new ItemOffsetDecoration(betweenPadding, R.layout.video_header));
 
+
+        //recyclerView.setAdapter(videoAdapter);
+    }
+
+    private void refreshDataFromPlayer() {
         /************************************************************
          / Suggestion list adapter
          /*************************************************************/
+        //edge case
+        if (recyclerView == null) return;
         suggestionListAdapter = new GroupAdapter<>();
         layoutManager = new GridLayoutManager(getActivity(), suggestionListAdapter.getSpanCount());
         layoutManager.setSpanSizeLookup(suggestionListAdapter.getSpanSizeLookup());
@@ -190,20 +228,8 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
 
         ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
         //apiInterface.getRelatedVideos("token",new RelatedVideosBody(data.getItemVideo(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
-        String token = null;
-        Realm realm = Realm.getDefaultInstance();
-        try {
-            User user = realm.where(User.class).findFirst();
-            if (user != null) {
-                token = user.getToken();
-            }
-        } catch (Exception e) {
-
-        } finally {
-            realm.close();
-        }
-        token = "JWT " + token;
-        Call<RelatedVideos> call = apiInterface.getRelatedVideos(token, new RelatedVideosBody(data.getItemTypeId(), getActivity().getIntent().getStringExtra(KEY_COURSE_ID)));
+        String token = getToken();
+        Call<RelatedVideos> call = apiInterface.getRelatedVideos(token, new RelatedVideosBody("creating-map-with-sorter-transformation-1", "informatica-powercenter-basics"));
         call.enqueue(new Callback<RelatedVideos>() {
             @Override
             public void onResponse(Call<RelatedVideos> call, Response<RelatedVideos> response) {
@@ -243,7 +269,6 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
 
             }
         });
-        //recyclerView.setAdapter(videoAdapter);
     }
 
     /***
@@ -287,20 +312,20 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
 
     @Override
     public void onShowMoreClickListener(ViewHolder viewHolder, int position, int page) {
-        // Get group from chile itemview
+        // Get group from chile item view
         ExpandableGroup expandableGroup = (ExpandableGroup) suggestionListAdapter.getGroup(suggestionListAdapter.getItem(viewHolder));
         if (expandableGroup.getGroup(INITIAL_GROUP_POSITION) instanceof RelatedVideosHeader) {
-            for (int i = 0; i < 5; i++) {
+            /*for (int i = 0; i < 5; i++) {
                 //relatedVideosGroup.add(relatedVideosGroup.getChildCount() - 1, new RelatedVideosViewHolder());
-            }
+            }*/
         } else if (expandableGroup.getGroup(INITIAL_GROUP_POSITION) instanceof RelatedCoursesHeader) {
-            for (int i = 0; i < 5; i++) {
+            /*for (int i = 0; i < 5; i++) {
                 //relatedCoursesGroup.add(relatedCoursesGroup.getChildCount() - 1, new RelatedCoursesViewHolder());
-            }
+            }*/
         } else if (expandableGroup.getGroup(INITIAL_GROUP_POSITION) instanceof RelatedSuggestionHeader) {
-            for (int i = 0; i < 5; i++) {
+            /*for (int i = 0; i < 5; i++) {
                 //relatedTopicVideosGroup.add(relatedTopicVideosGroup.getChildCount() - 1, new RelatedSuggestionViewHolder());
-            }
+            }*/
         }
     }
 
@@ -309,11 +334,29 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
      *
      * @param body
      */
-    public void updateVideoContent(VideoEntity body) {
+    public void updateVideoContent(VideoEntity body, boolean isLoading, boolean isError) {
+        content_progress.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        error_text.setVisibility(isError ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(View.GONE);
+        if (isLoading || isError || body == null) return;
+        recyclerView.setVisibility(View.VISIBLE);
+        refreshDataFromPlayer();
         this.videoEntity = body;
         videoContentDetailsAdapter = new VideoContentDetailsAdapter(data, body);
-        videoContentDetailsAdapter.setOnVoteListener(SuggestionFragment.this);
+        videoContentDetailsAdapter.setOnItemListener(SuggestionFragment.this);
         suggestionListAdapter.add(0, videoContentDetailsAdapter);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                OfflineVideo offloneVideo = getOfflineVideo(videoEntity.getVdoId());
+                if (offloneVideo != null && offloneVideo.isValid()) {
+                    List<Boolean> booleans = new ArrayList<>();
+                    booleans.add(true);
+                    videoContentDetailsAdapter.notifyChanged(booleans);
+                }
+            }
+        }, 500);
+
     }
 
     @Override
@@ -407,6 +450,68 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         }, 500);
     }
 
+    /**
+     * Check available space
+     *
+     * @return
+     */
+    public boolean isSizeAvailable(long size) {
+        long SourceSize = 0L;
+        long DestinationSize = 0L;
+        SourceSize = (size) / (1024 * 1024);
+
+        StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+        long bytesAvailable = (long) stat.getBlockSize() * (long) stat.getAvailableBlocks();
+        long megAvailable = bytesAvailable / (1024 * 1024);
+        DestinationSize = megAvailable;
+        return SourceSize < DestinationSize;
+    }
+
+    @Override
+    public void onDownloadVideo(ViewHolder item, int position, VideoEntity videoEntity) {
+
+        //Get download file name
+        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
+        if (currentApiVersion >= Build.VERSION_CODES.M) {
+            requestStoragePermission();
+        } else {
+            showAvailableOptions();
+            // TODO: 27/7/17 dont calculate size for now
+            //isSizeAvailable(videoEntity.getUrl());
+        }
+    }
+
+    private void requestStoragePermission() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE);
+        } else {
+            // TODO: 27/7/17 dont calculate size for now
+            //isSizeAvailable(videoEntity.getUrl());
+            showAvailableOptions();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //downLoadVideo(videoEntity.getUrl());
+            } else {
+                Utility.showMessage("You now can not download the file");
+            }
+        }
+    }
+
+    /**
+     * Upvote API
+     *
+     * @param downCount
+     * @param upCount
+     * @param videoId
+     */
+
     private void initUpVoteAPI(int downCount, int upCount, String videoId) {
 
         if (upVoteCall != null && !upVoteCall.isExecuted() && !upVoteCall.isCanceled()) {
@@ -430,6 +535,13 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         });
     }
 
+    /**
+     * Down vote API
+     *
+     * @param downCount
+     * @param upCount
+     * @param videoId
+     */
     private void initDownVoteAPI(int downCount, int upCount, String videoId) {
         if (downVoteCall != null && !downVoteCall.isExecuted() && !downVoteCall.isCanceled()) {
             downVoteCall.cancel();
@@ -452,6 +564,11 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         });
     }
 
+    /**
+     * Get Auth Token
+     *
+     * @return
+     */
     private String getToken() {
         String token = null;
         Realm realm = Realm.getDefaultInstance();
@@ -467,5 +584,221 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
         }
         token = "JWT " + token;
         return token;
+    }
+
+    /**
+     * Download video from url
+     *
+     * @param DOWNLOAD_URL
+     */
+    private void downLoadVideo(String DOWNLOAD_URL) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + FOLDER_NAME);
+        if (!file.exists()) file.mkdir();
+        downloadManager = (DownloadManager) getActivity().getSystemService(DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(DOWNLOAD_URL));
+        String fileExtenstion = MimeTypeMap.getFileExtensionFromUrl(DOWNLOAD_URL);
+        String name = URLUtil.guessFileName(DOWNLOAD_URL, null, fileExtenstion);
+        //Save file to destination folder
+        request.setDestinationInExternalPublicDir(FOLDER_NAME, name);
+        enqueue = downloadManager.enqueue(request);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            context.unregisterReceiver(receiver);
+        } catch (Exception e) {
+            Log.e(TAG, "onPause: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(DownloadManager.COLUMN_STATUS);
+        intentFilter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        context.registerReceiver(receiver, intentFilter);
+
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        this.context = context;
+        super.onAttach(context);
+        if (receiver == null) {
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    String action = intent.getAction();
+                    Log.e(TAG, "onReceive: " + action);
+                    if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
+                        intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
+                        DownloadManager.Query query = new DownloadManager.Query();
+                        query.setFilterById(enqueue);
+                        Cursor cursor = downloadManager.query(query);
+                        if (cursor.moveToFirst()) {
+                            int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                            if (DownloadManager.STATUS_SUCCESSFUL == cursor.getInt(columnIndex)) {
+                                String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                                Utility.showMessage("Download completed");
+                            }
+
+                        }
+                    }
+                }
+            };
+        }
+
+    }
+
+
+    private boolean fileExist(String fileName) {
+        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + FOLDER_NAME + File.separator + fileName);
+        return myFile.exists();
+    }
+
+    private String filePath(String fileName) {
+        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + FOLDER_NAME + File.separator + fileName);
+        return myFile.getAbsolutePath();
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Show available download options in resolution
+     */
+    private void showAvailableOptions() {
+
+
+        if (videoEntity.getVideo_urls() != null && videoEntity.getVideo_urls().size() < 0) {
+            Utility.showMessage("This video is not available to download");
+            return;
+        }
+        // setup the alert builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Save video offline");
+
+        // add a list
+        String[] downloadInfo = new String[videoEntity.getVideo_urls().size()];
+        for (int i = 0; i < videoEntity.getVideo_urls().size(); i++) {
+            downloadInfo[i] = String.format("%sp size %s", videoEntity.getVideo_urls().get(i).getRes(), Utility.getSizeFromKb(videoEntity.getVideo_urls().get(i).getVideoFileSize()));
+        }
+        builder.setItems(downloadInfo, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                long fileSize = videoEntity.getVideo_urls().get(which).getVideoFileSize();
+                String videoUrl = videoEntity.getVideo_urls().get(which).getDownloadUrl();
+                if (Utility.isEmpty(videoUrl)) {
+                    Utility.showMessage("Not valid url");
+                    return;
+                }
+                String fileExtenstion = MimeTypeMap.getFileExtensionFromUrl(videoUrl);
+                String name = URLUtil.guessFileName(videoUrl, null, fileExtenstion);
+                if (fileExist(name)) {
+                    Utility.showMessage("File already saved");
+                } else {
+                    if (isSizeAvailable(fileSize)) {
+                        Utility.showMessage("Downloading video");
+                        downLoadVideo(videoUrl);
+                        saveOfflineVideo(videoEntity.getVdoId(), name, videoUrl, filePath(name));
+                    } else {
+                        Utility.showMessage("No space available to download this video");
+                    }
+
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /**
+     * Save offline video
+     *
+     * @param videoId
+     * @param videoUrl
+     * @param videoLocalPath
+     */
+    private void saveOfflineVideo(final String videoId, final String videoName, final String videoUrl, final String videoLocalPath) {
+        Realm realm = null;
+        try {
+            realm = Realm.getDefaultInstance();
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    OfflineVideo offlineVideo = new OfflineVideo();
+                    offlineVideo.setVideoId(videoId);
+                    offlineVideo.setVideoName(videoName);
+                    offlineVideo.setVideoUrl(videoUrl);
+                    offlineVideo.setLocalPath(videoLocalPath);
+                    realm.insertOrUpdate(offlineVideo);
+                }
+            }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+
+                }
+            }, new Realm.Transaction.OnError() {
+                @Override
+                public void onError(Throwable error) {
+
+                }
+            });
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "saveOfflineVideo: " + e.getMessage());
+        } finally {
+            if (realm != null) realm.close();
+        }
+    }
+
+    /**
+     * Get offline video if available
+     *
+     * @param videoId
+     * @return
+     */
+    private OfflineVideo getOfflineVideo(String videoId) {
+        OfflineVideo offlineVideo = null;
+        Realm realm = null;
+        try {
+            realm = Realm.getDefaultInstance();
+            offlineVideo =
+                    realm.copyFromRealm(realm.where(OfflineVideo.class).equalTo("videoId", videoId).findFirst());
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "getOfflineVideo: " + e.getMessage());
+        } finally {
+            if (realm != null) realm.close();
+        }
+        return offlineVideo;
     }
 }

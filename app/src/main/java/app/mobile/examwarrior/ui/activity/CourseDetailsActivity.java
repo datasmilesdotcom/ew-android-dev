@@ -2,10 +2,8 @@ package app.mobile.examwarrior.ui.activity;
 
 
 import android.app.Dialog;
-
 import android.content.ComponentName;
 import android.content.Intent;
-
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
@@ -56,14 +54,15 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
     private List<CourseHeader> courseHeaders = new ArrayList<>();
     private Call<List<CourseDetail>> coursesList;
     private CustomFontTextView action_bar_title;
-    private String course_name,module_name,description_value="";
+    private String course_name, module_name, description_value = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.exploreToolbar);
-        action_bar_title= (CustomFontTextView) findViewById(R.id.action_bar_title);
-        AppCompatImageView info= (AppCompatImageView) findViewById(R.id.info);
+        action_bar_title = (CustomFontTextView) findViewById(R.id.action_bar_title);
+        AppCompatImageView info = (AppCompatImageView) findViewById(R.id.info);
         setSupportActionBar(toolbar);
         realm = Realm.getDefaultInstance();
 
@@ -79,7 +78,7 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
 
                     if (courseDetails.get(0).getModuleDetail() != null && courseHeaders.size() <= 0)
                         for (ModuleDetail moduleDetail : courseDetails.get(0).getModuleDetail().sort("moduleWeight", Sort.ASCENDING)) {
-                            courseHeaders.add(new CourseHeader(moduleDetail.getModuleName(), moduleDetail.getModuleId(), moduleDetail.getModuleItems().sort("itemWeight", Sort.ASCENDING)));
+                            courseHeaders.add(new CourseHeader(moduleDetail.getModuleName(), moduleDetail.getModuleId(), moduleDetail.getModuleId(), moduleDetail.getModuleItems().sort("itemWeight", Sort.ASCENDING)));
                         }
                     if (courseDetailsAdapter == null || courseDetailsAdapter.getItemCount() <= 0) {
                         courseDetailsAdapter = new CourseDetailsAdapter(CourseDetailsActivity.this, courseHeaders);
@@ -88,9 +87,9 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
 
                     }
                     if (!Utility.isEmpty(courseDetails.get(0).getCourseLongDesc()))
-                        description_value=  courseDetails.get(0).getCourseLongDesc();
+                        description_value = courseDetails.get(0).getCourseLongDesc();
                     if (!Utility.isEmpty(courseDetails.get(0).getCourseSubGroup()))
-                        module_name=courseDetails.get(0).getCourseSubGroup();
+                        module_name = courseDetails.get(0).getCourseSubGroup();
 
                 }
             }
@@ -113,6 +112,7 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
 
     /**
      * Get course details for course
+     *
      * @param courseId
      */
     private void getCourseDetails(String courseId) {
@@ -164,22 +164,24 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
         AppCompatTextView course_title = (AppCompatTextView) dialog.findViewById(R.id.course_name);
         AppCompatTextView course_module = (AppCompatTextView) dialog.findViewById(R.id.modue_name);
         MathJaxView description = (MathJaxView) dialog.findViewById(R.id.content);
-        course_title.setText("Course : "+course_name);
-        course_module.setText("Module :"+module_name);
+        course_title.setText("Course : " + course_name);
+        course_module.setText("Module :" + module_name);
         description.setInputText(description_value);
 
 
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogTheme;
 
-        dialog.getWindow().getAttributes().gravity = Gravity.RIGHT|Gravity.TOP;
+        dialog.getWindow().getAttributes().gravity = Gravity.RIGHT | Gravity.TOP;
         dialog.show();
 
     }
 
     @Override
-    public void onModuleClickListener(ChildViewHolder holder, int position, ModuleItem data) {
+    public void onModuleClickListener(ChildViewHolder holder, int position, ModuleItem data, CourseHeader courseHeader) {
         Intent intent = new Intent(getIntent());
-        intent.setComponent(new ComponentName(CourseDetailsActivity.this, PracticeActivity.class));
+        //intent.setAction(PlayerActivity.ACTION_VIEW_LIST);
+        intent.setComponent(new ComponentName(CourseDetailsActivity.this, VideoPlayerActivity.class));
+        intent.putExtra(PlayerActivity.KEY_MODULE_ID, courseHeader.getModuleId());
         intent.putExtra(PlayerActivity.KEY_MODULE_ITEM_ID, data.getItemId());
         startActivity(intent);
 

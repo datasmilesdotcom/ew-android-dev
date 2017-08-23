@@ -1,6 +1,5 @@
 package app.mobile.examwarrior.expandable_list.listeners;
 
-import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.List;
@@ -17,13 +16,14 @@ public class CourseHeader extends ExpandableGroup<ModuleItem> implements Parcela
     private String title;
     private List<ModuleItem> items;
     private String image;
+    private String moduleId;
 
-
-    public CourseHeader(String title, String image, List<ModuleItem> items) {
+    public CourseHeader(String title, String image, String moduleId, List<ModuleItem> items) {
         super(title, items);
         this.title = title;
         this.items = items;
         this.image = image;
+        this.moduleId = moduleId;
     }
 
     public String getImage() {
@@ -50,5 +50,13 @@ public class CourseHeader extends ExpandableGroup<ModuleItem> implements Parcela
 
     public void setItems(List<ModuleItem> items) {
         this.items = items;
+    }
+
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 }

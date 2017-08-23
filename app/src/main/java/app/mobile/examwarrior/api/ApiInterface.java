@@ -29,6 +29,8 @@ import app.mobile.examwarrior.model.VideoEntity;
 import app.mobile.examwarrior.model.VideoEntityBody;
 import app.mobile.examwarrior.model.VoteRequestBody;
 import app.mobile.examwarrior.model.VoteVideoResponse;
+import okhttp3.ResponseBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.Body;
@@ -37,6 +39,8 @@ import retrofit2.http.Header;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Url;
+import retrofit2.http.Url;
 
 
 public interface ApiInterface {
@@ -60,7 +64,7 @@ public interface ApiInterface {
     @POST("/auth/mobile/changePassword")
     Call<Response> changePassword(@HeaderMap Map<String, String> headers, @Body ChangePasswordRequestBody changePasswordRequestBody);
 
-    @POST("/videoentity/getVideoEntity")
+    @POST("/videoentity/mobile/getVideoEntity")
     Call<VideoEntity> getVideoEntity(@Header("Authorization") String auth_token, @Body VideoEntityBody videoEntityBody);
 
     @POST("/videoentity/getRelatedInfo")
@@ -83,5 +87,8 @@ public interface ApiInterface {
 
     @POST("practice/startUserExam")
     Call<Question> getQuestions(@Header("Authorization") String auth_token, @Body QuestionRequestBody questionRequestBody);
+
+    @GET
+    Call<ResponseBody> downloadFileLengthAsync(@Url String fileUrl);
 
 }
