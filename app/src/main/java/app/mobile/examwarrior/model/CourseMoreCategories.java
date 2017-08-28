@@ -8,10 +8,7 @@ import java.util.List;
 
 public class CourseMoreCategories {
 
-
-
     private String _id;
-    private String course_cat_id;
     private String mcourseid;
     private String mcoursename;
     private String about_mcourse;
@@ -24,14 +21,6 @@ public class CourseMoreCategories {
 
     public void set_id(String _id) {
         this._id = _id;
-    }
-
-    public String getCourse_cat_id() {
-        return course_cat_id;
-    }
-
-    public void setCourse_cat_id(String course_cat_id) {
-        this.course_cat_id = course_cat_id;
     }
 
     public String getMcourseid() {
@@ -75,82 +64,150 @@ public class CourseMoreCategories {
     }
 
     public static class CoursesBean {
-        /**
-         * COURSEID : informatica-powercenter-basics
-         * COURSENAME : Informatica Powercenter Basics
-         * PIC : https://s3.ap-south-1.amazonaws.com/dsn.ew.timages/10.jpg
-         */
 
-        private String COURSEID;
-        private String COURSENAME;
-        private String PIC;
-        /**
-         * Level : Basic
-         * CourseDesc : Informatica online training will help you master data integration concepts such as ETL and data mining using Informatica PowerCenter Designer 9x. It covers Informatica dev and admin concepts such as error handling, data migration, performance tuning, installation & configuration
-         * LastUpdateDt : 12-jun-2017
-         * Author : jeevan
-         */
+        private String _id;
+        private String courseId;
+        private String courseName;
+        private String courseLongDesc;
+        private String courseShortDesc;
+        private String courseLevel;
+        private String courseLevelDesc;
+        private String courseType;
+        private String imageUrl;
+        private String courseSubGroup;
 
-        private String Level;
-        private String CourseDesc;
-        private String LastUpdateDt;
-        private String Author;
+        private String createdAt;
+        private String updatedAt;
+        private List<AuthorBean> author;
 
-
-        public String getCOURSEID() {
-            return COURSEID;
+        public String get_id() {
+            return _id;
         }
 
-        public void setCOURSEID(String COURSEID) {
-            this.COURSEID = COURSEID;
+        public void set_id(String _id) {
+            this._id = _id;
         }
 
-        public String getCOURSENAME() {
-            return COURSENAME;
+        public String getCourseId() {
+            return courseId;
         }
 
-        public void setCOURSENAME(String COURSENAME) {
-            this.COURSENAME = COURSENAME;
+        public void setCourseId(String courseId) {
+            this.courseId = courseId;
         }
 
-        public String getPIC() {
-            return PIC;
+        public String getCourseName() {
+            return courseName;
         }
 
-        public void setPIC(String PIC) {
-            this.PIC = PIC;
+        public void setCourseName(String courseName) {
+            this.courseName = courseName;
         }
 
-        public String getLevel() {
-            return Level;
+        public String getCourseLongDesc() {
+            return courseLongDesc;
         }
 
-        public void setLevel(String Level) {
-            this.Level = Level;
+        public void setCourseLongDesc(String courseLongDesc) {
+            this.courseLongDesc = courseLongDesc;
         }
 
-        public String getCourseDesc() {
-            return CourseDesc;
+        public String getCourseShortDesc() {
+            return courseShortDesc;
         }
 
-        public void setCourseDesc(String CourseDesc) {
-            this.CourseDesc = CourseDesc;
+        public void setCourseShortDesc(String courseShortDesc) {
+            this.courseShortDesc = courseShortDesc;
         }
 
-        public String getLastUpdateDt() {
-            return LastUpdateDt;
+        public String getCourseLevel() {
+            return courseLevel;
         }
 
-        public void setLastUpdateDt(String LastUpdateDt) {
-            this.LastUpdateDt = LastUpdateDt;
+        public void setCourseLevel(String courseLevel) {
+            this.courseLevel = courseLevel;
         }
 
-        public String getAuthor() {
-            return Author;
+        public String getCourseLevelDesc() {
+            return courseLevelDesc;
         }
 
-        public void setAuthor(String Author) {
-            this.Author = Author;
+        public void setCourseLevelDesc(String courseLevelDesc) {
+            this.courseLevelDesc = courseLevelDesc;
+        }
+
+        public String getCourseType() {
+            return courseType;
+        }
+
+        public void setCourseType(String courseType) {
+            this.courseType = courseType;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+
+        public String getCourseSubGroup() {
+            return courseSubGroup;
+        }
+
+        public void setCourseSubGroup(String courseSubGroup) {
+            this.courseSubGroup = courseSubGroup;
+        }
+
+        public String getCreatedAt() {
+            return createdAt;
+        }
+
+        public void setCreatedAt(String createdAt) {
+            this.createdAt = createdAt;
+        }
+
+        public String getUpdatedAt() {
+            return updatedAt;
+        }
+
+        public void setUpdatedAt(String updatedAt) {
+            this.updatedAt = updatedAt;
+        }
+
+        public List<AuthorBean> getAuthor() {
+            return author;
+        }
+
+        public void setAuthor(List<AuthorBean> author) {
+            this.author = author;
+        }
+
+        public static class AuthorBean {
+            /**
+             * authorId : jeevan
+             * authorName : Jeevan Kumar Deva
+             */
+
+            private String authorId;
+            private String authorName;
+
+            public String getAuthorId() {
+                return authorId;
+            }
+
+            public void setAuthorId(String authorId) {
+                this.authorId = authorId;
+            }
+
+            public String getAuthorName() {
+                return authorName;
+            }
+
+            public void setAuthorName(String authorName) {
+                this.authorName = authorName;
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package app.mobile.examwarrior.ui.app_intro;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -21,11 +22,6 @@ public class AppIntroActivity extends AppCompatActivity implements View.OnClickL
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow(); // in Activity's onCreate() for instance
-//            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            hideSystemUI();
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_intro);
 
@@ -65,4 +61,17 @@ public class AppIntroActivity extends AppCompatActivity implements View.OnClickL
         );
     }
 
+    @Override
+    protected void onResume() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    hideSystemUI();
+                }
+            }
+        }, 500);
+
+        super.onResume();
+    }
 }

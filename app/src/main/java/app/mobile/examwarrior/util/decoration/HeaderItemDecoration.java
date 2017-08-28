@@ -23,7 +23,7 @@ public class HeaderItemDecoration extends RecyclerView.ItemDecoration {
 
     public boolean isHeader(View child, RecyclerView parent) {
         int viewType = parent.getLayoutManager().getItemViewType(child);
-        return viewType == R.layout.expandable_header_item;
+        return viewType == R.layout.expandable_header_item || viewType == R.layout.explore_header_item;
     }
 
     @Override

@@ -81,7 +81,6 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
-import com.google.gson.Gson;
 
 import java.io.File;
 import java.net.CookieHandler;
@@ -298,8 +297,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         initViews(view);
     }
 
-    private void
-    initViews(View view) {
+    private void initViews(View view) {
         mgr = (TelephonyManager) getActivity().getSystemService(TELEPHONY_SERVICE);
         if (mgr != null) {
             mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
@@ -593,7 +591,7 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
         boolean needNewPlayer = player == null;
         if (video_title != null && intent.getStringExtra(KEY_MODULE_ITEM_ID) != null)
             setVideoTitle(intent.getStringExtra(KEY_MODULE_ITEM_ID));
-        videoInfo = new Gson().fromJson("{\n" +
+        /*videoInfo = new Gson().fromJson("{\n" +
                 "\"usr_id\":\"sandesh\",\n" +
                 "\"vdo_id\":\"introduction-powercenter-1\",\n" +
                 "\"crt_dt\":null,\n" +
@@ -627,15 +625,9 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
                 "\"subtitleUrl\":\"\",\n" +
                 "\"isStreaming\":true,\n" +
                 "\"video_url\":\"http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4\"\n" +
-                "}", VideoEntity.class);
-        this.videoInfo = videoInfo;
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        final SuggestionFragment suggestionFragment = (SuggestionFragment) fragmentManager.findFragmentByTag(SuggestionFragment.TAG);
-        if (suggestionFragment != null) {
-            suggestionFragment.updateVideoContent(videoInfo, false, false);
-        }
+                "}", VideoEntity.class);*/
+        //this.videoInfo = videoInfo;
         if (videoInfo == null) {
-            needRetrySource = true;
             initVideoDetailsAPI("");
             return;
         }
@@ -708,87 +700,92 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             debugViewHelper.start();
         }
         if (needNewPlayer || needRetrySource) {
-            String action = intent.getAction();
-            final List<MediaSource> allMediaSources = new ArrayList<>();
-            Uri[] uris;
-            String[] extensions;
-            if (ACTION_VIEW.equals(action)) {
+            try {
+                String action = intent.getAction();
+                final List<MediaSource> allMediaSources = new ArrayList<>();
+                Uri[] uris;
+                String[] extensions;
+                if (ACTION_VIEW.equals(action)) {
 
-                uris = new Uri[]{Uri.parse("")};
-                extensions = new String[]{intent.getStringExtra(EXTENSION_EXTRA)};
-            } else if (ACTION_VIEW_LIST.equals(action)) {
-                String[] uriStrings = intent.getStringArrayExtra(URI_LIST_EXTRA);
-                uris = new Uri[uriStrings.length];
-                for (int i = 0; i < uriStrings.length; i++) {
-                    uris[i] = Uri.parse(uriStrings[i]);
-                }
-                extensions = intent.getStringArrayExtra(EXTENSION_LIST_EXTRA);
-                if (extensions == null) {
-                    extensions = new String[uriStrings.length];
-                }
-            } else {
+                    uris = new Uri[]{Uri.parse("")};
+                    extensions = new String[]{intent.getStringExtra(EXTENSION_EXTRA)};
+                } else if (ACTION_VIEW_LIST.equals(action)) {
+                    String[] uriStrings = intent.getStringArrayExtra(URI_LIST_EXTRA);
+                    uris = new Uri[uriStrings.length];
+                    for (int i = 0; i < uriStrings.length; i++) {
+                        uris[i] = Uri.parse(uriStrings[i]);
+                    }
+                    extensions = intent.getStringArrayExtra(EXTENSION_LIST_EXTRA);
+                    if (extensions == null) {
+                        extensions = new String[uriStrings.length];
+                    }
+                } else {
                 /*showToast(getString(R.string.unexpected_intent_action, action));
                 return;*/
-            }
-
-
-            videoInfo.setVideo_urls(Collections.unmodifiableList(videoInfo.getVideo_urls()));
-            if (videoInfo.isAdaptiveStreaming()) {
-                uris = new Uri[]{Uri.parse(videoInfo.getAdaptiveUrl())};
-                extensions = new String[]{""};
-            } else {
-                uris = new Uri[videoInfo.getVideo_urls().size()];
-                extensions = new String[videoInfo.getVideo_urls().size()];
-                for (int i = 0; i < videoInfo.getVideo_urls().size(); i++) {
-                    uris[i] = Uri.parse(videoInfo.getVideo_urls().get(i).getVideo_url());
-                    extensions[i] = "";
                 }
-            }
 
-            OfflineVideo offlineVideo = getOfflineVideo(videoInfo.getVdoId());
+
+                videoInfo.setVideo_urls(Collections.unmodifiableList(videoInfo.getVideo_urls()));
+                if (videoInfo.isAdaptiveStreaming()) {
+                    uris = new Uri[]{Uri.parse(videoInfo.getAdaptiveUrl())};
+                    extensions = new String[]{""};
+                } else {
+                    uris = new Uri[videoInfo.getVideo_urls().size()];
+                    extensions = new String[videoInfo.getVideo_urls().size()];
+                    for (int i = 0; i < videoInfo.getVideo_urls().size(); i++) {
+                        uris[i] = Uri.parse(videoInfo.getVideo_urls().get(i).getVideo_url());
+                        extensions[i] = "";
+                    }
+                }
+
+           /* OfflineVideo offlineVideo = getOfflineVideo(videoInfo.getVdoId());
             if (offlineVideo != null) {
                 localFile = new File(offlineVideo.getLocalPath());
                 if (localFile.exists()) {
                     uris = new Uri[]{Uri.fromFile(localFile)};
                     extensions = new String[]{""};
                 }
-            }
-            if (Util.maybeRequestReadExternalStoragePermission(getActivity(), uris)) {
-                // The player will be reinitialized if the permission is granted.
-                return;
-            }
+            }*/
+                if (Util.maybeRequestReadExternalStoragePermission(getActivity(), uris)) {
+                    // The player will be reinitialized if the permission is granted.
+                    return;
+                }
 
-            for (int i = 0; i < uris.length; i++) {
-                // Build the video MediaSource.
-                //MediaSource videoSource = new ExtractorMediaSource(videoUri, ...);
-                allMediaSources.add(buildMediaSource(uris[i], extensions[i]));
-            }
+                for (int i = 0; i < uris.length; i++) {
+                    // Build the video MediaSource.
+                    //MediaSource videoSource = new ExtractorMediaSource(videoUri, ...);
+                    allMediaSources.add(buildMediaSource(uris[i], extensions[i]));
+                }
 
-            MediaSource subtitleSource;
-            //FixedTrackSelection fixedTrackSelection = new FixedTrackSelection();
-            if (!Utility.isEmpty(videoInfo.getSubtitleUrl())) {
-                // Build the subtitle MediaSource.
-                subtitleSource = new SingleSampleMediaSource(Uri.parse(videoInfo.getSubtitleUrl()), mediaDataSourceFactory,
-                        Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP, null, Format.NO_VALUE, Format.NO_VALUE, "se", null), 0);
-                allMediaSources.add(subtitleSource);
-            }
+                MediaSource subtitleSource;
+                //FixedTrackSelection fixedTrackSelection = new FixedTrackSelection();
+                if (!Utility.isEmpty(videoInfo.getSubtitleUrl())) {
+                    // Build the subtitle MediaSource.
+                    subtitleSource = new SingleSampleMediaSource(Uri.parse(videoInfo.getSubtitleUrl()), mediaDataSourceFactory,
+                            Format.createTextSampleFormat(null, MimeTypes.APPLICATION_SUBRIP, null, Format.NO_VALUE, Format.NO_VALUE, "se", null), 0);
+                    allMediaSources.add(subtitleSource);
+                }
 
-            //https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8
-            MergingMediaSource mergedSource =
-                    new MergingMediaSource(allMediaSources.toArray(new MediaSource[allMediaSources.size()]));
+                //https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8
+                MergingMediaSource mergedSource =
+                        new MergingMediaSource(allMediaSources.toArray(new MediaSource[allMediaSources.size()]));
 
             /*MediaSource mediaSource = mediaSources.length == 1 ? mergedSource
                     : new ConcatenatingMediaSource(mergedSource);*/
-            MediaSource playlistSource = new ConcatenatingMediaSource(mergedSource);
+                MediaSource playlistSource = new ConcatenatingMediaSource(mergedSource);
 
 
-            boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
-            if (haveResumePosition) {
-                player.seekTo(resumeWindow, resumePosition);
+                boolean haveResumePosition = resumeWindow != C.INDEX_UNSET;
+                if (haveResumePosition) {
+                    player.seekTo(resumeWindow, resumePosition);
+                }
+                player.prepare(playlistSource, !haveResumePosition, false);
+                needRetrySource = false;
+                updateButtonVisibilities();
+            } catch (Exception e) {
+                Utility.showMessage("Can not play this video.");
             }
-            player.prepare(playlistSource, !haveResumePosition, false);
-            needRetrySource = false;
-            updateButtonVisibilities();
+
         }
     }
 
@@ -1154,19 +1151,19 @@ public class VideoPlayerFragment extends Fragment implements View.OnClickListene
             return;
         }
         ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
-            String token = null;
-            Realm realm = Realm.getDefaultInstance();
-            try {
-                User user = realm.where(User.class).findFirst();
-                if (user != null) {
-                    token = user.getToken();
-                }
-            } catch (Exception e) {
-
-            } finally {
-                realm.close();
+        String token = null;
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            User user = realm.where(User.class).findFirst();
+            if (user != null) {
+                token = user.getToken();
             }
-            token = "JWT " + token;
+        } catch (Exception e) {
+
+        } finally {
+            realm.close();
+        }
+        token = "JWT " + token;
         videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody(item.getItemTypeId()));
         //videoDetails = apiInterface.getVideoEntity(token, new VideoEntityBody("introduction-powercenter-1"));
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();

@@ -22,8 +22,6 @@ public class LocalSyncDB extends RealmObject {
 
     private String targetId;
 
-    private String tableName;
-
     private Date startDate;
 
     public int getJobId() {
@@ -58,13 +56,6 @@ public class LocalSyncDB extends RealmObject {
         this.targetId = targetId;
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
 
     public Date getStartDate() {
         return startDate;

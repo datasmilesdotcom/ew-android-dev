@@ -16,15 +16,19 @@ import app.mobile.examwarrior.database.StartUserExam;
 import app.mobile.examwarrior.model.ChangePasswordRequestBody;
 import app.mobile.examwarrior.model.CourseCategories;
 import app.mobile.examwarrior.model.CourseDetailId;
+import app.mobile.examwarrior.model.CourseMore;
 import app.mobile.examwarrior.model.CourseMoreCategories;
+import app.mobile.examwarrior.model.FinishExamRequestBody;
 import app.mobile.examwarrior.model.ForgetPasswordBody;
 import app.mobile.examwarrior.model.ForgetPasswordResponse;
 import app.mobile.examwarrior.model.LoginBody;
+import app.mobile.examwarrior.model.MoreTutorsResponse;
 import app.mobile.examwarrior.model.RegistrationResponse;
 import app.mobile.examwarrior.model.RelatedVideos;
 import app.mobile.examwarrior.model.RelatedVideosBody;
 import app.mobile.examwarrior.model.SignUpBody;
 import app.mobile.examwarrior.model.StartTestBody;
+import app.mobile.examwarrior.model.TutorsResponse;
 import app.mobile.examwarrior.model.Type;
 import app.mobile.examwarrior.model.User;
 import app.mobile.examwarrior.model.VideoEntity;
@@ -51,7 +55,7 @@ public interface ApiInterface {
 
     // Get Status of Test
     @POST("/practice/checkTestStatus")
-    Call<CheckTestStatus> getTestStatus(@Header("Authorization") String auth_token,  @Body JSONObject Test);
+    Call<CheckTestStatus> getTestStatus(@Header("Authorization") String auth_token, @Body JSONObject Test);
 
     // Get All Courses
     @POST("/course/getAll")
@@ -85,14 +89,23 @@ public interface ApiInterface {
     @POST("/videovotes/downvoteVideo")
     Call<VoteVideoResponse> downVoteVideo(@Header("Authorization") String auth_token, @Body VoteRequestBody voteRequestBody);
 
-    @GET("masterCourseCategoryDetails/details/{id}")
-    Call<CourseMoreCategories> getExlporeSubCategoryData(@Path("id") String id);
+    @GET("courseCategoryMaster/mobile/coursesByMCourses/{cat_id}/{id}")
+    Call<CourseMoreCategories> getExlporeSubCategoryData(@Path("cat_id") String catId, @Path("id") String id);
 
-    @GET("test/getAllCourseCategory")
+    @GET("courseCategoryMaster/mobile/coursesByMCourses/{cat_id}/{id}")
+    Call<List<TutorsResponse>> getTutorData(@Path("cat_id") String catId, @Path("id") String id);
+
+    @GET("/courseMasterDetails/mobile/courseCategory")
     Call<List<CourseCategories>> getExlporeData();
 
-    @GET("test/getCourseCategory/{id}")
-    Call<List<CourseMoreCategories>> getExlporeMoreData(@Path("id") String id);
+    @GET("/courseMasterDetails/mobile/coursesByCat/{id}")
+    Call<CourseMore> getExlporeMoreData(@Path("id") String id);
+
+    @GET("/courseMasterDetails/mobile/coursesByCat/{id}")
+    Call<MoreTutorsResponse> getExploreMoreTutorData(@Path("id") String id);
+
+    @POST("/practice/mobile/finishUserExam")
+    Call<ResponseBody> finishExam(@Header("Authorization") String auth_token, @Body FinishExamRequestBody finishExamRequestBody);
 
     @GET
     Call<ResponseBody> downloadFileLengthAsync(@Url String fileUrl);

@@ -9,12 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.ui.fragments.SuggestionFragment;
-import io.realm.internal.IOException;
 
 public class VideoPlayerActivity extends AppCompatActivity {
 
@@ -29,7 +25,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
             addFragment(R.id.course_player_view, VideoPlayerFragment.newInstance("", ""), VideoPlayerFragment.TAG);
             addFragment(R.id.related_videos, SuggestionFragment.newInstance("", ""), SuggestionFragment.TAG);
 
-            String json = null;
+           /* String json = null;
             try {
                 InputStream inputStream = getAssets().open("questions/Questions.json");
                 int size = inputStream.available();
@@ -45,11 +41,47 @@ public class VideoPlayerActivity extends AppCompatActivity {
             } catch (java.io.IOException e) {
                 e.printStackTrace();
             }
-           /* Gson gson = new Gson();
-            QuestionsList questionsList = gson.fromJson(json, QuestionsList.class);
-            for (Questions questions :
-                    questionsList.getQuestions()) {
-                Log.e(TAG, "getQuestionId: " + questions.getQuestionId());
+
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .setExclusionStrategies(new ExclusionStrategy() {
+                        @Override
+                        public boolean shouldSkipField(FieldAttributes f) {
+                            return f.getDeclaringClass().equals(RealmObject.class);
+                        }
+
+                        @Override
+                        public boolean shouldSkipClass(Class<?> clazz) {
+                            return false;
+                        }
+                    })
+                    .registerTypeAdapter(new TypeToken<RealmList<RealmString>>() {
+                    }.getType(), new RealmStringDeserializer())
+                    .create();
+            Realm realm = Realm.getDefaultInstance();
+
+            try {
+                final Questions[] main = gson.fromJson(json, Questions[].class);
+                Log.e(TAG, "onCreate: " + main[0].getList().get(0));
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        RealmResults<Questions> data = realm.where(Questions.class).findAll();
+                        if (data != null && !data.isEmpty()) {
+                            for (RealmString questions : data.get(0).getList()) {
+                                Log.e(TAG, "execute: " + questions);
+                            }
+                        } else {
+                            for (Questions questions : main) {
+                                realm.insertOrUpdate(questions);
+                            }
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "onCreate: " + e.getMessage());
+            } finally {
+                realm.close();
             }*/
         }
     }

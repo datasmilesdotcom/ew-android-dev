@@ -476,7 +476,6 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
             requestStoragePermission();
         } else {
             showAvailableOptions();
-            // TODO: 27/7/17 dont calculate size for now
             //isSizeAvailable(videoEntity.getUrl());
         }
     }
@@ -691,7 +690,6 @@ public class SuggestionFragment extends Fragment implements ToggleListener, Show
      * Show available download options in resolution
      */
     private void showAvailableOptions() {
-
 
         if (videoEntity.getVideo_urls() != null && videoEntity.getVideo_urls().size() < 0) {
             Utility.showMessage("This video is not available to download");

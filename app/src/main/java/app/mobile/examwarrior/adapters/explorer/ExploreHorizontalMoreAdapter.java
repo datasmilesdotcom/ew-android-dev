@@ -9,57 +9,109 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.listener.ExploreCardClickListener;
-import app.mobile.examwarrior.model.CourseCategories;
 import app.mobile.examwarrior.model.CourseMoreCategories;
+import app.mobile.examwarrior.model.Tutors;
+import app.mobile.examwarrior.util.Utility;
 
-public class ExploreHorizontalMoreAdapter extends RecyclerView.Adapter<ExploreHorizontalMoreAdapter.MyHolder> {
+import static app.mobile.examwarrior.adapters.explorer.ExploreSubCatListAdapter.ITEM_BOOK;
+import static app.mobile.examwarrior.adapters.explorer.ExploreSubCatListAdapter.ITEM_COURSES;
+import static app.mobile.examwarrior.adapters.explorer.ExploreSubCatListAdapter.ITEM_TUTOR;
 
-    List<CourseMoreCategories.CoursesBean> videoItems;
+public class ExploreHorizontalMoreAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private List<Object> videoItems;
     private Activity activity;
+    private int rootPosition = -1;
+    private int ITEM_TYPE = 0;
     private ExploreCardClickListener videoCardClickListener;
 
 
-    public ExploreHorizontalMoreAdapter(Activity activity, List<CourseMoreCategories.CoursesBean> videoItems) {
+    public ExploreHorizontalMoreAdapter(Activity activity, List<Object> videoItems, int rootPosition, int itemtype) {
         this.videoItems = videoItems;
         this.videoCardClickListener = (ExploreCardClickListener) activity;
         this.activity = activity;
-
+        this.rootPosition = rootPosition;
+        this.ITEM_TYPE = itemtype;
     }
 
     @Override
-    public ExploreHorizontalMoreAdapter.MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.explore_recycle_sub_categories, parent, false);
-        MyHolder holder = new MyHolder(view);
-        return holder;
+    public int getItemViewType(int position) {
+        return ITEM_TYPE;
     }
 
     @Override
-    public void onBindViewHolder(MyHolder holder, final int position) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        holder.textTitle.setText(videoItems.get(position).getCOURSENAME().toUpperCase());
-        Picasso.with(activity)
-                .load(videoItems.get(position).getPIC())
-                .error(R.drawable.placeholder_)
-                .into(holder.coverImage);
-        holder.root.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                videoCardClickListener.exploreCourcesMore(videoItems.get(position));
+        View view;
+        RecyclerView.ViewHolder viewHolder = null;
+        switch (viewType) {
+            case ITEM_COURSES:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.explore_recycle_sub_categories, parent, false);
+                viewHolder = new MyHolder(view);
+                break;
+            case ITEM_BOOK:
+                break;
+            case ITEM_TUTOR:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.explore_recycle_sub_categories, parent, false);
+                viewHolder = new MyHolder(view);
+                break;
+        }
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
+        if (videoItems.get(position) != null) {
+            switch (viewHolder.getItemViewType()) {
+                case ITEM_COURSES:
+                    MyHolder holder = (MyHolder) viewHolder;
+                    final CourseMoreCategories.CoursesBean coursesBean = (CourseMoreCategories.CoursesBean) videoItems.get(position);
+                    holder.textTitle.setText(coursesBean.getCourseName().toUpperCase());
+                    if (coursesBean.getImageUrl() != null && !coursesBean.getImageUrl().equals(""))
+                        Glide.with(activity)
+                                .load(coursesBean.getImageUrl())
+                                .error(R.drawable.placeholder_)
+                                .into(holder.coverImage);
+                    else
+                        holder.coverImage.setImageResource(R.drawable.placeholder_);
+                    holder.root.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            videoCardClickListener.exploreCourcesMore(coursesBean);
+                        }
+                    });
+                    break;
+                case ITEM_TUTOR:
+                    MyHolder tutorHolder = (MyHolder) viewHolder;
+                    final Tutors tutors = (Tutors) videoItems.get(position);
+                    tutorHolder.textTitle.setText(tutors.getFst_nm().toUpperCase());
+                    if (!Utility.isEmpty(tutors.getTeacher_pic()))
+                        Glide.with(activity)
+                                .load(tutors.getTeacher_pic())
+                                .error(R.drawable.placeholder_)
+                                .into(tutorHolder.coverImage);
+                    else
+                        tutorHolder.coverImage.setImageResource(R.drawable.placeholder_);
+                    tutorHolder.root.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                        }
+                    });
+                    break;
             }
-        });
-
+        }
 
     }
 
     @Override
     public int getItemCount() {
-        return videoItems.size();
+        return videoItems == null ? 0 : videoItems.size();
     }
 
     class MyHolder extends RecyclerView.ViewHolder {

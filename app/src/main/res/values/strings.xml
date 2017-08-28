@@ -28,6 +28,7 @@
     <string name="font_Helveticaneuemedium">helveticaneuemedium.ttf</string>
     <string name="font_GothamRnd_Medium">GothamRnd-Medium.otf</string>
     <string name="font_mavenpro_regular">mavenpro_regular.ttf</string>
+    <string name="font_montserrat_bold">Montserrat-Bold.ttf</string>
 
     <!--Error messages-->
     <string name="network_connectivity_error_message">No network available please try again.</string>
