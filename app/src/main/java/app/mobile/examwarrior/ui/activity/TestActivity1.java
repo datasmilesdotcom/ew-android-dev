@@ -32,14 +32,14 @@ import java.util.List;
 
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.api.ApiInterface;
-import app.mobile.examwarrior.api.RealmString;
-import app.mobile.examwarrior.api.RealmStringDeserializer;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.database.FinishUserExam;
 import app.mobile.examwarrior.database.FinishUserExamBody;
 import app.mobile.examwarrior.database.ResponseSaveQuestionData;
 import app.mobile.examwarrior.database.SaveUserExamQuestionData;
 import app.mobile.examwarrior.database.StartUserExam;
+import app.mobile.examwarrior.model.RealmString;
+import app.mobile.examwarrior.model.RealmStringDeserializer;
 import app.mobile.examwarrior.model.StartTestBody;
 import app.mobile.examwarrior.model.User;
 import app.mobile.examwarrior.ui.fragments.DisplayQuestionFragment;

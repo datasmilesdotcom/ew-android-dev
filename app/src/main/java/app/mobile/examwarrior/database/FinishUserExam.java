@@ -5,7 +5,7 @@ package app.mobile.examwarrior.database;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import app.mobile.examwarrior.api.RealmString;
+import app.mobile.examwarrior.model.RealmString;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 
