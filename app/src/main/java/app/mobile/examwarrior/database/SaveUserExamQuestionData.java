@@ -4,7 +4,9 @@ package app.mobile.examwarrior.database;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class SaveUserExamQuestionData {
+import io.realm.RealmObject;
+
+public class SaveUserExamQuestionData extends RealmObject {
 
     @SerializedName("questionData")
     @Expose

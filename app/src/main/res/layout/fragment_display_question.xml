@@ -29,7 +29,6 @@
 
         <LinearLayout
             android:id="@+id/options"
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -37,9 +36,11 @@
             android:padding="10dp">
 
             <LinearLayout
+                android:id="@+id/ll_ans1"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/dummy_tool"
+                android:clickable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -47,7 +48,16 @@
                     android:id="@+id/chkOpt1"
                     android:layout_width="40dp"
                     android:layout_height="30dp"
-                    android:theme="@style/MyCheckBox" />
+                    android:background="@drawable/hex_1"
+                    android:theme="@style/MyCheckBox"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/imgAns1"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/hex_1" />
+
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/option_one"
@@ -60,10 +70,13 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ll_ans2"
+
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/dummy_tool"
+                android:clickable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -71,7 +84,14 @@
                     android:id="@+id/chkOpt2"
                     android:layout_width="40dp"
                     android:layout_height="30dp"
-                    android:theme="@style/MyCheckBox" />
+                    android:theme="@style/MyCheckBox"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/imgAns2"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/hex_2" />
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/option_two"
@@ -85,10 +105,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ll_ans3"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/dummy_tool"
+                android:clickable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -96,7 +118,15 @@
                     android:id="@+id/chkOpt3"
                     android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:theme="@style/MyCheckBox" />
+                    android:theme="@style/MyCheckBox"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/imgAns3"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/hex_3" />
+
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/option_three"
@@ -109,10 +139,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ll_ans4"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/dummy_tool"
+                android:clickable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -120,7 +152,14 @@
                     android:id="@+id/chkOpt4"
                     android:layout_width="40dp"
                     android:layout_height="wrap_content"
-                    android:theme="@style/MyCheckBox" />
+                    android:theme="@style/MyCheckBox"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/imgAns4"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/hex_4" />
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/option_four"

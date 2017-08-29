@@ -227,6 +227,7 @@ public class QuestionPagerActivity extends AppCompatActivity {
             rootView.findViewById(R.id.checkbox4).setOnClickListener(this);
 
             MathJaxConfig mathJaxConfig = new MathJaxConfig();
+
 //            WebView laTexView = (WebView) rootView.findViewById(R.id.web_view);
 //            laTexView.getSettings().setJavaScriptEnabled(true);
 //            laTexView.setVerticalScrollBarEnabled(true);

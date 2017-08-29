@@ -84,11 +84,12 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
     long updatedTime = 0L;
     long timeSwapBuff = 0L;
     long timeInMilliseconds = 0L;
+
     long startTotalTime = 0L;
     long updatedTotalTime = 0L;
     long timeTotalSwapBuff = 0L;
     long timeTotalInMilliseconds = 0L;
-    int pager_pos = -1;
+
     ToggleButton tbtn_review;
     DrawerLayout drawer;
     int Qsecs;
@@ -108,8 +109,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
     private SharedPreferences mSharedPreferences = null;
     private SharedPreferences.Editor mEditor = null;
     private Handler customHandler = new Handler();
-    private Handler customHandlerTotal = new Handler();
-    private Runnable updateTimerThread = new Runnable() {
+    public Runnable updateTimerThread = new Runnable() {
 
         public void run() {
 
@@ -128,9 +128,11 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             customHandler.postDelayed(this, 0);
         }
     };
-    private Runnable updateTotalTimerThread = new Runnable() {
+    private Handler customHandlerTotal = new Handler();
+    public Runnable updateTotalTimerThread = new Runnable() {
 
         public void run() {
+
 
             timeTotalInMilliseconds = SystemClock.uptimeMillis() - startTotalTime;
             updatedTotalTime = timeTotalSwapBuff + timeTotalInMilliseconds;
@@ -170,6 +172,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         viewPager = findViewById(R.id.viewpager);
 
 
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -202,14 +205,6 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 System.out.println("viewpager onPageScrolled :" + position);
-               /* if (pager_pos != position) {
-                    pager_pos = position;
-                    startTime = SystemClock.uptimeMillis();
-                    customHandler.postDelayed(updateTimerThread, 0);
-
-                       // UpdateQuestionData();
-
-                }*/
             }
 
             @Override
@@ -226,7 +221,6 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                // UpdateQuestionData();
             }
         });
 
@@ -260,11 +254,12 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
                 // drawer.openDrawer(GravityCompat.END); /*Opens the Right Drawer*/
                 if (userExam != null) {
-                    getFinishExam();
+                    //  getFinishExam();
+
                 }
             }
         });
-        findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.prev).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -280,7 +275,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             }
         });
 
-        findViewById(R.id.prev).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -323,7 +318,21 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             @Override
             public void onStatusChange(View view, boolean state) {
                 if (state) {
+                    try {
+
+                        // startTotalTime=updatedTotalTime;
+                        customHandlerTotal.postDelayed(updateTotalTimerThread, 0);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 } else {
+                    try {
+                        customHandlerTotal.removeCallbacks(updateTotalTimerThread);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         });
@@ -391,7 +400,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
     private void UpdateQuestionData(int pos) {
         ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
-        SaveUserExamQuestionData examQuestionData = new SaveUserExamQuestionData();
+        final SaveUserExamQuestionData examQuestionData = new SaveUserExamQuestionData();
         JSONObject mJsonObject = new JSONObject();
 
         String strOpt1 = mSharedPreferences.getString("strOpt1", "");
@@ -442,6 +451,13 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
                     if (mResponseSaveQuestionData != null) {
                         System.out.println("questionId :" + mResponseSaveQuestionData.getQuestionId());
                         System.out.println("status :" + mResponseSaveQuestionData.getStatus());
+
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                realm.insertOrUpdate(examQuestionData);
+                            }
+                        });
                     }
                 }
 
