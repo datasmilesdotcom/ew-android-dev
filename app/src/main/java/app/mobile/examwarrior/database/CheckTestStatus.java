@@ -11,9 +11,20 @@ public class CheckTestStatus  extends RealmObject {
     @SerializedName("running")
     @Expose
     private Boolean running;
+    @SerializedName("completed")
+    @Expose
+    private Boolean completed;
     @SerializedName("userAllowedToAcess")
     @Expose
     private Boolean userAllowedToAcess;
+
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
 
     public Boolean getRunning() {
         return running;

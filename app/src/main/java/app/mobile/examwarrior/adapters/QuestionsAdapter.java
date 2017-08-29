@@ -22,24 +22,11 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
         this.items = items;
     }
 
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View cardView = LayoutInflater.from(this.context).inflate(R.layout.question_row, parent, false);
         return new ViewHolder(cardView);
-    }
-
-    class ViewHolder extends RecyclerView.ViewHolder {
-        private MathJaxView txtTitle;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-
-            this.txtTitle = (MathJaxView) itemView.findViewById(R.id.laTexView);
-        }
-
-        public void bind(String que) {
-            this.txtTitle.setInputText(que);
-        }
     }
 
     @Override
@@ -50,5 +37,19 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.View
     @Override
     public int getItemCount() {
         return items.length;
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
+        private MathJaxView txtTitle;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            this.txtTitle = itemView.findViewById(R.id.laTexView);
+        }
+
+        public void bind(String que) {
+            this.txtTitle.setInputText(que);
+        }
     }
 }

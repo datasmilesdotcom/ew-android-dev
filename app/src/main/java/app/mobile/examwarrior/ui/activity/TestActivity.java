@@ -1,3 +1,4 @@
+/*
 package app.mobile.examwarrior.ui.activity;
 
 import android.os.Bundle;
@@ -71,13 +72,15 @@ public class TestActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * Add fragment to the container
-     *
-     * @param containerViewId
-     * @param fragment
-     * @param fragmentTag
-     */
+    */
+/**
+ * Add fragment to the container
+ *
+ * @param containerViewId
+ * @param fragment
+ * @param fragmentTag
+ *//*
+
     protected void addFragment(int containerViewId,
                                Fragment fragment,
                                String fragmentTag) {
@@ -92,23 +95,27 @@ public class TestActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    /**
-     * Replace fragment from container
-     *
-     * @param containerViewId
-     * @param fragment
-     * @param fragmentTag
-     * @param backStackStateName
-     */
+    */
+/**
+ * Replace fragment from container
+ *
+ * @param containerViewId
+ * @param fragment
+ * @param fragmentTag
+ * @param backStackStateName
+ *//*
+
     public void replaceFragment(int containerViewId,
                                 Fragment fragment,
                                 String fragmentTag,
                                 String backStackStateName) {
         fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        /*fragmentTransaction.setCustomAnimations(R.anim.fragment_anim_enter_from_left,
+        */
+/*fragmentTransaction.setCustomAnimations(R.anim.fragment_anim_enter_from_left,
                 R.anim.fragment_anim_exit_to_right, R.anim.fragment_anim_enter_from_right,
-                R.anim.fragment_anim_exit_to_left);*/
+                R.anim.fragment_anim_exit_to_left);*//*
+
         fragmentTransaction.replace(containerViewId, fragment, fragmentTag);
         fragmentTransaction.addToBackStack(backStackStateName);
         fragmentTransaction.commit();
@@ -116,3 +123,4 @@ public class TestActivity extends AppCompatActivity {
     }
 
 }
+*/

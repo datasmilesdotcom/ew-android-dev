@@ -1,7 +1,6 @@
 
 package app.mobile.examwarrior.database;
 
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -10,18 +9,29 @@ import io.realm.RealmObject;
 
 public class StartUserExam extends RealmObject{
 
+    @SerializedName("testName")
+    @Expose
+    private String testName;
     @SerializedName("totalQuestions")
     @Expose
     private Integer totalQuestions;
     @SerializedName("usr_id")
     @Expose
     private String usrId;
-    @SerializedName("topic_id")
-    @Expose
-    private String topicId;
     @SerializedName("allQuestions")
     @Expose
     private RealmList<AllQuestion> allQuestions = null;
+    @SerializedName("test_id")
+    @Expose
+    private String testId;
+
+    public String getTestName() {
+        return testName;
+    }
+
+    public void setTestName(String testName) {
+        this.testName = testName;
+    }
 
     public Integer getTotalQuestions() {
         return totalQuestions;
@@ -39,20 +49,20 @@ public class StartUserExam extends RealmObject{
         this.usrId = usrId;
     }
 
-    public String getTopicId() {
-        return topicId;
-    }
-
-    public void setTopicId(String topicId) {
-        this.topicId = topicId;
-    }
-
     public RealmList<AllQuestion> getAllQuestions() {
         return allQuestions;
     }
 
     public void setAllQuestions(RealmList<AllQuestion> allQuestions) {
         this.allQuestions = allQuestions;
+    }
+
+    public String getTestId() {
+        return testId;
+    }
+
+    public void setTestId(String testId) {
+        this.testId = testId;
     }
 
 }

@@ -1,6 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment"
     android:name="app.mobile.examwarrior.ui.activity.TestActivityFragment"
     android:layout_width="match_parent"
@@ -14,11 +13,10 @@
 
         <app.mobile.examwarrior.widget.LockableViewPager
             android:id="@+id/pager"
-            android:layout_above="@+id/bottom"
-            android:padding="10dp"
-
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bottom"
+            android:paddingBottom="50dp">
 
         </app.mobile.examwarrior.widget.LockableViewPager>
 
@@ -27,16 +25,16 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical|left"
-            app:srcCompat="@drawable/ic_chevron_left_black_24dp"
-             />
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_chevron_left_black_24dp" />
 
         <ImageView
             android:id="@+id/right_nav"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical|right"
-            app:srcCompat="@drawable/ic_chevron_right_black_24dp"   />
-
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_chevron_right_black_24dp" />
 
     </FrameLayout>
 
@@ -49,63 +47,47 @@
         android:layout_height="match_parent"/>
 -->
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/bottom"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:orientation="horizontal"
         android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingTop="5dp"
-        android:background="#E0E0E0"
-        android:orientation="horizontal">
+        android:paddingTop="5dp">
 
         <android.support.v7.widget.AppCompatImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:tint="#FDD835"
+            android:id="@+id/imgDrawer"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
             android:padding="5dp"
-            app:srcCompat="@drawable/dummy"
-            android:id="@+id/appCompatImageView" />
-        <android.support.v7.widget.AppCompatImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:tint="#37474F"
-            android:padding="5dp"
-            app:srcCompat="@drawable/dummy"
-            android:id="@+id/appCompatImageView2"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/appCompatImageView"
-            android:layout_marginStart="11dp" />
+            app:srcCompat="@drawable/icon_setting" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"></View>
 
         <android.support.v7.widget.AppCompatImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:tint="#AED581"
+            android:id="@+id/next"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:padding="5dp"
-            app:srcCompat="@drawable/dummy"
-            android:layout_marginStart="15dp"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/appCompatImageView2" />
-
-        <android.support.v7.widget.AppCompatImageView
-            android:clickable="true"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="5dp"
-            app:srcCompat="@drawable/dummy"
-            android:layout_alignParentEnd="true"
-            android:id="@+id/next" />
+            app:srcCompat="@drawable/icon_previous" />
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/prev"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
             android:padding="5dp"
-            app:srcCompat="@drawable/dummy"
-            android:layout_alignParentTop="true"
-            android:layout_toStartOf="@+id/next" />
-    </RelativeLayout>
+            app:srcCompat="@drawable/icon_next" />
+
+
+    </LinearLayout>
 
 </RelativeLayout>

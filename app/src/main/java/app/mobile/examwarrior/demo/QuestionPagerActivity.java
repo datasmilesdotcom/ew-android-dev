@@ -141,18 +141,18 @@ public class QuestionPagerActivity extends AppCompatActivity {
         //que = new String[]{"\\[\\text\"average speed\" = \\text\"distance traveled\" / \\text\"elapsed time\"\\]","\\Δ FEC≅ \\ΔGBD","a{x^34} + 87x + 9 = 0","a{x^2} + 87x + 9 = 0","a{x^31} + 87x + 9 = 0","a{x^42} + 87x + 9 = 0","y-y_0=m(x-x_0)","\\cos^2θ+\\sin^2θ=1","∑↙{i=0}↖n i={n(n+1)}/2","{1+√5}/2=1+1/{1+1/{1+⋯}}","f'(x)=\\lim↙{h→0}{f(x+h)-f(x)}/h","\\[∀x_0∀ε>0∃δ>0∋{|x-x_0|}&lt;δ⇒{|f(x)-f(x_0)|}&lt;ε\\]","\\[∫_\\Δd\\bo ω=∫_{∂\\Δ}\\bo ω\\]","(\\table \\cos θ, - \\sin θ; \\sin θ, \\cos θ)$ gives a rotation by","$v↖{→}⋅w↖{→} = vw\\cos θ$","$\\{x:x^2∈\\ℚ\\}$ has measure 0 in $\\ℝ$.","\\[1/7 = 0.\\ov 142857\\]","\\[√^n{a}√^n{b} = √^n{ab}\\]","\\[\\table a, =, b+c; , =, d\\]","\\[\\text\"average speed\" = \\text\"distance traveled\" / \\text\"elapsed time\"\\]"};
 
         que = new String[]{question, q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12 };
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -215,10 +215,10 @@ public class QuestionPagerActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_question_pager, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            TextView textView = rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
 
-            MathJaxView  laTexView = (MathJaxView) rootView.findViewById(R.id.laTexView);
+            MathJaxView laTexView = rootView.findViewById(R.id.laTexView);
             laTexView.setInputText(que[getArguments().getInt(ARG_SECTION_NUMBER,0)]);
             rootView.findViewById(R.id.checkbox).setOnClickListener(this);
             rootView.findViewById(R.id.checkbox1).setOnClickListener(this);
@@ -281,7 +281,7 @@ public class QuestionPagerActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position );
+            return PlaceholderFragment.newInstance(position);
         }
 
         @Override

@@ -41,8 +41,7 @@ public class CourseDetailsAdapter extends ExpandableRecyclerViewAdapter<CourseMo
 
     @Override
     public ModuleItemViewHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_module, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_module, parent, false);
         return new ModuleItemViewHolder(view);
     }
 
