@@ -2,6 +2,7 @@ package app.mobile.examwarrior.ui.activity;
 
 
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -44,6 +45,8 @@ import app.mobile.examwarrior.model.CourseDetailId;
 import app.mobile.examwarrior.model.RealmString;
 import app.mobile.examwarrior.model.RealmStringDeserializer;
 import app.mobile.examwarrior.model.User;
+import app.mobile.examwarrior.player.PlayerActivity;
+import app.mobile.examwarrior.player.VideoPlayerActivity;
 import app.mobile.examwarrior.util.Utility;
 import de.timfreiheit.mathjax.android.MathJaxView;
 import io.realm.OrderedCollectionChangeSet;
@@ -352,15 +355,21 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
 
     @Override
     public void onModuleClickListener(ChildViewHolder holder, int position, ModuleItem data, CourseHeader courseHeader) {
-        String item_type_id = "super-q-test-id";
-        getTestStatus(item_type_id, data.getItemName());//data.getItemTypeId()
 
-        /*Intent intent = new Intent(getIntent());
+        if (data.getItemType().equalsIgnoreCase("video")) {
+            openVideoScreen(data, courseHeader);
+        } else {
+            String item_type_id = "super-q-test-id";
+            getTestStatus(item_type_id, data.getItemName());//data.getItemTypeId()
+        }
+    }
+
+    private void openVideoScreen(ModuleItem data, CourseHeader courseHeader) {
+        Intent intent = new Intent(getIntent());
         //intent.setAction(PlayerActivity.ACTION_VIEW_LIST);
         intent.setComponent(new ComponentName(CourseDetailsActivity.this, VideoPlayerActivity.class));
         intent.putExtra(PlayerActivity.KEY_MODULE_ID, courseHeader.getModuleId());
         intent.putExtra(PlayerActivity.KEY_MODULE_ITEM_ID, data.getItemId());
-        startActivity(intent);*/
-
+        startActivity(intent);
     }
 }
