@@ -263,7 +263,6 @@ public class QuestionPagerActivity extends AppCompatActivity {
                 ((CheckableLinearLayout)v).toggle();
 
             }
-
         }
     }
 
