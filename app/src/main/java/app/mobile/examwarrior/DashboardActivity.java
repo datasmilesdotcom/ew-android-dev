@@ -47,7 +47,7 @@ public class DashboardActivity extends AppCompatActivity {
         if (AppPref.getInstance().isSplashShown()) {
             startActivity(new Intent(DashboardActivity.this, HomeActivity.class));
         } else {
-            AppPref.getInstance().setSplashShown(true);
+            //AppPref.getInstance().setSplashShown(true);
             startActivity(new Intent(DashboardActivity.this, AppIntroActivity.class));
         }
 

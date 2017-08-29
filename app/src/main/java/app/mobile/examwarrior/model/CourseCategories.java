@@ -73,7 +73,7 @@ public class CourseCategories {
 
         private String mcourseid;
         private String mcoursename;
-        private String pic;
+        private String mcourse_pic;
 
         public String getMcourseid() {
             return mcourseid;
@@ -91,12 +91,12 @@ public class CourseCategories {
             this.mcoursename = mcoursename;
         }
 
-        public String getPic() {
-            return pic;
+        public String getMcourse_pic() {
+            return mcourse_pic;
         }
 
-        public void setPic(String pic) {
-            this.pic = pic;
+        public void setMcourse_pic(String mcourse_pic) {
+            this.mcourse_pic = mcourse_pic;
         }
     }
 }

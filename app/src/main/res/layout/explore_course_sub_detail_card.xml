@@ -9,101 +9,94 @@
     android:background="@color/white"
     app:cardElevation="2dp"
     app:cardUseCompatPadding="true"
+    app:contentPadding="5dp"
     card_view:cardCornerRadius="2dp"
     card_view:cardPreventCornerOverlap="false">
 
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/title_sub_cat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="hfghasgfhgfdghfgsdfgh"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <app.mobile.examwarrior.widget.AspectRatioImageView
+            android:id="@+id/coverImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:minWidth="150dp"
+            android:scaleType="centerCrop"
+            app:aspectRatio="0.6"
+            app:aspectRatioEnabled="true"
+            app:dominantMeasurement="width"
+            app:srcCompat="@drawable/placeholder_" />
 
         <LinearLayout
-            android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="100">
+            android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/coverImage"
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="65" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="35"
+                android:orientation="vertical"
                 android:paddingLeft="4dp"
                 android:paddingTop="4dp">
 
+
                 <android.support.v7.widget.AppCompatTextView
-                    android:id="@+id/title_sub_cat"
+                    android:id="@+id/author_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="hfghasgfhgfdghfgsdfgh"
-                    android:textColor="@color/colorPrimaryDark"
-                    android:textSize="15dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:text="Author : bdshfhdsbfhd"
+                    android:textSize="9dp"
                     android:textStyle="bold" />
 
-
-                <RelativeLayout
-                    android:id="@+id/author_info_container"
-                    android:layout_width="match_parent"
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/sub_cat_leval"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/title_sub_cat"
-                    android:layout_marginTop="2dp"
-                    android:paddingBottom="4dp"
-                    android:paddingRight="4dp"
-                    android:paddingTop="4dp">
-
-                    <android.support.v7.widget.AppCompatTextView
-                        android:id="@+id/author_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:text="Author : bdshfhdsbfhd"
-                        android:textSize="9dp"
-                        android:textStyle="bold" />
-
-                    <android.support.v7.widget.AppCompatTextView
-                        android:id="@+id/sub_cat_leval"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="12dp"
-                        android:layout_toRightOf="@+id/author_name"
-                        android:text="Level : Advanced"
-                        android:textStyle="bold"
-                        android:textSize="9dp" />
-
-
-                </RelativeLayout>
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/author_name"
+                    android:text="Level : Advanced"
+                    android:textSize="9dp"
+                    android:textStyle="bold" />
 
                 <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/last_updated"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/author_info_container"
                     android:paddingBottom="4dp"
                     android:paddingRight="4dp"
                     android:paddingTop="2dp"
                     android:text="Updated : 12_july_2017"
                     android:textSize="9dp"
                     android:textStyle="bold" />
-            </RelativeLayout>
-
-
+            </LinearLayout>
         </LinearLayout>
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/des_sub_cat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:padding="4dp"
-            android:text="fhbdsjfdhfhdsfhasfhfhdvhfvdhfvdhf jfshdjfheshf sfdsbghsbdhg jfjvbjfd fbjbjfj fjbvjfdbj fbjfdbj dfjbjfb"
+            android:text="Original Text"
+            android:textColor="@color/black"
             android:textSize="11dp" />
-    </RelativeLayout>
+
+    </LinearLayout>
 </android.support.v7.widget.CardView>

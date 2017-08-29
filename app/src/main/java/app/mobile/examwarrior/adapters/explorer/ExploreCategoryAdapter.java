@@ -1,7 +1,6 @@
 package app.mobile.examwarrior.adapters.explorer;
 
 import android.app.Activity;
-import android.graphics.Typeface;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,13 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import app.mobile.examwarrior.R;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.listener.ExploreCardClickListener;
 import app.mobile.examwarrior.model.CourseCategories;
+import app.mobile.examwarrior.widget.CustomFontTextView;
 
 
 public class ExploreCategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -49,18 +48,17 @@ public class ExploreCategoryAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
 
         MyHolder holder = (MyHolder) viewHolder;
-        if(arraylist.get(position).getCourse_cat_title() !=null){
+        if (arraylist.get(position).getCourse_cat_title() != null) {
             holder.textData.setText(arraylist.get(position).getCourse_cat_title().toUpperCase());
         }
-        Typeface face = Typeface.createFromAsset(activity.getAssets(),
-                "fonts/Montserrat-Bold.ttf");
-        holder.textData.setTypeface(face);
-        holder.setDaa(arraylist.get(position).getMcourses());
+
+        holder.horizontalVideoListAdapter = new ExploreHorizontalAdapter(position, activity, arraylist.get(position).getMcourses());
+        holder.horizontalVideoList.setAdapter(holder.horizontalVideoListAdapter);
         holder.horizontalVideoListAdapter.notifyDataSetChanged();
         holder.moreVideos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moreClickListener.getMoreCources(arraylist.get(position).getCourse_cat_id());
+                moreClickListener.getMoreCources(position, arraylist.get(position).getCourse_cat_id());
             }
         });
         holder.moreVideos.setTag(position - 1);
@@ -69,12 +67,14 @@ public class ExploreCategoryAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public int getItemCount() {
-        return arraylist.size();
+
+        return arraylist != null ? arraylist.size() : 0;
     }
 
     class MyHolder extends RecyclerView.ViewHolder {
 
-        TextView textData, moreVideos;
+        CustomFontTextView textData;
+        TextView moreVideos;
         RecyclerView horizontalVideoList;
         ExploreHorizontalAdapter horizontalVideoListAdapter;
         List<CourseCategories.McoursesBean> data = new ArrayList<>();
@@ -83,24 +83,21 @@ public class ExploreCategoryAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         public MyHolder(View itemView) {
             super(itemView);
 
-            textData = (TextView) itemView.findViewById(R.id.textPropertyName);
+            textData = itemView.findViewById(R.id.textPropertyName);
             moreVideos = (TextView) itemView.findViewById(R.id.moreButton);
             horizontalVideoList = (RecyclerView) itemView.findViewById(R.id.horizontalVideoList);
             LinearLayoutManager imageLayoutManager = new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false);
             horizontalVideoList.setLayoutManager(imageLayoutManager);
             horizontalVideoList.setNestedScrollingEnabled(false);
-            horizontalVideoListAdapter = new ExploreHorizontalAdapter(activity, data);
-            horizontalVideoList.setAdapter(horizontalVideoListAdapter);
 
         }
 
         public void setDaa(List<CourseCategories.McoursesBean> dataValues) {
-            data.clear();
-            data.addAll(dataValues);
+            if (dataValues != null && !dataValues.isEmpty()) {
+                data.clear();
+                data.addAll(dataValues);
+            }
         }
-
-
     }
-
 }
 

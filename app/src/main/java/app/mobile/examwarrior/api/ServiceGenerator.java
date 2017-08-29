@@ -13,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 import app.mobile.examwarrior.BuildConfig;
 import app.mobile.examwarrior.app_controller.AppController;
+import app.mobile.examwarrior.model.RealmString;
+import app.mobile.examwarrior.model.RealmStringDeserializer;
 import app.mobile.examwarrior.util.Utility;
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -115,8 +117,23 @@ public class ServiceGenerator {
         httpClient.cache(new okhttp3.Cache(new File(AppController.getAppContext().getCacheDir(), "http"), 10 * 1024 * 1024));
         httpClient.readTimeout(1, TimeUnit.MINUTES);
         httpClient.connectTimeout(1, TimeUnit.MINUTES);
-        Gson gson = gsonBuilder.create();
-        retrofit = builder.client(httpClient.build()).addConverterFactory(GsonConverterFactory.create(realmGson)).addConverterFactory(GsonConverterFactory.create(gson)).build();
+        Gson realmGson = new GsonBuilder()
+                .setLenient()
+                .setExclusionStrategies(new ExclusionStrategy() {
+                    @Override
+                    public boolean shouldSkipField(FieldAttributes f) {
+                        return f.getDeclaringClass().equals(RealmObject.class);
+                    }
+
+                    @Override
+                    public boolean shouldSkipClass(Class<?> clazz) {
+                        return false;
+                    }
+                })
+                .registerTypeAdapter(new TypeToken<RealmList<RealmString>>() {
+                }.getType(), new RealmStringDeserializer())
+                .create();
+        retrofit = builder.client(httpClient.build()).addConverterFactory(GsonConverterFactory.create(realmGson)).build();
         return retrofit.create(serviceClass);
     }
 }

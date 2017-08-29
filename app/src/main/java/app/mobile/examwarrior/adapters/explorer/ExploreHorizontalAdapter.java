@@ -5,34 +5,35 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.listener.ExploreCardClickListener;
 import app.mobile.examwarrior.model.CourseCategories;
+import app.mobile.examwarrior.util.Utility;
+import app.mobile.examwarrior.widget.AspectRatioImageView;
 
 public class ExploreHorizontalAdapter extends RecyclerView.Adapter<ExploreHorizontalAdapter.MyHolder> {
 
     List<CourseCategories.McoursesBean> videoItems;
+    int rootPosition = -1;
     private Activity activity;
     private ExploreCardClickListener videoCardClickListener;
 
-
-    public ExploreHorizontalAdapter(Activity activity, List<CourseCategories.McoursesBean> videoItems) {
+    public ExploreHorizontalAdapter(int rootPosition, Activity activity, List<CourseCategories.McoursesBean> videoItems) {
         this.videoItems = videoItems;
         this.videoCardClickListener = (ExploreCardClickListener) activity;
         this.activity = activity;
-
+        this.rootPosition = rootPosition;
     }
 
     @Override
-    public ExploreHorizontalAdapter.MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.explore_recycle_sub_categories, parent, false);
         MyHolder holder = new MyHolder(view);
         return holder;
@@ -42,14 +43,15 @@ public class ExploreHorizontalAdapter extends RecyclerView.Adapter<ExploreHorizo
     public void onBindViewHolder(MyHolder holder, final int position) {
 
         holder.textTitle.setText(videoItems.get(position).getMcoursename().toUpperCase());
-        Picasso.with(activity)
-                .load(videoItems.get(position).getPic())
-                .error(R.drawable.placeholder_)
-                .into(holder.coverImage);
+        if (!Utility.isEmpty(videoItems.get(position).getMcourse_pic())) {
+            Glide.with(holder.itemView.getContext()).load(videoItems.get(position).getMcourse_pic()).asBitmap().error(R.drawable.placeholder_).into(holder.coverImage);
+        }
+        //Glide.with(holder.itemView.getContext()).load("http://lorempixel.com/400/200/business/").asBitmap().signature(new StringSignature(String.valueOf(System.currentTimeMillis()))).error(R.drawable.placeholder_).into(holder.coverImage);
+
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                videoCardClickListener.exploreCources(videoItems.get(position));
+                videoCardClickListener.exploreCources(rootPosition, videoItems.get(position));
             }
         });
 
@@ -64,14 +66,14 @@ public class ExploreHorizontalAdapter extends RecyclerView.Adapter<ExploreHorizo
     class MyHolder extends RecyclerView.ViewHolder {
 
         TextView textTitle;
-        ImageView coverImage;
+        AspectRatioImageView coverImage;
         RelativeLayout root;
 
         public MyHolder(View itemView) {
             super(itemView);
 
             textTitle = (TextView) itemView.findViewById(R.id.videoTitle);
-            coverImage = (ImageView) itemView.findViewById(R.id.topicImage);
+            coverImage = itemView.findViewById(R.id.topicImage);
             root = (RelativeLayout) itemView.findViewById(R.id.sub_cat_container);
 
         }
