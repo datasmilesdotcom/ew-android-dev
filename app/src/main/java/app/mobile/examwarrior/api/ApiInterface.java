@@ -1,10 +1,8 @@
 package app.mobile.examwarrior.api;
 
 /**
- * Created by vinod on 10/1/17.
+ * Created by kunjan on 10/1/17.
  */
-
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -12,8 +10,12 @@ import java.util.Map;
 import app.mobile.examwarrior.database.CheckTestStatus;
 import app.mobile.examwarrior.database.Course;
 import app.mobile.examwarrior.database.CourseDetail;
+import app.mobile.examwarrior.database.FinishUserExamBody;
+import app.mobile.examwarrior.database.ResponseSaveQuestionData;
+import app.mobile.examwarrior.database.SaveUserExamQuestionData;
 import app.mobile.examwarrior.database.StartUserExam;
 import app.mobile.examwarrior.model.ChangePasswordRequestBody;
+import app.mobile.examwarrior.model.CheckTestStatusModel;
 import app.mobile.examwarrior.model.CourseCategories;
 import app.mobile.examwarrior.model.CourseDetailId;
 import app.mobile.examwarrior.model.CourseMoreCategories;
@@ -45,14 +47,21 @@ import retrofit2.http.Url;
 
 public interface ApiInterface {
 
-    // Get List of Questions
-    @POST("/practice/mobile/startUserExam")
-    Call<StartUserExam> getQuestionsList(@Header("Authorization") String auth_token, @Body StartTestBody StartTest);
-
     // Get Status of Test
     @POST("/practice/checkTestStatus")
-    Call<CheckTestStatus> getTestStatus(@Header("Authorization") String auth_token,  @Body JSONObject Test);
+    Call<CheckTestStatus> getTestStatus(@Header("Authorization") String auth_token, @Body CheckTestStatusModel Test);
 
+    // Get List of Questions
+    @POST("/practice/mobile/startUserExam")
+    Call<List<StartUserExam>> getQuestionsList(@Header("Authorization") String auth_token, @Body StartTestBody StartTest);
+
+    // update the question data
+    @POST("/practice/saveUserExamQuestionData")
+    Call<ResponseSaveQuestionData> updateQuestionData(@Header("Authorization") String auth_token, @Body SaveUserExamQuestionData examQuestionData);
+
+    // Get Finish Test Result
+    @POST("/practice/mobile/finishUserExam")
+    Call<ResponseBody> getResult(@Header("Authorization") String auth_token, @Body FinishUserExamBody Test);
     // Get All Courses
     @POST("/course/getAll")
     Call<List<Course>> getCourseList(@Body Type tag);

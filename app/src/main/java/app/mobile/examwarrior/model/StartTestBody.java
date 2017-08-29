@@ -6,19 +6,19 @@ import com.google.gson.annotations.SerializedName;
 
 public class StartTestBody {
 
-    @SerializedName("topic_id")
+    @SerializedName("test_id")
     @Expose
-    private String topicId;
+    private String test_id;
     @SerializedName("shouldStartNew")
     @Expose
     private Boolean shouldStartNew;
 
-    public String getTopicId() {
-        return topicId;
+    public String getTest_id() {
+        return test_id;
     }
 
-    public void setTopicId(String topicId) {
-        this.topicId = topicId;
+    public void setTest_id(String test_id) {
+        this.test_id = test_id;
     }
 
     public Boolean getShouldStartNew() {

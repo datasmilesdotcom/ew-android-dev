@@ -1,6 +1,7 @@
 
 package app.mobile.examwarrior.database;
 
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,8 +11,19 @@ import com.google.gson.annotations.SerializedName;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 
-public class AllQuestion  extends RealmObject implements Parcelable {
+public class AllQuestion extends RealmObject implements Parcelable {
 
+    public static final Creator<AllQuestion> CREATOR = new Creator<AllQuestion>() {
+        @Override
+        public AllQuestion createFromParcel(Parcel in) {
+            return new AllQuestion(in);
+        }
+
+        @Override
+        public AllQuestion[] newArray(int size) {
+            return new AllQuestion[size];
+        }
+    };
     @SerializedName("questionId")
     @Expose
     private String questionId;
@@ -30,6 +42,25 @@ public class AllQuestion  extends RealmObject implements Parcelable {
     @SerializedName("originalTextExplanation")
     @Expose
     private String originalTextExplanation;
+    @SerializedName("superQuestionDescription")
+    @Expose
+    private String superQuestionDescription;
+
+    public AllQuestion() {
+
+    }
+
+    protected AllQuestion(Parcel in) {
+        questionId = in.readString();
+        if (in.readByte() == 0) {
+            questionTime = null;
+        } else {
+            questionTime = in.readInt();
+        }
+        originalQuestion = in.readString();
+        originalTextExplanation = in.readString();
+        superQuestionDescription = in.readString();
+    }
 
     public String getQuestionId() {
         return questionId;
@@ -79,6 +110,14 @@ public class AllQuestion  extends RealmObject implements Parcelable {
         this.originalTextExplanation = originalTextExplanation;
     }
 
+    public String getSuperQuestionDescription() {
+        return superQuestionDescription;
+    }
+
+    public void setSuperQuestionDescription(String superQuestionDescription) {
+        this.superQuestionDescription = superQuestionDescription;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -86,6 +125,15 @@ public class AllQuestion  extends RealmObject implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-
+        parcel.writeString(questionId);
+        if (questionTime == null) {
+            parcel.writeByte((byte) 0);
+        } else {
+            parcel.writeByte((byte) 1);
+            parcel.writeInt(questionTime);
+        }
+        parcel.writeString(originalQuestion);
+        parcel.writeString(originalTextExplanation);
+        parcel.writeString(superQuestionDescription);
     }
 }

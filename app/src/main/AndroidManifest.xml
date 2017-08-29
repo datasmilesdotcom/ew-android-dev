@@ -100,7 +100,6 @@
             </intent-filter>-->
         </activity>
 
-
         <activity
             android:name=".ui.activity.TestActivity1"
             android:label="@string/title_activity_test1"
@@ -112,6 +111,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>-->
         </activity>
+
+        <activity
+            android:name=".ui.activity.DisplayTestResultActivity"
+            android:theme="@style/AppTheme"></activity>
+
 
         <activity
             android:name=".demo.QuestionPagerActivity"
