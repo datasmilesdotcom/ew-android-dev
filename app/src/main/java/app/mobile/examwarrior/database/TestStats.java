@@ -1,6 +1,9 @@
 package app.mobile.examwarrior.database;
 
+import app.mobile.examwarrior.model.RealmAutoIncrement;
+import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -10,8 +13,8 @@ import io.realm.annotations.PrimaryKey;
 public class TestStats extends RealmObject {
 
     @PrimaryKey
-    private Integer _id;
-
+    @Index
+    private long _id = RealmAutoIncrement.getNextIdFromModel(Realm.getDefaultInstance(), TestStats.class, "_id");
     private String course_id;
     private String question_id;
     private boolean is_question_attempted = false;
@@ -46,11 +49,11 @@ public class TestStats extends RealmObject {
         this.syncStatus = syncStatus;
     }
 
-    public Integer get_id() {
+    public long get_id() {
         return _id;
     }
 
-    public void set_id(Integer _id) {
+    public void set_id(long _id) {
         this._id = _id;
     }
 

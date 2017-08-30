@@ -16,14 +16,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.evernote.android.job.util.support.PersistableBundleCompat;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.adapters.CoursesListAdapter;
 import app.mobile.examwarrior.api.ApiInterface;
 import app.mobile.examwarrior.api.ServiceGenerator;
 import app.mobile.examwarrior.database.Course;
+import app.mobile.examwarrior.database.TestStats;
+import app.mobile.examwarrior.model.RealmAutoIncrement;
 import app.mobile.examwarrior.model.Type;
+import app.mobile.examwarrior.sync.QuestionSyncJob;
+import app.mobile.examwarrior.sync.SyncTag;
 import io.realm.OrderedCollectionChangeSet;
 import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
@@ -35,6 +44,7 @@ import retrofit2.Response;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static final String TAG = HomeActivity.class.getSimpleName();
     private ProgressBar courseLoading;
     private AppCompatTextView emptyTextView;
     private Realm realm;
@@ -61,6 +71,33 @@ public class HomeActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                try {
+                    realm.executeTransactionAsync(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            TestStats testStats = new TestStats();
+                            testStats.setAdded_to_review(true);
+                            testStats.get_id();
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss", Locale.ENGLISH);
+                            testStats.setChosen_answer("selected answer " + simpleDateFormat.format(new Date(System.currentTimeMillis())));
+                            testStats.setSyncStatus(SyncTag.IDEAL);
+                            realm.insertOrUpdate(testStats);
+
+                        }
+                    }, new Realm.Transaction.OnSuccess() {
+                        @Override
+                        public void onSuccess() {
+                            enqueueJob(TestStats.class.getSimpleName(), RealmAutoIncrement.getLastIdFromModel(realm, TestStats.class, "_id"));
+                        }
+                    });
+                } catch (Exception e) {
+
+                } finally {
+
+                }
+
+
             }
         });
 
@@ -182,5 +219,12 @@ public class HomeActivity extends AppCompatActivity
         courseRealmResults.removeChangeListener(courseChangeListener);
         realm.close();
         super.onDestroy();
+    }
+
+    private void enqueueJob(String table_name, long _id) {
+        PersistableBundleCompat persistableBundleCompat = new PersistableBundleCompat();
+        persistableBundleCompat.putString(SyncTag.BUNDLE_KEYS.KEY_TABLE_NAME, table_name);
+        persistableBundleCompat.putLong(SyncTag.BUNDLE_KEYS.KEY_TARGET_ID, _id);
+        QuestionSyncJob.scheduleJob(persistableBundleCompat);
     }
 }
