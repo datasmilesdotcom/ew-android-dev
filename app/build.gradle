@@ -6,7 +6,7 @@ android {
     buildToolsVersion '26.0.0'
     defaultConfig {
         applicationId "app.mobile.examwarrior"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -18,7 +18,7 @@ android {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'mips', 'x86', 'x86_64'
         }*/
 
-        resConfigs "en"
+       resConfigs "en"
     }
 
     packagingOptions {
@@ -129,4 +129,6 @@ dependencies {
     compile 'com.longtailvideo.jwplayer:jwplayer-common:+'
     compile 'com.longtailvideo.jwplayer:jwplayer-ima:+'        // Only required if using IMA features
     compile 'com.longtailvideo.jwplayer:jwplayer-chromecast:+' // Only required if using Chromecast*/
+
+
 }

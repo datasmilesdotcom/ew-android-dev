@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.database.AllQuestion;
@@ -31,7 +31,7 @@ public class DisplayQuestionFragment extends Fragment {
     private AppCompatTextView optionFour;
     private CheckBox chkOpt1, chkOpt2, chkOpt3, chkOpt4;
     private String strOpt1 = "", strOpt2 = "", strOpt3 = "", strOpt4 = "";
-
+    private LinearLayout ll_ans1, ll_ans2, ll_ans3, ll_ans4;
     // private Realm realm;
     private SharedPreferences mSharedPreferences = null;
     private SharedPreferences.Editor mEditor = null;
@@ -74,6 +74,10 @@ public class DisplayQuestionFragment extends Fragment {
         chkOpt2 = view.findViewById(R.id.chkOpt2);
         chkOpt3 = view.findViewById(R.id.chkOpt3);
         chkOpt4 = view.findViewById(R.id.chkOpt4);
+        ll_ans1 = view.findViewById(R.id.ll_ans1);
+        ll_ans2 = view.findViewById(R.id.ll_ans2);
+        ll_ans3 = view.findViewById(R.id.ll_ans3);
+        ll_ans4 = view.findViewById(R.id.ll_ans4);
 
         questionsText.getSettings().setJavaScriptEnabled(true);
         questionsText.getSettings().setSupportZoom(true);
@@ -105,7 +109,68 @@ public class DisplayQuestionFragment extends Fragment {
     }
 
     private void setListener() {
-        chkOpt1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        ll_ans1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (strOpt1.equals("")) {
+                    strOpt1 = Question.getOptions().get(0).getId();
+                    ll_ans1.setBackgroundColor(getResources().getColor(R.color.blue_light));
+                } else {
+                    strOpt1 = "";
+                    ll_ans1.setBackgroundColor(getResources().getColor(android.R.color.white));
+                }
+                mEditor.putString("strOpt1", strOpt1);
+                mEditor.commit();
+            }
+        });
+
+        ll_ans2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (strOpt2.equals("")) {
+                    strOpt2 = Question.getOptions().get(1).getId();
+                    ll_ans2.setBackgroundColor(getResources().getColor(R.color.blue_light));
+                } else {
+                    strOpt2 = "";
+                    ll_ans2.setBackgroundColor(getResources().getColor(android.R.color.white));
+                }
+                mEditor.putString("strOpt4", strOpt4);
+                mEditor.commit();
+            }
+        });
+
+        ll_ans3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (strOpt3.equals("")) {
+                    strOpt3 = Question.getOptions().get(2).getId();
+                    ll_ans3.setBackgroundColor(getResources().getColor(R.color.blue_light));
+                } else {
+                    strOpt3 = "";
+                    ll_ans3.setBackgroundColor(getResources().getColor(android.R.color.white));
+                }
+                mEditor.putString("strOpt3", strOpt3);
+                mEditor.commit();
+            }
+        });
+
+        ll_ans4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (strOpt4.equals("")) {
+                    strOpt4 = Question.getOptions().get(3).getId();
+                    ll_ans4.setBackgroundColor(getResources().getColor(R.color.blue_light));
+                } else {
+                    strOpt4 = "";
+                    ll_ans4.setBackgroundColor(getResources().getColor(android.R.color.white));
+                }
+                mEditor.putString("strOpt4", strOpt4);
+                mEditor.commit();
+            }
+        });
+
+/*        chkOpt1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -159,6 +224,6 @@ public class DisplayQuestionFragment extends Fragment {
                 mEditor.putString("strOpt4", strOpt4);
                 mEditor.commit();
             }
-        });
+        });*/
     }
 }
