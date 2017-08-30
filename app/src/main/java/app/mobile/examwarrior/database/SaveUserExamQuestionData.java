@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class SaveUserExamQuestionData extends RealmObject {
 
@@ -14,9 +15,33 @@ public class SaveUserExamQuestionData extends RealmObject {
     @SerializedName("topic_id")
     @Expose
     private String topicId;
+
+    @SerializedName("user_id")
+    @Expose
+    private String userId;
+    @SerializedName("token_id")
+    @Expose
+    private String tokenId;
+    @PrimaryKey
     @SerializedName("questionId")
     @Expose
     private String questionId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getTokenId() {
+        return tokenId;
+    }
+
+    public void setTokenId(String tokenId) {
+        this.tokenId = tokenId;
+    }
 
     public String getQuestionData() {
         return questionData;

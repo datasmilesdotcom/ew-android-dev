@@ -25,6 +25,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -92,7 +93,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
     ToggleButton tbtn_review;
     DrawerLayout drawer;
-    int Qsecs;
+    long Qsecs;
     String item_type_id = "";
     /* private int[] tabIcons = {
              R.drawable.fab_image,
@@ -100,6 +101,8 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
      };*/
     ViewPager viewPager;
     StartUserExam userExam;
+    int finish_pos = 0;
+    RealmResults<SaveUserExamQuestionData> saveUserExamQuestionDataRealmResults;
     private Call<ResponseSaveQuestionData> mResponseSaveQuestionDataCall;
     private android.support.v4.app.FragmentManager fragmentManager;
     private LockableViewPager mPager;
@@ -149,6 +152,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         }
     };
     private TabLayout tabLayout;
+    private boolean finish = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +174,6 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         startTotalTime = SystemClock.uptimeMillis();
         customHandlerTotal.postDelayed(updateTotalTimerThread, 0);
         viewPager = findViewById(R.id.viewpager);
-
 
 
     }
@@ -212,7 +215,9 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
                 startTime = SystemClock.uptimeMillis();
                 customHandler.postDelayed(updateTimerThread, 0);
                 if (position != 0) {
+                    finish_pos = position;
                     position = position - 1;
+                    position = position + 1;
                 }
 
                 UpdateQuestionData(position);
@@ -254,8 +259,8 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
                 // drawer.openDrawer(GravityCompat.END); /*Opens the Right Drawer*/
                 if (userExam != null) {
-                    //  getFinishExam();
-
+                    UpdateQuestionData(finish_pos);
+                    finish = true;
                 }
             }
         });
@@ -289,7 +294,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         });
 
         setStartExamListner();
-        //  setFinishExamLister();
+        //setSaveUserExamQuestionDataListner();
 
      /*   NavigationView rightNavigationView = (NavigationView) findViewById(R.id.nav_right_view);
         rightNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -367,6 +372,16 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         return token;
     }
 
+ /*   private String getString(String path, String equation) {
+        final String js = "<html><head>"
+                + "<link rel='stylesheet' href='" + path + "jqmath-0.4.3.css'>"
+                + "<script src='" + path + "jquery-1.4.3.min.js'></script>"
+                + "<script src='" + path + "jqmath-etc-0.4.6.min.js'></script>"
+                + "</head>Find the value of <body>"
+                + "<script>var s ='$$" + equation + "$$';M.parseMath(s);document.write(s);</script></body>";
+        return js;
+    }*/
+
     private void initViews() {
         mPager = findViewById(R.id.pager);
         tvTotalTime = findViewById(R.id.tvTotalTime);
@@ -384,21 +399,11 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
     }
 
- /*   private String getString(String path, String equation) {
-        final String js = "<html><head>"
-                + "<link rel='stylesheet' href='" + path + "jqmath-0.4.3.css'>"
-                + "<script src='" + path + "jquery-1.4.3.min.js'></script>"
-                + "<script src='" + path + "jqmath-etc-0.4.6.min.js'></script>"
-                + "</head>Find the value of <body>"
-                + "<script>var s ='$$" + equation + "$$';M.parseMath(s);document.write(s);</script></body>";
-        return js;
-    }*/
-
     private int getItem(int i) {
         return mPager.getCurrentItem() + i;
     }
 
-    private void UpdateQuestionData(int pos) {
+    private void UpdateQuestionData(int position) {
         ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
         final SaveUserExamQuestionData examQuestionData = new SaveUserExamQuestionData();
         JSONObject mJsonObject = new JSONObject();
@@ -409,7 +414,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         String strOpt4 = mSharedPreferences.getString("strOpt4", "");
 
         RealmResults<StartUserExam> startUserExams = realm.where(StartUserExam.class).findAllAsync();
-        String queID = startUserExams.get(0).getAllQuestions().get(pos).getQuestionId();
+        String queID = startUserExams.get(0).getAllQuestions().get(position).getQuestionId();
 
         try {
 
@@ -419,22 +424,34 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             }
             mJsonObject.put("isSkipped", isSkipped);
             mJsonObject.put("markForReview", tbtn_review.isChecked());
+
+            RealmResults<SaveUserExamQuestionData> examQuestionData1 = realm.where(SaveUserExamQuestionData.class).equalTo("questionId", queID).findAll();
+            if (examQuestionData1 != null && examQuestionData1.size() > 0) {
+                try {
+                    JSONObject mJsonObject1 = new JSONObject(examQuestionData1.get(0).getQuestionData());
+                    String timeSpent = mJsonObject1.getString("timeSpent");
+                    Qsecs = Qsecs + Long.parseLong(timeSpent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
             mJsonObject.put("timeSpent", Qsecs);
             JSONArray mJsonArray = new JSONArray();
             if (!strOpt1.equals("")) {
-                strOpt1 = startUserExams.get(0).getAllQuestions().get(pos).getOptions().get(0).getId();
+                strOpt1 = startUserExams.get(0).getAllQuestions().get(position).getOptions().get(0).getId();
                 mJsonArray.put(strOpt1);
             }
             if (!strOpt2.equals("")) {
-                strOpt2 = startUserExams.get(0).getAllQuestions().get(pos).getOptions().get(1).getId();
+                strOpt2 = startUserExams.get(0).getAllQuestions().get(position).getOptions().get(1).getId();
                 mJsonArray.put(strOpt2);
             }
             if (!strOpt3.equals("")) {
-                strOpt3 = startUserExams.get(0).getAllQuestions().get(pos).getOptions().get(2).getId();
+                strOpt3 = startUserExams.get(0).getAllQuestions().get(position).getOptions().get(2).getId();
                 mJsonArray.put(strOpt3);
             }
             if (!strOpt4.equals("")) {
-                strOpt4 = startUserExams.get(0).getAllQuestions().get(pos).getOptions().get(3).getId();
+                strOpt4 = startUserExams.get(0).getAllQuestions().get(position).getOptions().get(3).getId();
                 mJsonArray.put(strOpt4);
             }
             mJsonObject.put("userAnswers", mJsonArray);
@@ -442,12 +459,14 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             examQuestionData.setQuestionData(mJsonObject.toString());
             examQuestionData.setQuestionId(queID);
             examQuestionData.setTopicId(userExam.getTestId());
-
+            examQuestionData.setTokenId(getToken());
+            User user = realm.where(User.class).findFirst();
+            examQuestionData.setUserId(user.getUsrId());
             mResponseSaveQuestionDataCall = apiInterface.updateQuestionData(getToken(), examQuestionData);
             mResponseSaveQuestionDataCall.enqueue(new Callback<ResponseSaveQuestionData>() {
                 @Override
                 public void onResponse(Call<ResponseSaveQuestionData> call, Response<ResponseSaveQuestionData> response) {
-                    ResponseSaveQuestionData mResponseSaveQuestionData = response.body();
+                    final ResponseSaveQuestionData mResponseSaveQuestionData = response.body();
                     if (mResponseSaveQuestionData != null) {
                         System.out.println("questionId :" + mResponseSaveQuestionData.getQuestionId());
                         System.out.println("status :" + mResponseSaveQuestionData.getStatus());
@@ -455,7 +474,13 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
+
                                 realm.insertOrUpdate(examQuestionData);
+
+                                if (finish) {
+                                    finish = false;
+                                    getFinishExam();
+                                }
                             }
                         });
                     }
@@ -489,8 +514,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         });
     }
 
-
-    private void initStartUserExamAPI(boolean startNew) {
+    private void initStartUserExamAPI(final boolean startNew) {
         ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
         StartTestBody mStartTestBody = new StartTestBody();
         mStartTestBody.setTest_id(item_type_id); //"super-super-test"
@@ -507,7 +531,19 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
                             //  UserTestList newsListObj = new UserTestList();
                             // newsListObj.setStartUserExams((RealmList<StartUserExam>) userExamList);
+                            realm.delete(StartUserExam.class);
                             realm.insertOrUpdate(userExamList.get(0));
+                            if (startNew) {
+                                realm.delete(SaveUserExamQuestionData.class);
+                            } else {
+                              /* saveUserExamQuestionDataRealmResults = realm.where(SaveUserExamQuestionData.class).findAll();
+                                if (saveUserExamQuestionDataRealmResults.size() > 0) {
+                                    for(int i=0; i<saveUserExamQuestionDataRealmResults.size(); i++)
+                                    {
+                                      System.out.println("QuestionID :"+saveUserExamQuestionDataRealmResults.get(i).getQuestionId());
+                                    }
+                                }*/
+                            }
                         }
                     });
                 }
@@ -612,6 +648,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
     private class DemoFragmentAdapter extends FragmentPagerAdapter {
 
         private int position = 0;
+
         public DemoFragmentAdapter(FragmentManager fm) {
             super(fm);
         }

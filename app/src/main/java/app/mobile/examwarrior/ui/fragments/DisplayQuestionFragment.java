@@ -15,8 +15,15 @@ import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import app.mobile.examwarrior.R;
 import app.mobile.examwarrior.database.AllQuestion;
+import app.mobile.examwarrior.database.SaveUserExamQuestionData;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 
 public class DisplayQuestionFragment extends Fragment {
@@ -32,7 +39,7 @@ public class DisplayQuestionFragment extends Fragment {
     private CheckBox chkOpt1, chkOpt2, chkOpt3, chkOpt4;
     private String strOpt1 = "", strOpt2 = "", strOpt3 = "", strOpt4 = "";
     private LinearLayout ll_ans1, ll_ans2, ll_ans3, ll_ans4;
-    // private Realm realm;
+    private Realm realm;
     private SharedPreferences mSharedPreferences = null;
     private SharedPreferences.Editor mEditor = null;
 
@@ -43,7 +50,8 @@ public class DisplayQuestionFragment extends Fragment {
     public static DisplayQuestionFragment newInstance(AllQuestion Question) {
         DisplayQuestionFragment fragment = new DisplayQuestionFragment();
         Bundle args = new Bundle();
-        args.putParcelable("question",Question);
+        args.putParcelable("question", Question);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,8 +69,8 @@ public class DisplayQuestionFragment extends Fragment {
         mEditor = mSharedPreferences.edit();
         mEditor.clear();
         mEditor.commit();
-        // realm = Realm.getDefaultInstance();
-       /*RealmResults<AllQuestion> results= realm.where(AllQuestion.class).findAll();*/
+        realm = Realm.getDefaultInstance();
+
 
         questionsText = view.findViewById(R.id.questions_text);
         //options = (LinearLayout) view.findViewById(R.id.options);
@@ -96,6 +104,41 @@ public class DisplayQuestionFragment extends Fragment {
 
         initViews(view);
 
+        RealmResults<SaveUserExamQuestionData> saveUserExamQuestionDataRealmResults = realm.where(SaveUserExamQuestionData.class).findAll();
+        if (saveUserExamQuestionDataRealmResults.size() > 0) {
+            for (int i = 0; i < saveUserExamQuestionDataRealmResults.size(); i++) {
+                if (saveUserExamQuestionDataRealmResults.get(i).getQuestionId().equalsIgnoreCase(Question.getQuestionId())) {
+                    try {
+                        JSONObject mJsonObject = new JSONObject(saveUserExamQuestionDataRealmResults.get(i).getQuestionData());
+                        String isSkipped = mJsonObject.getString("isSkipped");
+                        String markForReview = mJsonObject.getString("markForReview");
+                        String timeSpent = mJsonObject.getString("timeSpent");
+                        JSONArray mJsonArray = mJsonObject.getJSONArray("userAnswers");
+
+                        for (int j = 0; j < mJsonArray.length(); j++) {
+                            String str = mJsonArray.get(j).toString();
+
+                            for (int k = 0; k < Question.getOptions().size(); k++) {
+                                if (str.equalsIgnoreCase(Question.getOptions().get(k).getId())) {
+                                    if (k == 0) {
+                                        ll_ans1.setBackgroundColor(getResources().getColor(R.color.blue_light));
+                                    } else if (k == 1) {
+                                        ll_ans2.setBackgroundColor(getResources().getColor(R.color.blue_light));
+                                    } else if (k == 2) {
+                                        ll_ans3.setBackgroundColor(getResources().getColor(R.color.blue_light));
+                                    } else if (k == 3) {
+                                        ll_ans4.setBackgroundColor(getResources().getColor(R.color.blue_light));
+                                    }
+                                }
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
         final String path = "file:///android_asset/";
         questionsText.loadDataWithBaseURL(path, Question.getOriginalQuestion(), "text/html", "UTF-8", null);
         optionOne.setText(Html.fromHtml(Question.getOptions().get(0).getOriginalText()));
@@ -103,6 +146,7 @@ public class DisplayQuestionFragment extends Fragment {
         optionThree.setText(Html.fromHtml(Question.getOptions().get(2).getOriginalText()));
         optionFour.setText(Html.fromHtml(Question.getOptions().get(3).getOriginalText()));
         mEditor.commit();
+
 
         setListener();
 
