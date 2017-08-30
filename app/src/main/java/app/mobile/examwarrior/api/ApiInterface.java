@@ -14,6 +14,8 @@ import app.mobile.examwarrior.database.FinishUserExamBody;
 import app.mobile.examwarrior.database.ResponseSaveQuestionData;
 import app.mobile.examwarrior.database.SaveUserExamQuestionData;
 import app.mobile.examwarrior.database.StartUserExam;
+import app.mobile.examwarrior.demo.SyncResponse;
+import app.mobile.examwarrior.demo.SyncTable;
 import app.mobile.examwarrior.model.ChangePasswordRequestBody;
 import app.mobile.examwarrior.model.CheckTestStatusModel;
 import app.mobile.examwarrior.model.CourseCategories;
@@ -66,6 +68,7 @@ public interface ApiInterface {
     // Get Finish Test Result
     @POST("/practice/mobile/finishUserExam")
     Call<ResponseBody> getResult(@Header("Authorization") String auth_token, @Body FinishUserExamBody Test);
+
     // Get All Courses
     @POST("/course/getAll")
     Call<List<Course>> getCourseList(@Body Type tag);
@@ -118,4 +121,7 @@ public interface ApiInterface {
 
     @GET
     Call<ResponseBody> downloadFileLengthAsync(@Url String fileUrl);
+
+    @POST("/test/sync")
+    Call<SyncResponse> syncTable(@Header("JobID") String jobid, @Body SyncTable syncTable);
 }

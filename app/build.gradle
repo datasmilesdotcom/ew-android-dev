@@ -81,7 +81,7 @@ ext {
     gsonLibraryVersion = '2.8.1'
     realmAdapterVersion = '2.0.0'
     glideVersion = '3.8.0'
-    evernoteSyncLibraryVersion = '1.1.11'
+    evernoteSyncLibraryVersion = '1.2.0-alpha4'
 }
 
 dependencies {

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.bumptech.glide.Glide;
+import com.evernote.android.job.JobManager;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -14,6 +15,7 @@ import com.google.android.exoplayer2.util.Util;
 
 import app.mobile.examwarrior.BuildConfig;
 import app.mobile.examwarrior.R;
+import app.mobile.examwarrior.sync.SyncManager;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -23,10 +25,21 @@ import io.realm.RealmConfiguration;
 
 public class AppController extends Application {
 
+
     private static AppController sInstance;
     private static RealmConfiguration realmConfiguration;
+    private static JobManager jobManager;
     protected String userAgent;
     private Cache cache;
+
+    /**
+     * SyncJobManager Instance
+     *
+     * @return
+     */
+    public static JobManager getJobManagerInstance() {
+        return jobManager;
+    }
 
     /**
      * Gets the instance of AppController throughout the App
@@ -73,7 +86,9 @@ public class AppController extends Application {
         Realm.init(this);
         realmConfiguration = realmConfiguration();
         Realm.setDefaultConfiguration(realmConfiguration);
-
+        // Job manager instance creation
+        jobManager = JobManager.create(this);
+        jobManager.addJobCreator(new SyncManager());
         super.onCreate();
     }
 
