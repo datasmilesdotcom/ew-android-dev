@@ -4,43 +4,45 @@ package app.mobile.examwarrior.database;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import app.mobile.examwarrior.model.RealmAutoIncrement;
+import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 public class SaveUserExamQuestionData extends RealmObject {
 
+    @PrimaryKey
+    @SerializedName("app_table_pk")
+    @Index
+    private long app_table_pk;
+    @SerializedName("app_update_dt")
+    @Expose
+    private String app_update_dt;
     @SerializedName("questionData")
     @Expose
     private String questionData;
     @SerializedName("topic_id")
     @Expose
     private String topicId;
-
-    @SerializedName("user_id")
-    @Expose
-    private String userId;
-    @SerializedName("token_id")
-    @Expose
-    private String tokenId;
-    @PrimaryKey
     @SerializedName("questionId")
     @Expose
     private String questionId;
 
-    public String getUserId() {
-        return userId;
+    public long getApp_table_pk() {
+        return app_table_pk;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setApp_table_pk() {
+        this.app_table_pk = RealmAutoIncrement.getNextIdFromModel(Realm.getDefaultInstance(), SaveUserExamQuestionData.class, "app_table_pk");
     }
 
-    public String getTokenId() {
-        return tokenId;
+    public String getApp_update_dt() {
+        return app_update_dt;
     }
 
-    public void setTokenId(String tokenId) {
-        this.tokenId = tokenId;
+    public void setApp_update_dt(String app_update_dt) {
+        this.app_update_dt = app_update_dt;
     }
 
     public String getQuestionData() {

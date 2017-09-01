@@ -150,6 +150,7 @@ public class QuestionSyncJob extends Job {
         syncTable.setPrimary_key("c1");
         syncTable.setTablename("ew_test_sync");
         syncTable.setUsr_id("Sandesh");
+
         final List<Fields> fields = new ArrayList<>();
         Realm realm = Realm.getDefaultInstance();
         try {
@@ -158,7 +159,7 @@ public class QuestionSyncJob extends Job {
             Log.e(TAG, "syncTableToServer: " + d.size());
             if (data != null && data.isValid()) {
                 Fields field = new Fields();
-                field.setC1(data.getChosen_answer() + data.getJob_id());
+                // field.setC1(data.getChosen_answer() + data.getJob_id());
                 field.setStatus(false);
                 fields.add(field);
             }
@@ -168,7 +169,7 @@ public class QuestionSyncJob extends Job {
             realm.close();
         }
 
-        syncTable.setFields(fields);
+        //    syncTable.setFields(fields);
         Call<SyncResponse> syncCall = apiInterface.syncTable(Integer.toString(params.getId()), syncTable);
         syncCall.enqueue(new Callback<SyncResponse>() {
             @Override
@@ -185,7 +186,7 @@ public class QuestionSyncJob extends Job {
                 if (response.isSuccessful()) {
                     for (Fields fields1 :
                             response.body().getFields()) {
-                        Log.e(TAG, "onResponse: Success " + fields1.getC1() + " " + fields1.getStatus());
+                        //  Log.e(TAG, "onResponse: Success " + fields1.getC1() + " " + fields1.getStatus());
                     }
                 } else {
                     //AppController.getJobManagerInstance().getJobRequest(Integer.parseInt(call.request().header("JobID"))).schedule();

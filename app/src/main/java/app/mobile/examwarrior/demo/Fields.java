@@ -7,19 +7,19 @@ import com.google.gson.annotations.SerializedName;
  * Awesome Pojo Generator
  */
 public class Fields {
-    @SerializedName("c1")
+    @SerializedName("app_table_pk")
     @Expose
-    private String c1;
+    private String app_table_pk;
     @SerializedName("status")
     @Expose
     private Boolean status;
 
-    public String getC1() {
-        return c1;
+    public String getApp_table_pk() {
+        return app_table_pk;
     }
 
-    public void setC1(String c1) {
-        this.c1 = c1;
+    public void setApp_table_pk(String app_table_pk) {
+        this.app_table_pk = app_table_pk;
     }
 
     public Boolean getStatus() {

@@ -13,10 +13,13 @@ public interface SyncTag {
     int RESCHEDULE = 3;
     // Sync operation tag
     String QuestionSyncTAG = "app.mobile.examwarrior.sync.question_sync_tag";
+    String AnswersSyncTAG = "app.mobile.examwarrior.sync.answer_sync_tag";
 
-    public interface BUNDLE_KEYS {
-        public String KEY_TABLE_NAME = "app.mobile.examwarrior.sync.table_name";
-        public String KEY_TARGET_ID = "app.mobile.examwarrior.sync.target_id";
+    interface BUNDLE_KEYS {
+        String KEY_TABLE_NAME = "app.mobile.examwarrior.sync.table_name";
+        String KEY_TARGET_ID = "app.mobile.examwarrior.sync.target_id";
+        String KEY_USR_ID = "app.mobile.examwarrior.sync.user_id";
+        String KEY_TIME = "app.mobile.examwarrior.sync.time";
     }
 
 }

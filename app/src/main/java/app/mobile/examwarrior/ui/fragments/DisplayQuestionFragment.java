@@ -12,8 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,12 +31,12 @@ public class DisplayQuestionFragment extends Fragment {
     public static final String TAG = DisplayQuestionFragment.class.getSimpleName();
 
     AllQuestion Question;
+    TextView tvAnsTime;
     private WebView questionsText;
     private AppCompatTextView optionOne;
     private AppCompatTextView optionTwo;
     private AppCompatTextView optionThree;
     private AppCompatTextView optionFour;
-    private CheckBox chkOpt1, chkOpt2, chkOpt3, chkOpt4;
     private String strOpt1 = "", strOpt2 = "", strOpt3 = "", strOpt4 = "";
     private LinearLayout ll_ans1, ll_ans2, ll_ans3, ll_ans4;
     private Realm realm;
@@ -51,7 +51,6 @@ public class DisplayQuestionFragment extends Fragment {
         DisplayQuestionFragment fragment = new DisplayQuestionFragment();
         Bundle args = new Bundle();
         args.putParcelable("question", Question);
-
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,6 +63,7 @@ public class DisplayQuestionFragment extends Fragment {
         }
     }
 
+
     private void initViews(View view) {
         mSharedPreferences = getActivity().getSharedPreferences("display_question", Context.MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
@@ -71,17 +71,13 @@ public class DisplayQuestionFragment extends Fragment {
         mEditor.commit();
         realm = Realm.getDefaultInstance();
 
-
+        tvAnsTime = view.findViewById(R.id.tvAnsTime);
         questionsText = view.findViewById(R.id.questions_text);
-        //options = (LinearLayout) view.findViewById(R.id.options);
         optionOne = view.findViewById(R.id.option_one);
         optionTwo = view.findViewById(R.id.option_two);
         optionThree = view.findViewById(R.id.option_three);
         optionFour = view.findViewById(R.id.option_four);
-        chkOpt1 = view.findViewById(R.id.chkOpt1);
-        chkOpt2 = view.findViewById(R.id.chkOpt2);
-        chkOpt3 = view.findViewById(R.id.chkOpt3);
-        chkOpt4 = view.findViewById(R.id.chkOpt4);
+
         ll_ans1 = view.findViewById(R.id.ll_ans1);
         ll_ans2 = view.findViewById(R.id.ll_ans2);
         ll_ans3 = view.findViewById(R.id.ll_ans3);
@@ -101,18 +97,13 @@ public class DisplayQuestionFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         initViews(view);
-
-        RealmResults<SaveUserExamQuestionData> saveUserExamQuestionDataRealmResults = realm.where(SaveUserExamQuestionData.class).findAll();
-        if (saveUserExamQuestionDataRealmResults.size() > 0) {
-            for (int i = 0; i < saveUserExamQuestionDataRealmResults.size(); i++) {
-                if (saveUserExamQuestionDataRealmResults.get(i).getQuestionId().equalsIgnoreCase(Question.getQuestionId())) {
+        RealmResults<SaveUserExamQuestionData> results = realm.where(SaveUserExamQuestionData.class).findAll();
+        if (results.size() > 0) {
+            for (int i = 0; i < results.size(); i++) {
+                if (results.get(i).getQuestionId().equalsIgnoreCase(Question.getQuestionId())) {
                     try {
-                        JSONObject mJsonObject = new JSONObject(saveUserExamQuestionDataRealmResults.get(i).getQuestionData());
-                        String isSkipped = mJsonObject.getString("isSkipped");
-                        String markForReview = mJsonObject.getString("markForReview");
-                        String timeSpent = mJsonObject.getString("timeSpent");
+                        JSONObject mJsonObject = new JSONObject(results.get(i).getQuestionData());
                         JSONArray mJsonArray = mJsonObject.getJSONArray("userAnswers");
 
                         for (int j = 0; j < mJsonArray.length(); j++) {
@@ -146,10 +137,7 @@ public class DisplayQuestionFragment extends Fragment {
         optionThree.setText(Html.fromHtml(Question.getOptions().get(2).getOriginalText()));
         optionFour.setText(Html.fromHtml(Question.getOptions().get(3).getOriginalText()));
         mEditor.commit();
-
-
         setListener();
-
     }
 
     private void setListener() {
@@ -214,60 +202,6 @@ public class DisplayQuestionFragment extends Fragment {
             }
         });
 
-/*        chkOpt1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    strOpt1 = Question.getOptions().get(0).getId();
-                } else {
-                    strOpt1 = "";
-                }
-                mEditor.putString("strOpt1", strOpt1);
-                mEditor.commit();
-            }
-        });
-
-        chkOpt2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    strOpt2 = Question.getOptions().get(1).getId();
-                } else {
-                    strOpt2 = "";
-                }
-                mEditor.putString("strOpt2", strOpt2);
-                mEditor.commit();
-            }
-        });
-
-        chkOpt3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    strOpt3 = Question.getOptions().get(2).getId();
-                } else {
-                    strOpt3 = "";
-                }
-                mEditor.putString("strOpt3", strOpt3);
-                mEditor.commit();
-            }
-        });
-
-        chkOpt4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    strOpt4 = Question.getOptions().get(3).getId();
-                } else {
-                    strOpt4 = "";
-                }
-                mEditor.putString("strOpt4", strOpt4);
-                mEditor.commit();
-            }
-        });*/
     }
+
 }

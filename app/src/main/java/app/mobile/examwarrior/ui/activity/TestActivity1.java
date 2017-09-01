@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
@@ -43,6 +44,8 @@ import app.mobile.examwarrior.model.RealmString;
 import app.mobile.examwarrior.model.RealmStringDeserializer;
 import app.mobile.examwarrior.model.StartTestBody;
 import app.mobile.examwarrior.model.User;
+import app.mobile.examwarrior.sync.SaveAnswersData;
+import app.mobile.examwarrior.sync.SyncTag;
 import app.mobile.examwarrior.ui.fragments.DisplayQuestionFragment;
 import app.mobile.examwarrior.ui.fragments.OneFragment;
 import app.mobile.examwarrior.ui.fragments.TwoFragment;
@@ -79,7 +82,6 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             .registerTypeAdapter(new TypeToken<RealmList<RealmString>>() {
             }.getType(), new RealmStringDeserializer())
             .create();
-    // String[] que;
     String path = "file:///android_asset/";
     long startTime = 0L;
     long updatedTime = 0L;
@@ -91,24 +93,25 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
     long timeTotalSwapBuff = 0L;
     long timeTotalInMilliseconds = 0L;
 
-    ToggleButton tbtn_review;
+
     DrawerLayout drawer;
     long Qsecs;
     String item_type_id = "";
-    /* private int[] tabIcons = {
-             R.drawable.fab_image,
-             R.drawable.fab_img,
-     };*/
     ViewPager viewPager;
     StartUserExam userExam;
-    int finish_pos = 0;
+
     RealmResults<SaveUserExamQuestionData> saveUserExamQuestionDataRealmResults;
+    int current_position = 0;
+
     private Call<ResponseSaveQuestionData> mResponseSaveQuestionDataCall;
     private android.support.v4.app.FragmentManager fragmentManager;
     private LockableViewPager mPager;
     private DemoFragmentAdapter mAdapter;
     private Realm realm;
-    private TextView tvTotalTime, tvAnsTime;
+    private TextView tvTotalTime;
+
+    private TextView tvAnsTime;
+    private ToggleButton tbtn_review;
     private SharedPreferences mSharedPreferences = null;
     private SharedPreferences.Editor mEditor = null;
     private Handler customHandler = new Handler();
@@ -165,6 +168,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         if (mBundle != null) {
             boolean startNew = mBundle.getBoolean("startNew");
             item_type_id = mBundle.getString("item_type_id");
+
             initStartUserExamAPI(startNew);
         }
 
@@ -212,15 +216,18 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
             @Override
             public void onPageSelected(int position) {
+
                 startTime = SystemClock.uptimeMillis();
                 customHandler.postDelayed(updateTimerThread, 0);
-                if (position != 0) {
-                    finish_pos = position;
-                    position = position - 1;
-                    position = position + 1;
+                if (current_position > position) {
+                    UpdateQuestionData(position + 1);
+                } else if (current_position < position) {
+                    UpdateQuestionData(position - 1);
+                } else {
+                    UpdateQuestionData(position);
                 }
+                current_position = position;
 
-                UpdateQuestionData(position);
                 System.out.println("viewpager onPageSelected :" + position);
             }
 
@@ -259,7 +266,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
                 // drawer.openDrawer(GravityCompat.END); /*Opens the Right Drawer*/
                 if (userExam != null) {
-                    UpdateQuestionData(finish_pos);
+                    UpdateQuestionData(current_position);
                     finish = true;
                 }
             }
@@ -294,30 +301,6 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         });
 
         setStartExamListner();
-        //setSaveUserExamQuestionDataListner();
-
-     /*   NavigationView rightNavigationView = (NavigationView) findViewById(R.id.nav_right_view);
-        rightNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                // Handle Right navigation view item clicks here.
-                int id = item.getItemId();
-
-               *//* if (id == R.id.nav_settings) {
-                    Toast.makeText(TestActivity1.this, "Right Drawer - Settings", Toast.LENGTH_SHORT).show();
-                } else if (id == R.id.nav_logout) {
-                    Toast.makeText(TestActivity1.this, "Right Drawer - Logout", Toast.LENGTH_SHORT).show();
-                } else if (id == R.id.nav_help) {
-                    Toast.makeText(TestActivity1.this, "Right Drawer - Help", Toast.LENGTH_SHORT).show();
-                } else if (id == R.id.nav_about) {
-                    Toast.makeText(TestActivity1.this, "Right Drawer - About", Toast.LENGTH_SHORT).show();
-                }*//*
-
-                drawer.closeDrawer(GravityCompat.END); *//*Important Line*//*
-                return true;
-            }
-        });*/
-
         PlayPauseButton playPauseButton = findViewById(R.id.main_play_pause_button);
         playPauseButton.setOnControlStatusChangeListener(new PlayPauseButton.OnControlStatusChangeListener() {
             @Override
@@ -341,8 +324,26 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
                 }
             }
         });
+    }
 
+    private void getAnswerDatabase() {
+        RealmResults<SaveUserExamQuestionData> results = realm.where(SaveUserExamQuestionData.class).findAll();
+        if (results.size() > 0) {
+            for (int i = 0; i < results.size(); i++) {
+                if (results.get(i).getQuestionId().equalsIgnoreCase(userExam.getAllQuestions().get(current_position).getQuestionId())) {
+                    try {
+                        JSONObject mJsonObject = new JSONObject(results.get(i).getQuestionData());
 
+                        String markForReview = mJsonObject.getString("markForReview");
+                        String timeSpent = mJsonObject.getString("timeSpent");
+                        tvAnsTime.setText(timeSpent);
+                        tbtn_review.setChecked(Boolean.parseBoolean(markForReview));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -403,7 +404,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         return mPager.getCurrentItem() + i;
     }
 
-    private void UpdateQuestionData(int position) {
+    private void UpdateQuestionData(final int position) {
         ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
         final SaveUserExamQuestionData examQuestionData = new SaveUserExamQuestionData();
         JSONObject mJsonObject = new JSONObject();
@@ -456,12 +457,14 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             }
             mJsonObject.put("userAnswers", mJsonArray);
 
+            examQuestionData.setApp_table_pk();
             examQuestionData.setQuestionData(mJsonObject.toString());
             examQuestionData.setQuestionId(queID);
+            examQuestionData.setApp_update_dt(String.valueOf(System.currentTimeMillis()));
             examQuestionData.setTopicId(userExam.getTestId());
-            examQuestionData.setTokenId(getToken());
-            User user = realm.where(User.class).findFirst();
-            examQuestionData.setUserId(user.getUsrId());
+            //   examQuestionData.setTokenId(getToken());
+            //  User user = realm.where(User.class).findFirst();
+            //  examQuestionData.setUserId(user.getUsrId());
             mResponseSaveQuestionDataCall = apiInterface.updateQuestionData(getToken(), examQuestionData);
             mResponseSaveQuestionDataCall.enqueue(new Callback<ResponseSaveQuestionData>() {
                 @Override
@@ -471,18 +474,35 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
                         System.out.println("questionId :" + mResponseSaveQuestionData.getQuestionId());
                         System.out.println("status :" + mResponseSaveQuestionData.getStatus());
 
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(Realm realm) {
-
-                                realm.insertOrUpdate(examQuestionData);
-
-                                if (finish) {
-                                    finish = false;
-                                    getFinishExam();
+                        try {
+                            realm.executeTransactionAsync(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    realm.insertOrUpdate(examQuestionData);
+                                    if (finish) {
+                                        finish = false;
+                                        getFinishExam();
+                                    }
                                 }
-                            }
-                        });
+                            }, new Realm.Transaction.OnSuccess() {
+                                @Override
+                                public void onSuccess() {
+                                    tbtn_review.setChecked(false);
+                                    enqueueJob("ew_" + SaveUserExamQuestionData.class.getSimpleName(), "app_table_pk");
+                                    getAnswerDatabase();
+                                }
+                            }, new Realm.Transaction.OnError() {
+                                @Override
+                                public void onError(Throwable error) {
+
+                                }
+                            });
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+
+                        }
                     }
                 }
 
@@ -498,6 +518,15 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         }
     }
 
+    private void enqueueJob(String table_name, String _id) {
+        PersistableBundleCompat persistableBundleCompat = new PersistableBundleCompat();
+        persistableBundleCompat.putString(SyncTag.BUNDLE_KEYS.KEY_TABLE_NAME, table_name.toLowerCase());
+        persistableBundleCompat.putString(SyncTag.BUNDLE_KEYS.KEY_TARGET_ID, _id);
+        //  persistableBundleCompat.putString(SyncTag.BUNDLE_KEYS.KEY_USR_ID, user_id);
+        // persistableBundleCompat.putString(SyncTag.BUNDLE_KEYS.KEY_TIME, time);
+        SaveAnswersData.scheduleJob(persistableBundleCompat);
+    }
+
     private void setStartExamListner() {
         RealmResults<StartUserExam> startUserExams = realm.where(StartUserExam.class).findAll();
         startUserExams.addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<StartUserExam>>() {
@@ -509,7 +538,6 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
                     tabLayout.setupWithViewPager(viewPager);
                     mPager.setAdapter(mAdapter);
                 }
-
             }
         });
     }
@@ -663,7 +691,12 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
         @Override
         public Fragment getItem(int position) {
-            return DisplayQuestionFragment.newInstance(userExam.getAllQuestions().get(position));
+
+            DisplayQuestionFragment fragment = DisplayQuestionFragment.newInstance(userExam.getAllQuestions().get(position));
+            //  Log.v("TestActivity1: ","getLst_mark_review :"+fragment.getLst_mark_review(position));
+            // Log.v("TestActivity1: ","getLst_spent_time :"+fragment.getLst_spent_time(position));
+
+            return fragment;
         }
 
         @Override

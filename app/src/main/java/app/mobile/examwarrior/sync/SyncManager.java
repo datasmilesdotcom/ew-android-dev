@@ -17,6 +17,8 @@ public class SyncManager implements JobCreator {
         switch (tag) {
             case SyncTag.QuestionSyncTAG:
                 return new QuestionSyncJob();
+            case SyncTag.AnswersSyncTAG:
+                return new SaveAnswersData();
             default:
                 return null;
         }
