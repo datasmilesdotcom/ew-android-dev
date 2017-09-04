@@ -12,7 +12,6 @@ import io.realm.annotations.PrimaryKey;
 
 public class SaveUserExamQuestionData extends RealmObject {
 
-    @PrimaryKey
     @SerializedName("app_table_pk")
     @Index
     private long app_table_pk;
@@ -25,6 +24,8 @@ public class SaveUserExamQuestionData extends RealmObject {
     @SerializedName("topic_id")
     @Expose
     private String topicId;
+
+    @PrimaryKey
     @SerializedName("questionId")
     @Expose
     private String questionId;

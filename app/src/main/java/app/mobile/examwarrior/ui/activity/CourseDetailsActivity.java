@@ -37,6 +37,8 @@ import app.mobile.examwarrior.database.FinishUserExam;
 import app.mobile.examwarrior.database.FinishUserExamBody;
 import app.mobile.examwarrior.database.ModuleDetail;
 import app.mobile.examwarrior.database.ModuleItem;
+import app.mobile.examwarrior.database.SaveUserExamQuestionData;
+import app.mobile.examwarrior.database.StartUserExam;
 import app.mobile.examwarrior.delegates.CourseModuleItemListener;
 import app.mobile.examwarrior.expandable_list.listeners.CourseHeader;
 import app.mobile.examwarrior.expandable_list.viewholders.ChildViewHolder;
@@ -330,6 +332,7 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
                     dialog.dismiss();
                     Intent mIntent = new Intent(CourseDetailsActivity.this, TestActivity1.class);
                     mIntent.putExtra("startNew", false);
+
                     mIntent.putExtra("item_type_id", item_type_id);
                     startActivity(mIntent);
                 }
@@ -360,7 +363,22 @@ public class CourseDetailsActivity extends AppCompatActivity implements CourseMo
             openVideoScreen(data, courseHeader);
         } else {
             String item_type_id = "super-q-test-id";
-            getTestStatus(item_type_id, data.getItemName());//data.getItemTypeId()
+            if (Utility.isNetworkAvailable()) {
+                getTestStatus(item_type_id, data.getItemName());//data.getItemTypeId()
+            } else {
+
+                RealmResults<StartUserExam> mStartUserExams = realm.where(StartUserExam.class).findAll();
+                if (mStartUserExams.size() > 0) {
+                    RealmResults<SaveUserExamQuestionData> results = realm.where(SaveUserExamQuestionData.class).findAll();
+                    if (results.size() > 0) {
+                        customDialog(item_type_id, data.getItemName(), false, true, false);
+                    } else {
+                        customDialog(item_type_id, data.getItemName(), true, true, false);
+                    }
+                } else {
+                    customDialog(item_type_id, data.getItemName(), false, false, false);
+                }
+            }
         }
     }
 

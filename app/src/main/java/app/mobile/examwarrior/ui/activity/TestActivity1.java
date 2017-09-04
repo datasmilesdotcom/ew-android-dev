@@ -1,8 +1,6 @@
 package app.mobile.examwarrior.ui.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -14,8 +12,10 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.evernote.android.job.util.support.PersistableBundleCompat;
@@ -40,6 +40,7 @@ import app.mobile.examwarrior.database.FinishUserExamBody;
 import app.mobile.examwarrior.database.ResponseSaveQuestionData;
 import app.mobile.examwarrior.database.SaveUserExamQuestionData;
 import app.mobile.examwarrior.database.StartUserExam;
+import app.mobile.examwarrior.listener.UserAnswers;
 import app.mobile.examwarrior.model.RealmString;
 import app.mobile.examwarrior.model.RealmStringDeserializer;
 import app.mobile.examwarrior.model.StartTestBody;
@@ -82,38 +83,36 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             .registerTypeAdapter(new TypeToken<RealmList<RealmString>>() {
             }.getType(), new RealmStringDeserializer())
             .create();
+    public Runnable updatePauseTotalTimerThread = new Runnable() {
+        @Override
+        public void run() {
+
+
+        }
+    };
     String path = "file:///android_asset/";
     long startTime = 0L;
     long updatedTime = 0L;
     long timeSwapBuff = 0L;
     long timeInMilliseconds = 0L;
-
     long startTotalTime = 0L;
     long updatedTotalTime = 0L;
     long timeTotalSwapBuff = 0L;
     long timeTotalInMilliseconds = 0L;
-
-
     DrawerLayout drawer;
     long Qsecs;
     String item_type_id = "";
     ViewPager viewPager;
     StartUserExam userExam;
-
-    RealmResults<SaveUserExamQuestionData> saveUserExamQuestionDataRealmResults;
     int current_position = 0;
-
     private Call<ResponseSaveQuestionData> mResponseSaveQuestionDataCall;
     private android.support.v4.app.FragmentManager fragmentManager;
     private LockableViewPager mPager;
     private DemoFragmentAdapter mAdapter;
     private Realm realm;
     private TextView tvTotalTime;
-
     private TextView tvAnsTime;
     private ToggleButton tbtn_review;
-    private SharedPreferences mSharedPreferences = null;
-    private SharedPreferences.Editor mEditor = null;
     private Handler customHandler = new Handler();
     public Runnable updateTimerThread = new Runnable() {
 
@@ -121,6 +120,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
             timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
             updatedTime = timeSwapBuff + timeInMilliseconds;
+
             int secs = (int) (updatedTime / 1000);
             Qsecs = secs;
             int mins = secs / 60;
@@ -134,6 +134,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             customHandler.postDelayed(this, 0);
         }
     };
+    private Handler pauseHandlerTotal = new Handler();
     private Handler customHandlerTotal = new Handler();
     public Runnable updateTotalTimerThread = new Runnable() {
 
@@ -141,7 +142,14 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
 
             timeTotalInMilliseconds = SystemClock.uptimeMillis() - startTotalTime;
-            updatedTotalTime = timeTotalSwapBuff + timeTotalInMilliseconds;
+            updatedTotalTime = timeTotalInMilliseconds - timeTotalSwapBuff;
+
+            System.out.println("step startTotalTime :" + startTotalTime);
+            System.out.println("step SystemClock.uptimeMillis() :" + SystemClock.uptimeMillis());
+            System.out.println("step timeInMilliseconds :" + timeTotalInMilliseconds);
+            System.out.println("step timeSwapBuff :" + timeTotalSwapBuff);
+            System.out.println("step updatedTime :" + updatedTotalTime);
+
             int secs = (int) (updatedTotalTime / 1000);
             int mins = secs / 60;
             secs = secs % 60;
@@ -166,10 +174,28 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         setListener();
         Bundle mBundle = getIntent().getExtras();
         if (mBundle != null) {
-            boolean startNew = mBundle.getBoolean("startNew");
+            final boolean startNew = mBundle.getBoolean("startNew");
             item_type_id = mBundle.getString("item_type_id");
 
-            initStartUserExamAPI(startNew);
+            if (Utility.isNetworkAvailable()) {
+                initStartUserExamAPI(startNew);
+            } else {
+
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        if (startNew) {
+                            realm.delete(SaveUserExamQuestionData.class);
+                        }
+                        RealmResults<StartUserExam> mStartUserExams = realm.where(StartUserExam.class).findAll();
+                        userExam = mStartUserExams.get(0);
+                        setupViewPager(viewPager);
+                        tabLayout.setupWithViewPager(viewPager);
+                        mPager.setAdapter(mAdapter);
+                    }
+                });
+
+            }
         }
 
         startTime = SystemClock.uptimeMillis();
@@ -177,7 +203,6 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
         startTotalTime = SystemClock.uptimeMillis();
         customHandlerTotal.postDelayed(updateTotalTimerThread, 0);
-        viewPager = findViewById(R.id.viewpager);
 
 
     }
@@ -217,17 +242,29 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             @Override
             public void onPageSelected(int position) {
 
+
                 startTime = SystemClock.uptimeMillis();
                 customHandler.postDelayed(updateTimerThread, 0);
                 if (current_position > position) {
-                    UpdateQuestionData(position + 1);
+                    if (Utility.isNetworkAvailable()) {
+                        UpdateQuestionData(position + 1);
+                    } else {
+                        insertData(null, position + 1);
+                    }
                 } else if (current_position < position) {
-                    UpdateQuestionData(position - 1);
+                    if (Utility.isNetworkAvailable()) {
+                        UpdateQuestionData(position - 1);
+                    } else {
+                        insertData(null, position - 1);
+                    }
                 } else {
-                    UpdateQuestionData(position);
+                    if (Utility.isNetworkAvailable()) {
+                        UpdateQuestionData(position);
+                    } else {
+                        insertData(null, position);
+                    }
                 }
                 current_position = position;
-
                 System.out.println("viewpager onPageSelected :" + position);
             }
 
@@ -300,6 +337,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             }
         });
 
+
         setStartExamListner();
         PlayPauseButton playPauseButton = findViewById(R.id.main_play_pause_button);
         playPauseButton.setOnControlStatusChangeListener(new PlayPauseButton.OnControlStatusChangeListener() {
@@ -307,8 +345,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             public void onStatusChange(View view, boolean state) {
                 if (state) {
                     try {
-
-                        // startTotalTime=updatedTotalTime;
+                        timeTotalSwapBuff = updatedTotalTime;
                         customHandlerTotal.postDelayed(updateTotalTimerThread, 0);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -316,6 +353,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
                 } else {
                     try {
+                        long pause = SystemClock.uptimeMillis();
                         customHandlerTotal.removeCallbacks(updateTotalTimerThread);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -330,14 +368,16 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         RealmResults<SaveUserExamQuestionData> results = realm.where(SaveUserExamQuestionData.class).findAll();
         if (results.size() > 0) {
             for (int i = 0; i < results.size(); i++) {
+
                 if (results.get(i).getQuestionId().equalsIgnoreCase(userExam.getAllQuestions().get(current_position).getQuestionId())) {
+
                     try {
                         JSONObject mJsonObject = new JSONObject(results.get(i).getQuestionData());
-
                         String markForReview = mJsonObject.getString("markForReview");
                         String timeSpent = mJsonObject.getString("timeSpent");
                         tvAnsTime.setText(timeSpent);
                         tbtn_review.setChecked(Boolean.parseBoolean(markForReview));
+                        break;
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -391,11 +431,8 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         drawer = findViewById(R.id.drawer_layout);
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         realm = Realm.getDefaultInstance();
-        mSharedPreferences = getSharedPreferences("display_question", Context.MODE_PRIVATE);
-        mEditor = mSharedPreferences.edit();
-        mEditor.clear();
-        mEditor.commit();
         tabLayout = findViewById(R.id.tabs);
+        viewPager = findViewById(R.id.viewpager);
         mAdapter = new DemoFragmentAdapter(getSupportFragmentManager());
 
     }
@@ -404,18 +441,27 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         return mPager.getCurrentItem() + i;
     }
 
-    private void UpdateQuestionData(final int position) {
-        ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
-        final SaveUserExamQuestionData examQuestionData = new SaveUserExamQuestionData();
+    private SaveUserExamQuestionData getAnswerBody(int position) {
+        SaveUserExamQuestionData examQuestionData = new SaveUserExamQuestionData();
         JSONObject mJsonObject = new JSONObject();
 
-        String strOpt1 = mSharedPreferences.getString("strOpt1", "");
-        String strOpt2 = mSharedPreferences.getString("strOpt2", "");
-        String strOpt3 = mSharedPreferences.getString("strOpt3", "");
-        String strOpt4 = mSharedPreferences.getString("strOpt4", "");
+        UserAnswers mAnswers = realm.where(UserAnswers.class).equalTo("position", position).findFirst();
+        String strOpt1 = "", strOpt2 = "", strOpt3 = "", strOpt4 = "";
+        if (mAnswers.getStrOption1() != null) {
+            strOpt1 = mAnswers.getStrOption1();
+        }
+        if (mAnswers.getStrOption2() != null) {
+            strOpt2 = mAnswers.getStrOption2();
+        }
+        if (mAnswers.getStrOption3() != null) {
+            strOpt3 = mAnswers.getStrOption3();
+        }
+        if (mAnswers.getStrOption4() != null) {
+            strOpt4 = mAnswers.getStrOption4();
+        }
 
         RealmResults<StartUserExam> startUserExams = realm.where(StartUserExam.class).findAllAsync();
-        String queID = startUserExams.get(0).getAllQuestions().get(position).getQuestionId();
+        final String queID = startUserExams.get(0).getAllQuestions().get(position).getQuestionId();
 
         try {
 
@@ -432,6 +478,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
                     JSONObject mJsonObject1 = new JSONObject(examQuestionData1.get(0).getQuestionData());
                     String timeSpent = mJsonObject1.getString("timeSpent");
                     Qsecs = Qsecs + Long.parseLong(timeSpent);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -465,57 +512,72 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             //   examQuestionData.setTokenId(getToken());
             //  User user = realm.where(User.class).findFirst();
             //  examQuestionData.setUserId(user.getUsrId());
-            mResponseSaveQuestionDataCall = apiInterface.updateQuestionData(getToken(), examQuestionData);
-            mResponseSaveQuestionDataCall.enqueue(new Callback<ResponseSaveQuestionData>() {
+            return examQuestionData;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void insertData(SaveUserExamQuestionData examQuestionData, int pos) {
+        try {
+            if (examQuestionData == null) {
+                examQuestionData = getAnswerBody(pos);
+            }
+            final SaveUserExamQuestionData finalExamQuestionData = examQuestionData;
+            realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
-                public void onResponse(Call<ResponseSaveQuestionData> call, Response<ResponseSaveQuestionData> response) {
-                    final ResponseSaveQuestionData mResponseSaveQuestionData = response.body();
-                    if (mResponseSaveQuestionData != null) {
-                        System.out.println("questionId :" + mResponseSaveQuestionData.getQuestionId());
-                        System.out.println("status :" + mResponseSaveQuestionData.getStatus());
-
-                        try {
-                            realm.executeTransactionAsync(new Realm.Transaction() {
-                                @Override
-                                public void execute(Realm realm) {
-                                    realm.insertOrUpdate(examQuestionData);
-                                    if (finish) {
-                                        finish = false;
-                                        getFinishExam();
-                                    }
-                                }
-                            }, new Realm.Transaction.OnSuccess() {
-                                @Override
-                                public void onSuccess() {
-                                    tbtn_review.setChecked(false);
-                                    enqueueJob("ew_" + SaveUserExamQuestionData.class.getSimpleName(), "app_table_pk");
-                                    getAnswerDatabase();
-                                }
-                            }, new Realm.Transaction.OnError() {
-                                @Override
-                                public void onError(Throwable error) {
-
-                                }
-                            });
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        } finally {
-
-                        }
+                public void execute(Realm realm) {
+                    realm.insertOrUpdate(finalExamQuestionData);
+                    if (finish) {
+                        finish = false;
+                        getFinishExam();
                     }
                 }
-
+            }, new Realm.Transaction.OnSuccess() {
                 @Override
-                public void onFailure(Call<ResponseSaveQuestionData> call, Throwable t) {
-                    System.out.println("onFailure");
-                    Utility.showMessage(t.getMessage());
+                public void onSuccess() {
+                    tbtn_review.setChecked(false);
+                    //  mEditor.clear();
+                    enqueueJob("ew_" + SaveUserExamQuestionData.class.getSimpleName(), "app_table_pk");
+                    getAnswerDatabase();
+                }
+            }, new Realm.Transaction.OnError() {
+                @Override
+                public void onError(Throwable error) {
+                    Log.v(TAG, "Realm error : " + error.getMessage().toString());
+                    Toast.makeText(TestActivity1.this, "" + error.getMessage().toString(), Toast.LENGTH_SHORT).show();
                 }
             });
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+
         }
+    }
+
+    private void UpdateQuestionData(final int position) {
+        ApiInterface apiInterface = ServiceGenerator.createServiceWithCache(ApiInterface.class);
+        final SaveUserExamQuestionData examQuestionData = getAnswerBody(position);
+        mResponseSaveQuestionDataCall = apiInterface.updateQuestionData(getToken(), examQuestionData);
+        mResponseSaveQuestionDataCall.enqueue(new Callback<ResponseSaveQuestionData>() {
+            @Override
+            public void onResponse(Call<ResponseSaveQuestionData> call, Response<ResponseSaveQuestionData> response) {
+                final ResponseSaveQuestionData mResponseSaveQuestionData = response.body();
+                if (mResponseSaveQuestionData != null) {
+                    System.out.println("questionId :" + mResponseSaveQuestionData.getQuestionId());
+                    System.out.println("status :" + mResponseSaveQuestionData.getStatus());
+                    insertData(examQuestionData, -1);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSaveQuestionData> call, Throwable t) {
+                System.out.println("onFailure");
+                Utility.showMessage(t.getMessage());
+            }
+        });
     }
 
     private void enqueueJob(String table_name, String _id) {
@@ -557,20 +619,10 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
                         @Override
                         public void execute(Realm realm) {
 
-                            //  UserTestList newsListObj = new UserTestList();
-                            // newsListObj.setStartUserExams((RealmList<StartUserExam>) userExamList);
                             realm.delete(StartUserExam.class);
                             realm.insertOrUpdate(userExamList.get(0));
                             if (startNew) {
                                 realm.delete(SaveUserExamQuestionData.class);
-                            } else {
-                              /* saveUserExamQuestionDataRealmResults = realm.where(SaveUserExamQuestionData.class).findAll();
-                                if (saveUserExamQuestionDataRealmResults.size() > 0) {
-                                    for(int i=0; i<saveUserExamQuestionDataRealmResults.size(); i++)
-                                    {
-                                      System.out.println("QuestionID :"+saveUserExamQuestionDataRealmResults.get(i).getQuestionId());
-                                    }
-                                }*/
                             }
                         }
                     });
@@ -603,12 +655,10 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
 
 
                                 realm.delete(FinishUserExam.class);
-
+                                realm.delete(SaveUserExamQuestionData.class);
                                 for (int i = 0; i < mfinishUserExam.length; i++) {
                                     realm.insertOrUpdate(mfinishUserExam[i]);
                                 }
-
-
                                 Intent mIntent = new Intent(TestActivity1.this, DisplayTestResultActivity.class);
                                 startActivity(mIntent);
                                 finish();
@@ -626,6 +676,19 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
             }
         });
     }
+
+  /*  @Override
+    public void setAnswers(String key, String value) {
+        if (key.equalsIgnoreCase("strOpt1")) {
+            strOpt1 = value;
+        } else if (key.equalsIgnoreCase("strOpt2")) {
+            strOpt2 = value;
+        } else if (key.equalsIgnoreCase("strOpt3")) {
+            strOpt3 = value;
+        } else if (key.equalsIgnoreCase("strOpt4")) {
+            strOpt4 = value;
+        }
+    }*/
 
 
   /*  private void setFinishExamLister()
@@ -693,9 +756,7 @@ public class TestActivity1 extends AppCompatActivity implements OneFragment.GetP
         public Fragment getItem(int position) {
 
             DisplayQuestionFragment fragment = DisplayQuestionFragment.newInstance(userExam.getAllQuestions().get(position));
-            //  Log.v("TestActivity1: ","getLst_mark_review :"+fragment.getLst_mark_review(position));
-            // Log.v("TestActivity1: ","getLst_spent_time :"+fragment.getLst_spent_time(position));
-
+            fragment.setPosition(position);
             return fragment;
         }
 
